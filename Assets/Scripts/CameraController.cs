@@ -11,6 +11,7 @@ public class CameraController : MonoBehaviour
 
     public Camera cam;
     public float widthMagnify;
+    public float height;
     void Awake()
     {
         instance = this;
@@ -26,6 +27,7 @@ public class CameraController : MonoBehaviour
                 float ratio = (float)Screen.height / Screen.width;
 
                 widthMagnify = ratio;
+                height = 2 * ratio;
                 cam.orthographicSize = widthMagnify;
                 transform.position = new Vector3(0, ratio, -10);
             }
