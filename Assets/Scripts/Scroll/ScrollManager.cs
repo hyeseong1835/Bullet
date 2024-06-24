@@ -11,6 +11,7 @@ public interface IScroll
 public class ScrollManager : MonoBehaviour
 {
     public static ScrollManager instance;
+
     public ScrollLayer[] scrollLayerArray;
 
     public float speed = 1;
