@@ -1,5 +1,6 @@
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.UI;
 
 [ExecuteAlways]
 [RequireComponent(typeof(Camera))]
@@ -9,8 +10,8 @@ public class CameraController : MonoBehaviour
 
     public Camera cam;
     
-    public float widthMagnify;
-    public float height;
+    public float height = 5;
+    public float width = 2;
 
     void Awake()
     {
@@ -34,9 +35,16 @@ public class CameraController : MonoBehaviour
 
             float ratio = (float)Screen.height / Screen.width;
 
-            height = 2 * ratio / widthMagnify;
-            cam.orthographicSize = ratio / widthMagnify;
-            transform.position = new Vector3(0, ratio / widthMagnify, -10);
+            if (ratio < height / width)
+            {
+                cam.orthographicSize = 0.5f * height;
+                transform.position = new Vector3(0, cam.orthographicSize, -10);
+            }
+            else
+            {
+                cam.orthographicSize = ratio / (0.5f * width);
+                transform.position = new Vector3(0, ratio / (0.5f * width), -10);
+            }
         }
         #endif
     }
