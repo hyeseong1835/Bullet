@@ -44,27 +44,27 @@ public class PlayerController : MonoBehaviour
     }
     void WallCollide()
     {
-        Vector2 offset = new Vector2(-0.5f * moveLockSize.x - moveLockCenter.x, -0.5f * moveLockSize.y - moveLockCenter.y);
-       
+        float offset;
+
         //¿ì
-        if (transform.position.x > 1 + offset.x)
+        if (transform.position.x > (offset = 1 - 0.5f * moveLockSize.x - moveLockCenter.x))
         {
-            transform.position = new Vector3(1 + offset.x, transform.position.y, transform.position.z);
+            transform.position = new Vector3(offset, transform.position.y, transform.position.z);
         }
         //ÁÂ
-        else if(transform.position.x < -1 - offset.x)
+        else if(transform.position.x < (offset = -1 + 0.5f * moveLockSize.x - moveLockCenter.x))
         {
-            transform.position = new Vector3(-1 - offset.x, transform.position.y, transform.position.z);
+            transform.position = new Vector3(offset, transform.position.y, transform.position.z);
         }
         //À§
-        if (transform.position.y > cam.height + offset.y)
+        if (transform.position.y > (offset = cam.height - 0.5f * moveLockSize.y - moveLockCenter.y))
         {
-            transform.position = new Vector3(transform.position.x, cam.height + offset.y, transform.position.z);
+            transform.position = new Vector3(transform.position.x, offset, transform.position.z);
         }
         //¾Æ·¡
-        else if (transform.position.y < -offset.y)
+        else if (transform.position.y < (offset = 0.5f * moveLockSize.y - moveLockCenter.y))
         {
-            transform.position = new Vector3(transform.position.x, -offset.y, transform.position.z);
+            transform.position = new Vector3(transform.position.x, offset, transform.position.z);
         }
     }
     void OnDrawGizmosSelected()

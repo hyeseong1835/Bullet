@@ -11,10 +11,9 @@ public class CameraController : MonoBehaviour
 {
     public static CameraController instance;
 
-    public Camera screenCam;
-    public Camera gameCam;
+    public Camera cam;
     public Canvas canvas;
-    public RectTransform sceneRectTransform;
+    public RectTransform gameViewRectTransform;
     
     public float widthMagnify;
     public float height;
@@ -34,17 +33,18 @@ public class CameraController : MonoBehaviour
         else
         {
             if (instance == null) instance = this;
+            if (cam == null) cam = GetComponent<Camera>();
 
             float ratio = (float)Screen.height / Screen.width;
 
-            widthMagnify = ratio;
-            height = 2 * ratio;
-            screenCam.orthographicSize = widthMagnify;
-            transform.position = new Vector3(0, ratio, -10);
+            height = 2 * ratio / widthMagnify;
+            cam.orthographicSize = ratio / widthMagnify;
+            transform.position = new Vector3(0, ratio / widthMagnify, -10);
         }
     }
     void OnDrawGizmos()
     {
-
+        Gizmos.color = Color.white;
+        Gizmos.DrawWireCube(new Vector2(0, 0.5f * height), new Vector2(2, height));
     }
 }
