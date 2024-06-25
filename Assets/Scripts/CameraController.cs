@@ -12,8 +12,6 @@ public class CameraController : MonoBehaviour
     public static CameraController instance;
 
     public Camera cam;
-    public Canvas canvas;
-    public RectTransform gameViewRectTransform;
     
     public float widthMagnify;
     public float height;
@@ -24,11 +22,14 @@ public class CameraController : MonoBehaviour
     }
     void Update()
     {
+        #if UNITY_EDITOR
         if (EditorApplication.isPlaying)
         {
-            
-            
-            return;
+        #endif
+
+
+
+        #if UNITY_EDITOR
         }
         else
         {
@@ -41,6 +42,7 @@ public class CameraController : MonoBehaviour
             cam.orthographicSize = ratio / widthMagnify;
             transform.position = new Vector3(0, ratio / widthMagnify, -10);
         }
+        #endif
     }
     void OnDrawGizmos()
     {

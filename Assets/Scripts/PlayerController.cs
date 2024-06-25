@@ -11,17 +11,22 @@ public class PlayerController : MonoBehaviour
 
     public Rigidbody2D rigid;
     public Collider2D coll;
-    public float speed = 1;
 
-    public int hp = 3;
-    public Vector2 moveLockSize;
-    public Vector2 moveLockCenter;
+    [SerializeField] float hp = 3;
+    [SerializeField] float speed = 1;
+    
+    [SerializeField] Vector2 moveLockSize;
+    [SerializeField] Vector2 moveLockCenter;
+
+    [SerializeField] Pool bulletPool;
 
     void Awake()
     {
         instance = this;
         rigid = GetComponent<Rigidbody2D>();
         coll = GetComponent<Collider2D>();
+
+        bulletPool.Init();
     }
     void Update()
     {
@@ -32,13 +37,31 @@ public class PlayerController : MonoBehaviour
         }
         Move();
         WallCollide();
+
+        if (Input.GetMouseButtonDown(0))
+        {
+            bulletPool.Use().transform.position = transform.position;
+        }
+        for (int bulletIndex = 0; bulletIndex < bulletPool.count; bulletIndex++)
+        {
+            GameObject bullet = bulletPool.pool[bulletIndex];
+
+            if (bullet.activeInHierarchy)
+            {
+                bullet.transform.position += Vector3.up * 1 * Time.deltaTime;
+                if (bullet.transform.position.y > cam.height)
+                {
+                    bulletPool.DeUse(ref bullet);
+                }
+            }
+        }
     }
     void Move()
     {
         Vector3 input = new Vector3(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"), 0);
         transform.Translate(input.normalized * speed * Time.deltaTime);
     }
-    public void Hit(int damage)
+    public void Hit(float damage)
     {
         hp -= damage;
     }
