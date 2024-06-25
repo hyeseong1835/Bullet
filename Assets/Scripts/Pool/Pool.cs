@@ -50,8 +50,12 @@ public class Pool
     [HideInInspector] public List<GameObject> pool = new List<GameObject>();
     [HideInInspector] public List<WaitDestroyElement> waitDestroy = new List<WaitDestroyElement>();//-|
 
-    public void Init()
+    [SerializeField] Action<GameObject> addEvent;
+
+    public void Init(Action<GameObject> addEvent)
     {
+        this.addEvent = addEvent;
+
         holder = new GameObject(prefab.name).transform;
         holder.SetParent(PoolHolder.instance.transform);
 
@@ -95,7 +99,7 @@ public class Pool
         //모두 사용 중일 때
         return Add();
     }
-    public GameObject DeUse(ref GameObject obj)
+    public GameObject DeUse(GameObject obj)
     {
         //초과 상태일 때
         if (count > stayCount)
@@ -117,6 +121,7 @@ public class Pool
     public GameObject Add()
     {
         GameObject obj = UnityEngine.Object.Instantiate(prefab, holder);
+        addEvent(obj);
         pool.Add(obj);
         return obj;
     }
