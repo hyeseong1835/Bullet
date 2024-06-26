@@ -22,16 +22,22 @@ public class ScrollManager : MonoBehaviour
     }
     void Update()
     {
-        if (EditorApplication.isPlaying)
-        {
-            Scroll(speed * Time.deltaTime);
-        }
-        else
+#if UNITY_EDITOR
+        if (EditorApplication.isPlaying == false)
         {
             transform.position = Vector3.zero;
 
             SetScrollLayerArray();
         }
+        else 
+        {
+#endif
+
+            Scroll(speed * Time.deltaTime);
+
+#if UNITY_EDITOR
+        }
+#endif
 
     }
     public void Scroll(float scroll)

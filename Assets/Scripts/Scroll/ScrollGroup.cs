@@ -16,17 +16,15 @@ public class ScrollGroup : MonoBehaviour, IScroll
 
     void Update()
     {
-        if (EditorApplication.isPlaying)
-        {
-
-        }
-        else
+#if UNITY_EDITOR
+        if (EditorApplication.isPlaying == false)
         {
             transform.position = Vector3.zero;
             if (layer == null) layer = transform.parent.GetComponent<ScrollLayer>();
-            
+
             SetElementArray();
         }
+#endif
     }
     public void Scroll(float scroll)
     {

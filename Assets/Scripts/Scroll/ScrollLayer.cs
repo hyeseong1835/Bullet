@@ -18,11 +18,8 @@ public class ScrollLayer : MonoBehaviour
     }
     void Update()
     {
-        if (EditorApplication.isPlaying)
-        {
-
-        }
-        else
+#if UNITY_EDITOR
+        if (EditorApplication.isPlaying == false)
         {
             transform.position = Vector3.zero;
             if (scrollManager == null) ScrollManager.instance = transform.parent.GetComponent<ScrollManager>();
@@ -33,6 +30,7 @@ public class ScrollLayer : MonoBehaviour
                 Debug.LogWarning("Speed cannot be less than 0");
             }
         }
+#endif
     }
     public void Scroll(float scroll)
     {
