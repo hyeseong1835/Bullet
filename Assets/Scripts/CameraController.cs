@@ -34,7 +34,7 @@ public class CameraController : MonoBehaviour
     void Refresh()
     {
         float ratio = (float)Screen.height / Screen.width;
-
+        
         if (ratio < height / width)
         {
             cam.orthographicSize = 0.5f * height;

@@ -3,27 +3,23 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-public class EnemyController : Entity
+public class EnemyController : Enemy
 {
     public EnemyControllerData data;
-    public override EntityData EntityData => data;
+    public override EnemyData EnemyData => data;
 
     [SerializeField] float move;
 
-    // Start is called before the first frame update
     void Start()
     {
         move = data.speed;
     }
 
-    // Update is called once per frame
-    void Update()
+    new void Update()
     {
+        base.Update();
 #if UNITY_EDITOR
-        if (EditorApplication.isPlaying == false)
-        {
-            gameObject.layer = LayerMask.NameToLayer("Enemy");
-        }
+        if (EditorApplication.isPlaying == false) return;
 #endif
         Move();
     }

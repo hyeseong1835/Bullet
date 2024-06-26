@@ -1,0 +1,27 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+[Serializable]
+public struct DropInfo
+{
+    public GameObject prefab;
+    public float ratio;
+}
+[ExecuteAlways]
+public abstract class EnemyData : EntityData
+{
+    public List<DropInfo> drops = new List<DropInfo>();
+    public float ratioMax;
+
+    void OnValidate()
+    {
+        ratioMax = 0;
+
+        foreach (DropInfo drop in drops)
+        {
+            ratioMax += drop.ratio;
+        }
+    }
+}

@@ -18,7 +18,11 @@ public abstract class Entity : MonoBehaviour
 
         if (hp <= 0)
         {
-            Destroy(gameObject);
+            OnDead();
         }
+    }
+    protected virtual void OnDead()
+    {
+        Destroy(gameObject);
     }
 }
