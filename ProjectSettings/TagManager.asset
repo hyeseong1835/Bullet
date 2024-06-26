@@ -25,7 +25,7 @@ TagManager:
   - 
   - 
   - 
-  - 
+  - Item
   - 
   - 
   - 
@@ -40,4 +40,22 @@ TagManager:
   m_SortingLayers:
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: BackGround
+    uniqueID: 2075138613
+    locked: 0
+  - name: Enemy
+    uniqueID: 110878141
+    locked: 0
+  - name: Player
+    uniqueID: 1261475667
+    locked: 0
+  - name: Item
+    uniqueID: 290645037
+    locked: 0
+  - name: Bullet
+    uniqueID: 3232508219
+    locked: 0
+  - name: UI
+    uniqueID: 3790274889
     locked: 0

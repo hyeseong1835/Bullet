@@ -1,11 +1,18 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
+[ExecuteAlways]
 [RequireComponent(typeof(Rigidbody2D), typeof(Collider2D))]
 public class Bullet : MonoBehaviour
 {
+#if UNITY_EDITOR
+    enum BulletType
+    {
+        Player,
+        Enemy
+    }
+    [SerializeField] BulletType bulletType = BulletType.Enemy;
+#endif
     Action<Bullet, Collider2D> enterEvent;
     Action<Bullet, Collider2D> stayEvent;
     Action<Bullet, Collider2D> exitEvent;
@@ -15,6 +22,22 @@ public class Bullet : MonoBehaviour
         enterEvent = enter;
         stayEvent = stay;
         exitEvent = exit;
+    }
+    void Update()
+    {
+#if UNITY_EDITOR
+        if (Application.isPlaying == false)
+        {
+            if (bulletType == BulletType.Player) gameObject.layer = LayerMask.NameToLayer("PlayerBullet");
+            else if (bulletType == BulletType.Enemy) gameObject.layer = LayerMask.NameToLayer("EnemyBullet");
+
+            Rigidbody2D rigid = GetComponent<Rigidbody2D>();
+            rigid.bodyType = RigidbodyType2D.Kinematic;
+
+            CircleCollider2D collider = GetComponent<CircleCollider2D>();
+            collider.isTrigger = true;
+        }
+#endif
     }
 
     void OnTriggerEnter2D(Collider2D collision)

@@ -1,40 +1,63 @@
 using UnityEditor;
 using UnityEngine;
 
+[ExecuteAlways]
 [RequireComponent(typeof(Rigidbody2D), typeof(Collider2D))]
 public class PlayerController : Entity
 {
+    public PlayerControllerData data;
+    public override EntityData EntityData => data;
+
     public static PlayerController instance;
     static CameraController cam => CameraController.instance;
 
     [HideInInspector] public Rigidbody2D rigid;
     [HideInInspector] public Collider2D coll;
 
+    public Inventory inventory;
+
     [SerializeField] float speed = 1;
-    
-    [SerializeField] Vector2 moveLockSize;
-    [SerializeField] Vector2 moveLockCenter;
+
+    [SerializeField] Box moveLock;
 
     [SerializeField] Pool bulletPool;
     [SerializeField] float bulletSpeed = 5;
 
     void Awake()
     {
+#if UNITY_EDITOR
+        if (EditorApplication.isPlaying == false)
+        {
+            return;
+        }
+#endif
         instance = this;
+        inventory = GetComponent<Inventory>();
         rigid = GetComponent<Rigidbody2D>();
         coll = GetComponent<Collider2D>();
     }
     void Start()
     {
+#if UNITY_EDITOR
+        if (EditorApplication.isPlaying == false)
+        {
+            return;
+        }
+#endif
         bulletPool.Init((obj) => obj.GetComponent<Bullet>().Initialize(enter: BulletEnter));
     }
     void Update()
     {
+#if UNITY_EDITOR
         if (EditorApplication.isPlaying == false)
         {
             if (instance == null) instance = this;
+
+            gameObject.layer = LayerMask.NameToLayer("Player");
+
             return;
         }
+#endif
         Move();
         WallCollide();
 
@@ -66,22 +89,22 @@ public class PlayerController : Entity
         float offset;
 
         //¿ì
-        if (transform.position.x > (offset = 1 - 0.5f * moveLockSize.x - moveLockCenter.x))
+        if (transform.position.x > (offset = 1 - 0.5f * moveLock.size.x - moveLock.center.x))
         {
             transform.position = new Vector3(offset, transform.position.y, transform.position.z);
         }
         //ÁÂ
-        else if(transform.position.x < (offset = -1 + 0.5f * moveLockSize.x - moveLockCenter.x))
+        else if(transform.position.x < (offset = -1 + 0.5f * moveLock.size.x - moveLock.center.x))
         {
             transform.position = new Vector3(offset, transform.position.y, transform.position.z);
         }
         //À§
-        if (transform.position.y > (offset = cam.height - 0.5f * moveLockSize.y - moveLockCenter.y))
+        if (transform.position.y > (offset = cam.height - 0.5f * moveLock.size.y - moveLock.center.y))
         {
             transform.position = new Vector3(transform.position.x, offset, transform.position.z);
         }
         //¾Æ·¡
-        else if (transform.position.y < (offset = 0.5f * moveLockSize.y - moveLockCenter.y))
+        else if (transform.position.y < (offset = 0.5f * moveLock.size.y - moveLock.center.y))
         {
             transform.position = new Vector3(transform.position.x, offset, transform.position.z);
         }
@@ -96,6 +119,6 @@ public class PlayerController : Entity
     void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.green;
-        Gizmos.DrawWireCube((Vector2)transform.position + moveLockCenter, moveLockSize);
+        Gizmos.DrawWireCube((Vector2)transform.position + moveLock.center, moveLock.size);
     }
 }
