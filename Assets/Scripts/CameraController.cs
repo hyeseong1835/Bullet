@@ -38,12 +38,12 @@ public class CameraController : MonoBehaviour
         if (ratio < height / width)
         {
             cam.orthographicSize = 0.5f * height;
-            transform.position = new Vector3(0, cam.orthographicSize, -10);
+            transform.position = new Vector3(transform.position.x, cam.orthographicSize, transform.position.z);
         }
-        else
+        else//ratio / width == 0.5
         {
-            cam.orthographicSize = ratio / (0.5f * width);
-            transform.position = new Vector3(0, ratio / (0.5f * width), -10);
+            cam.orthographicSize = 0.5f * ratio * width;
+            transform.position = new Vector3(transform.position.x, cam.orthographicSize, transform.position.z);
         }
     }
     void OnDrawGizmos()
