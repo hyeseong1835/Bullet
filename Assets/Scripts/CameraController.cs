@@ -1,5 +1,6 @@
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 
 [ExecuteAlways]
@@ -14,6 +15,12 @@ public class CameraController : MonoBehaviour
     public float height = 5;
     public float width = 2;
 
+    public float screenRatio;
+    public float pixelPerUnit;
+    float prevScreenRatio;
+
+    public UnityEvent onScreenRatioChangeEvent;
+
     void Awake()
     {
         instance = this;
@@ -23,6 +30,16 @@ public class CameraController : MonoBehaviour
     }
     void Update()
     {
+        screenRatio = (float)Screen.height / Screen.width;
+
+        if (screenRatio != prevScreenRatio)
+        {
+            Refresh();
+            onScreenRatioChangeEvent.Invoke();
+        }
+
+        prevScreenRatio = screenRatio;
+
 #if UNITY_EDITOR
 
         instance = this;
@@ -32,17 +49,17 @@ public class CameraController : MonoBehaviour
     }
     void Refresh()
     {
-        float ratio = (float)Screen.height / Screen.width;
-        
-        if (ratio < height / width)
+        if (screenRatio < height / width)
         {
             cam.orthographicSize = 0.5f * height;
             transform.position = new Vector3(transform.position.x, 0.5f * height, transform.position.z);
+            pixelPerUnit = Screen.height / height;
         }
-        else//ratio / width == 0.5
+        else
         {
-            cam.orthographicSize = 0.5f * ratio * width;
-            transform.position = new Vector3(transform.position.x, 0.5f * ratio * width, transform.position.z);
+            cam.orthographicSize = 0.5f * screenRatio * width;
+            transform.position = new Vector3(transform.position.x, 0.5f * screenRatio * width, transform.position.z);
+            pixelPerUnit = Screen.width / width;
         }
     }
     void OnValidate()

@@ -70,7 +70,7 @@ public class Pool
         {
             if (gameObject == null)
             {
-                Debug.Log("pool 공란 제거");
+                Debug.LogWarning("Pool has null element");
                 pool.Remove(gameObject);
                 continue;
             }
@@ -87,7 +87,7 @@ public class Pool
             GameObject obj = element.obj;
             if (obj == null)
             {
-                Debug.Log("waitDestroy 공란 제거");
+                Debug.LogWarning("Pool has null element");
                 return Use();
             }
             obj.SetActive(true);

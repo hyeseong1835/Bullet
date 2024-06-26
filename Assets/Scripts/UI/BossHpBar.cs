@@ -2,45 +2,44 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.UI;
 
-[ExecuteAlways]
-public class BossHpBar : MonoBehaviour
+[RequireComponent(typeof(Slider))]
+public class HpBar : MonoBehaviour
 {
-    public static BossHpBar instance;
-
     public Entity target;
-    [SerializeField] Transform fillSprite;
-    [SerializeField] Transform backGroundSprite;
+    Slider slider;
 
     void Awake()
     {
-        instance = this;
+        slider = GetComponent<Slider>();
     }
     void Update()
     {
-
-#if UNITY_EDITOR
-        if (EditorApplication.isPlaying == false)
-        {
-            if (instance == null) instance = this;
-
-            gameObject.layer = LayerMask.NameToLayer("Enemy");
-        }
-#endif
+        Refresh();
+    }
+    void Refresh()
+    {
         if (target == null)
         {
-            fillSprite.gameObject.SetActive(false);
-            backGroundSprite.gameObject.SetActive(false);
+            for (int i = 0; i < transform.childCount; i++)
+            {
+                transform.GetChild(i).gameObject.SetActive(false);
+            }
         }
         else
         {
-            fillSprite.gameObject.SetActive(true);
-            backGroundSprite.gameObject.SetActive(true);
-
-            float fill = target.hp / target.EntityData.maxHp;
-
-            fillSprite.transform.localPosition = new Vector3(-0.5f * (1 - fill), 0, 0);
-            fillSprite.transform.localScale = new Vector3(fill, 1, 1);
+            for (int i = 0; i < transform.childCount; i++)
+            {
+                transform.GetChild(i).gameObject.SetActive(true);
+            }
+            slider.value = target.hp / target.EntityData.maxHp;
         }
+    }
+    void OnValidate()
+    {
+        slider = GetComponent<Slider>();
+
+        Refresh();
     }
 }
