@@ -16,13 +16,13 @@ public class PlayerController : Entity
     [SerializeField] Vector2 moveLockCenter;
 
     [SerializeField] Pool bulletPool;
+    [SerializeField] float bulletSpeed = 5;
 
     void Awake()
     {
         instance = this;
         rigid = GetComponent<Rigidbody2D>();
         coll = GetComponent<Collider2D>();
-
     }
     void Start()
     {
@@ -48,7 +48,7 @@ public class PlayerController : Entity
 
             if (bulletObj.activeInHierarchy)
             {
-                bulletObj.transform.position += Vector3.up * 1 * Time.deltaTime;
+                bulletObj.transform.position += Vector3.up * bulletSpeed * Time.deltaTime;
                 if (bulletObj.transform.position.y > cam.height + 1)
                 {
                     bulletPool.DeUse(bulletObj);
