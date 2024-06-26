@@ -25,6 +25,8 @@ public abstract class Enemy : Entity
         {
             if (random <= drop.ratio)
             {
+                if (drop.prefab == null) break;
+
                 GameObject itemInstance = Instantiate(drop.prefab);
                 itemInstance.transform.position = transform.position;
                 break;

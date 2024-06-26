@@ -9,26 +9,25 @@ public class CameraController : MonoBehaviour
     public static CameraController instance;
 
     public Camera cam;
-    
+    [SerializeField] LetterBox letterBox;
+
     public float height = 5;
     public float width = 2;
 
     void Awake()
     {
         instance = this;
+        cam = GetComponent<Camera>();
+
         Refresh();
     }
     void Update()
     {
 #if UNITY_EDITOR
-        if (EditorApplication.isPlaying == false)
-        {
-            
-        }
-        if (instance == null) instance = this;
-        if (cam == null) cam = GetComponent<Camera>();
 
+        instance = this;
         Refresh();
+
 #endif
     }
     void Refresh()
@@ -45,6 +44,11 @@ public class CameraController : MonoBehaviour
             cam.orthographicSize = 0.5f * ratio * width;
             transform.position = new Vector3(transform.position.x, cam.orthographicSize, transform.position.z);
         }
+    }
+    void OnValidate()
+    {
+        instance = this;
+        letterBox.Refresh();
     }
     void OnDrawGizmos()
     {
