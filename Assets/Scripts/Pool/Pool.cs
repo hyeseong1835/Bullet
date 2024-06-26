@@ -8,26 +8,24 @@ public class WaitDestroyElement
 {
     PoolHolder coroutineRunner => PoolHolder.instance;
 
-    Pool pool;
     public GameObject obj;
     
     Coroutine destroyCoroutine;
 
     public WaitDestroyElement(Pool pool, GameObject obj)
     {
-        this.pool = pool;
         this.obj = obj;
         
-        destroyCoroutine = coroutineRunner.StartCoroutine(DelayDestroy());
+        destroyCoroutine = coroutineRunner.StartCoroutine(DelayDestroy(pool, pool.destroyDelay));
     }
-    IEnumerator DelayDestroy()
+    IEnumerator DelayDestroy(Pool pool, float delay)
     {
-        yield return new WaitForSeconds(pool.destroyDelay);
+        yield return new WaitForSeconds(delay);
 
         UnityEngine.Object.Destroy(obj);
         pool.waitDestroy.Remove(this);
     }
-    public void CancelDestroy()
+    public void CancelDestroy(Pool pool)
     {
         coroutineRunner.StopCoroutine(destroyCoroutine);
         pool.pool.Add(obj);
@@ -93,7 +91,7 @@ public class Pool
                 return Use();
             }
             obj.SetActive(true);
-            element.CancelDestroy();
+            element.CancelDestroy(this);
             return obj;
         }
         //모두 사용 중일 때
