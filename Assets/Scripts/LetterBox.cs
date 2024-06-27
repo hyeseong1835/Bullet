@@ -1,7 +1,6 @@
 using UnityEngine;
-using System;
-using System.Linq;
-public class LetterBox : MonoBehaviour
+
+public class LetterBox : MonoBehaviour, IOnWindowValidateReceiver
 {
     public Transform top, bottom, right, left;
     [SerializeField] float size;
@@ -20,7 +19,7 @@ public class LetterBox : MonoBehaviour
         left.position = new Vector3(-0.5f * Window.ScreenWidth - 0.5f * size, 0.5f * Window.ScreenHeight, 0);
         left.localScale = new Vector3(size, Window.ScreenHeight + 2 * size, 1);
     }
-    void OnValidate()
+    public void OnWindowValidate()
     {
         Refresh();
     }

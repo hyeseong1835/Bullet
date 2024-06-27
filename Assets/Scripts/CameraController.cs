@@ -1,7 +1,7 @@
 using UnityEngine;
 
 [RequireComponent(typeof(Camera))]
-public class CameraController : MonoBehaviour
+public class CameraController : MonoBehaviour, IOnScreenResizedReceiver
 {
     public static CameraController instance;
     public Camera cam;
@@ -25,5 +25,15 @@ public class CameraController : MonoBehaviour
     void OnValidate()
     {
         instance = this;
+    }
+    public void OnScreenResized()
+    {
+        Vector3 camPos = cam.transform.position;
+        
+        if (Window.isDriveHeight) camPos.y = 0.5f * Window.ScreenHeight;
+        else camPos.y = 0.5f * Window.windowRatio * Window.ScreenWidth;
+
+        cam.transform.position = camPos;
+        cam.orthographicSize = camPos.y;
     }
 }

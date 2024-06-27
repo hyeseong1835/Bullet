@@ -1,14 +1,23 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
+public interface IOnWindowValidateReceiver
+{
+    void OnWindowValidate();
+}
+public interface IOnScreenResizedReceiver
+{
+    public void OnScreenResized();
+}
 [ExecuteAlways]
 public class Window : MonoBehaviour
 {
     public static Window instance;
-    static CameraController cam => CameraController.instance;
     public Canvas windowCanvas;
     public RectTransform screenRect;
     public RectTransform gameRect;
@@ -43,11 +52,11 @@ public class Window : MonoBehaviour
 
     public float scaleFactor = 1024;
 
-    public float pixelPerUnit { get; private set; }
+    public static float pixelPerUnit { get; private set; }
 
-    public bool isDriveHeight { get; private set; }
+    public static bool isDriveHeight { get; private set; }
 
-    public Action onScreenResized;
+    IOnScreenResizedReceiver[] onScreenResizedReceivers;
 
     float prevWindowHeight;
     float prevWindowWidth;
@@ -56,13 +65,13 @@ public class Window : MonoBehaviour
     {
         instance = this;
 
-        screenRatio = screenWidth / screenHeight;
+        screenRatio = screenHeight / screenWidth;
         screenUp = screenHeight;
         screenDown = 0;
         screenRight = 0.5f * screenWidth;
         screenLeft = -0.5f * screenWidth;
 
-        gameRatio = gameWidth / gameHeight;
+        gameRatio = gameHeight / gameWidth;
         gameUp = gameHeight;
         gameDown = 0;
         gameRight = 0.5f * gameWidth;
@@ -80,7 +89,10 @@ public class Window : MonoBehaviour
             
             Refresh();
 
-            if (onScreenResized.IsUnityNull() == false) onScreenResized.Invoke();
+            foreach (IOnScreenResizedReceiver receiver in onScreenResizedReceivers)
+            {
+                receiver.OnScreenResized();
+            }
 
             prevWindowHeight = WindowHeight;
             prevWindowWidth = WindowWidth;
@@ -92,23 +104,10 @@ public class Window : MonoBehaviour
 
         pixelPerUnit = isDriveHeight ? (WindowHeight / screenHeight) : (WindowWidth / screenWidth);
         
-        Vector2 camPos = cam.transform.position;
         float scale;
-        if (isDriveHeight)
-        {
-            camPos.y = 0.5f * screenHeight;
-
-            scale = WindowHeight / scaleFactor;
-        }
-        else
-        {
-            camPos.y = 0.5f * windowRatio * screenWidth;
-
-            scale = WindowWidth * screenRatio / scaleFactor;
-        }
-        cam.transform.position = camPos;
-        cam.cam.orthographicSize = camPos.y;
-
+        if (isDriveHeight) scale = WindowHeight / scaleFactor;
+        else scale = WindowWidth * screenRatio / scaleFactor;
+        
         canvasScaler.scaleFactor = scale;
 
         float factor = pixelPerUnit / scale;
@@ -122,5 +121,18 @@ public class Window : MonoBehaviour
     void OnValidate()
     {
         Set();
+
+        var onWindowValidaterecieverIt = FindObjectsOfType<MonoBehaviour>()
+                                                   .OfType<IOnWindowValidateReceiver>();
+
+        foreach (IOnWindowValidateReceiver receiver in onWindowValidaterecieverIt)
+        {
+            receiver.OnWindowValidate();
+        }
+
+        var onScreenResizedRecieverIt = FindObjectsOfType<MonoBehaviour>()
+                                                  .OfType<IOnScreenResizedReceiver>();
+
+        onScreenResizedReceivers = onScreenResizedRecieverIt.ToArray();
     }
 }
