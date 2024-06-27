@@ -1096,7 +1096,7 @@ Camera:
   far clip plane: 1000
   field of view: 34
   orthographic: 1
-  orthographic size: 3.6824644
+  orthographic size: 3.630841
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -1121,7 +1121,7 @@ Transform:
   m_GameObject: {fileID: 519420028}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 3.6824644, z: -10}
+  m_LocalPosition: {x: 0, y: 3.630841, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1141,13 +1141,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cam: {fileID: 519420031}
   letterBox: {fileID: 109920615}
-  screenRatio: 1.8412322
-  pixelPerUnit: 105.5
+  screenRatio: 1.8154205
+  pixelPerUnit: 107
   onScreenRatioChangeEvent:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 2142726285}
-        m_TargetAssemblyTypeName: GameCanvas, Assembly-CSharp
+      - m_Target: {fileID: 1337435775}
+        m_TargetAssemblyTypeName: Window, Assembly-CSharp
         m_MethodName: OnChangeScreenRatio
         m_Mode: 1
         m_Arguments:
@@ -1565,19 +1565,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1c7378e5b4aec034bb7e922a80c1fbd9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  damage: 0.1
-  cooltime: 0.5
-  canUse: 1
-  bulletPool:
-    prefab: {fileID: 4026119069186307829, guid: 13b6534241a59ae49bc5a91e4ed5be80, type: 3}
-    holder: {fileID: 0}
-    destroyDelay: 1
-    startCount: 5
-    stayCount: 5
-    pool: []
-    waitDestroy: []
-  bulletSpeed: 5
-  tip: {fileID: 2098546631}
 --- !u!1 &698708180
 GameObject:
   m_ObjectHideFlags: 0
@@ -1668,7 +1655,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &699863005
 Transform:
   m_ObjectHideFlags: 0
@@ -2162,10 +2149,8 @@ MonoBehaviour:
   moveLock:
     size: {x: 0.5, y: 0.5}
     center: {x: 0, y: 0.1}
-  weapon: {fileID: 2144339706}
-  autoWeaponList:
-  - {fileID: 656967651}
-  - {fileID: 1554272288}
+  weapon: {fileID: 0}
+  autoWeaponList: []
 --- !u!1 &1017030525
 GameObject:
   m_ObjectHideFlags: 0
@@ -2890,11 +2875,12 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1337435771}
+  - component: {fileID: 1337435775}
   - component: {fileID: 1337435774}
   - component: {fileID: 1337435773}
   - component: {fileID: 1337435772}
   m_Layer: 5
-  m_Name: Canvas
+  m_Name: Window Canvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2912,6 +2898,7 @@ RectTransform:
   m_LocalScale: {x: 0, y: 0, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 1530866301}
   - {fileID: 2142726284}
   m_Father: {fileID: 132257868}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -2951,7 +2938,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_UiScaleMode: 0
   m_ReferencePixelsPerUnit: 100
-  m_ScaleFactor: 0.5151367
+  m_ScaleFactor: 0.52246094
   m_ReferenceResolution: {x: 800, y: 600}
   m_ScreenMatchMode: 0
   m_MatchWidthOrHeight: 0
@@ -2983,6 +2970,27 @@ Canvas:
   m_SortingLayerID: -504692407
   m_SortingOrder: 0
   m_TargetDisplay: 0
+--- !u!114 &1337435775
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1337435770}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f622a0f462561a94aac09d21e5c0fcaf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  windowCanvas: {fileID: 1337435774}
+  screenRect: {fileID: 2142726284}
+  gameRect: {fileID: 1530866301}
+  canvasScaler: {fileID: 1337435773}
+  screenHeight: 5
+  screenWidth: 4
+  gameHeight: 5
+  gameWidth: 2
+  scaleFactor: 1024
 --- !u!1 &1345073588
 GameObject:
   m_ObjectHideFlags: 0
@@ -3219,6 +3227,41 @@ Transform:
   m_Children: []
   m_Father: {fileID: 436265670}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1530866300
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1530866301}
+  m_Layer: 5
+  m_Name: Game Canvas
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1530866301
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1530866300}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1337435771}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0}
+  m_AnchorMax: {x: 0.5, y: 0}
+  m_AnchoredPosition: {x: 0, y: 512}
+  m_SizeDelta: {x: 409.6, y: 1024}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1534860703
 GameObject:
   m_ObjectHideFlags: 0
@@ -3383,19 +3426,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1c7378e5b4aec034bb7e922a80c1fbd9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  damage: 0.1
-  cooltime: 0.5
-  canUse: 1
-  bulletPool:
-    prefab: {fileID: 4026119069186307829, guid: 13b6534241a59ae49bc5a91e4ed5be80, type: 3}
-    holder: {fileID: 0}
-    destroyDelay: 1
-    startCount: 5
-    stayCount: 5
-    pool: []
-    waitDestroy: []
-  bulletSpeed: 5
-  tip: {fileID: 1470123453}
 --- !u!1 &1563279745
 GameObject:
   m_ObjectHideFlags: 0
@@ -4233,9 +4263,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2142726284}
-  - component: {fileID: 2142726285}
   m_Layer: 5
-  m_Name: Game Canvas
+  m_Name: Screen Canvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4264,23 +4293,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 512}
   m_SizeDelta: {x: 819.2, y: 1024}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &2142726285
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2142726283}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f622a0f462561a94aac09d21e5c0fcaf, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  rect: {fileID: 2142726284}
-  canvasScaler: {fileID: 1337435773}
-  height: 5
-  width: 4
-  scaleFactor: 1024
 --- !u!1 &2144339704
 GameObject:
   m_ObjectHideFlags: 0
@@ -4326,19 +4338,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1c7378e5b4aec034bb7e922a80c1fbd9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  damage: 1
-  cooltime: 0.5
-  canUse: 1
-  bulletPool:
-    prefab: {fileID: 4026119069186307829, guid: 6c32088d52cab394db9e36aaf369b63e, type: 3}
-    holder: {fileID: 0}
-    destroyDelay: 1
-    startCount: 5
-    stayCount: 5
-    pool: []
-    waitDestroy: []
-  bulletSpeed: 5
-  tip: {fileID: 1797723409}
 --- !u!1001 &5990378196775089744
 PrefabInstance:
   m_ObjectHideFlags: 0

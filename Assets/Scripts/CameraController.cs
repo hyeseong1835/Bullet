@@ -8,10 +8,9 @@ using UnityEngine.UI;
 public class CameraController : MonoBehaviour
 {
     public static CameraController instance;
-
+    static Window Screen => Window.instance;
     public Camera cam;
     [SerializeField] LetterBox letterBox;
-    static GameCanvas GameCanvas => GameCanvas.instance;
 
     public float screenRatio;
     public float pixelPerUnit;
@@ -30,7 +29,7 @@ public class CameraController : MonoBehaviour
     }
     void Update()
     {
-        screenRatio = (float)Screen.height / Screen.width;
+        screenRatio = (float)Window.Height / Window.Width;
 
         if (screenRatio != prevScreenRatio)
         {
@@ -49,18 +48,18 @@ public class CameraController : MonoBehaviour
     }
     void Refresh()
     {
-        if (screenRatio < GameCanvas.height / GameCanvas.width)
+        if (screenRatio < Screen.screenHeight / Screen.screenWidth)
         {
-            cam.orthographicSize = 0.5f * GameCanvas.height;
-            transform.position = new Vector3(transform.position.x, 0.5f * GameCanvas.height, transform.position.z);
-            pixelPerUnit = Screen.height / GameCanvas.height;
+            cam.orthographicSize = 0.5f * Screen.screenHeight;
+            transform.position = new Vector3(transform.position.x, 0.5f * Screen.screenHeight, transform.position.z);
+            pixelPerUnit = Window.Height / Screen.screenHeight;
             isDriveHeight = true;
         }
         else
         {
-            cam.orthographicSize = 0.5f * screenRatio * GameCanvas.width;
-            transform.position = new Vector3(transform.position.x, 0.5f * screenRatio * GameCanvas.width, transform.position.z);
-            pixelPerUnit = Screen.width / GameCanvas.width;
+            cam.orthographicSize = 0.5f * screenRatio * Screen.screenWidth;
+            transform.position = new Vector3(transform.position.x, 0.5f * screenRatio * Screen.screenWidth, transform.position.z);
+            pixelPerUnit = Window.Width / Screen.screenWidth;
             isDriveHeight = false;
         }
     }
@@ -72,6 +71,6 @@ public class CameraController : MonoBehaviour
     void OnDrawGizmos()
     {
         Gizmos.color = Color.white;
-        Gizmos.DrawWireCube(new Vector2(0, 0.5f * GameCanvas.height), new Vector2(2, GameCanvas.height));
+        Gizmos.DrawWireCube(new Vector2(0, 0.5f * Screen.screenHeight), new Vector2(2, Screen.screenHeight));
     }
 }

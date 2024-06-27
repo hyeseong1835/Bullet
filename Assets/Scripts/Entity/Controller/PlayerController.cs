@@ -11,7 +11,7 @@ public class PlayerController : Entity
     public PlayerControllerData data;
     public override EntityData EntityData => data;
 
-    static GameCanvas GameCanvas => GameCanvas.instance;
+    static Window GameCanvas => Window.instance;
     static GameManager Game => GameManager.instance;
 
     [HideInInspector] public Rigidbody2D rigid;
@@ -54,28 +54,8 @@ public class PlayerController : Entity
     }
     void WallCollide()
     {
-        float offset;
-
-        //¿ì
-        if (transform.position.x > (offset = 1 - 0.5f * moveLock.size.x - moveLock.center.x))
-        {
-            transform.position = new Vector3(offset, transform.position.y, transform.position.z);
-        }
-        //ÁÂ
-        else if(transform.position.x < (offset = -1 + 0.5f * moveLock.size.x - moveLock.center.x))
-        {
-            transform.position = new Vector3(offset, transform.position.y, transform.position.z);
-        }
-        //À§
-        if (transform.position.y > (offset = GameCanvas.height - 0.5f * moveLock.size.y - moveLock.center.y))
-        {
-            transform.position = new Vector3(transform.position.x, offset, transform.position.z);
-        }
-        //¾Æ·¡
-        else if (transform.position.y < (offset = 0.5f * moveLock.size.y - moveLock.center.y))
-        {
-            transform.position = new Vector3(transform.position.x, offset, transform.position.z);
-        }
+        Vector3 contact;
+        if (moveLock.IsContactGame(transform.position, out contact)) transform.position = contact;
     }
     void UseWeapon()
     {
