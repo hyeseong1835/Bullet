@@ -1,35 +1,21 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 public class Shooter : Weapon
 {
-    [SerializeField] Pool bulletPool;
-    [SerializeField] float bulletSpeed;
-    [SerializeField] Transform tip;
+    public ShooterData data;
+    public override WeaponData WeaponData => data;
 
-    void Start()
-    {
-        bulletPool.Init(BulletPoolInit);
-    }
-    void BulletPoolInit(GameObject obj)
-    {
-        obj.GetComponent<Bullet>().Initialize(bulletSpeed, delete: BulletDeUse, enter: BulletEnter);
-    }
+    [SerializeField] float damage;
+    [SerializeField] float speed;
+
     protected override void Use()
     {
-        bulletPool.Use().transform.position = tip.position;
-    }
-
-    void BulletDeUse(Bullet bullet)
-    {
-        bulletPool.DeUse(bullet.gameObject);
-    }
-    void BulletEnter(Bullet bullet, Collider2D coll)
-    {
-        Entity entity = coll.GetComponent<Entity>();
-        entity.TakeDamage(damage);
-
-        BulletDeUse(bullet);
+        GameObject obj = Instantiate(data.bulletPrefab);
+        obj.transform.position = data.tip.position;
+        obj.transform.rotation = data.tip.rotation;
+        obj.GetComponent<Bullet>().Initialize(damage, speed);
     }
 }

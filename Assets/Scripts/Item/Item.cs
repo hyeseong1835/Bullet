@@ -5,12 +5,10 @@ using UnityEngine;
 public abstract class Item : MonoBehaviour
 {
     protected PlayerController player => PlayerController.instance;
-    protected Inventory inventory => player.inventory;
 
     void Update()
     {
-#if UNITY_EDITOR
-        if (Application.isPlaying == false)
+        if (GameManager.IsEditor)
         {
             gameObject.layer = LayerMask.NameToLayer("Item");
 
@@ -20,7 +18,6 @@ public abstract class Item : MonoBehaviour
             CircleCollider2D collider = GetComponent<CircleCollider2D>();
             collider.isTrigger = true;
         }
-#endif
     }
     void OnTriggerEnter2D(Collider2D collision)
     {

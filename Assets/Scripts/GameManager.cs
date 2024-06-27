@@ -13,7 +13,7 @@ public class GameManager : MonoBehaviour
     public static GameManager instance;
 
     public GameState state;
-    public static bool isEditor => instance.state == GameState.Editor;
+    public static bool IsEditor => instance.state == GameState.Editor;
 
     [SerializeField] GameObject mainPanel;
 

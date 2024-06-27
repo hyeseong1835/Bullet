@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-public class EnemyController : Enemy
+public class HorizontalMoveEnemy : Enemy
 {
-    public EnemyControllerData data;
+    public HorizontalMoveEnemyData data;
     public override EnemyData EnemyData => data;
 
     [SerializeField] float move;
@@ -18,9 +18,9 @@ public class EnemyController : Enemy
     new void Update()
     {
         base.Update();
-#if UNITY_EDITOR
-        if (EditorApplication.isPlaying == false) return;
-#endif
+
+        if (GameManager.IsEditor) return;
+        
         Move();
     }
     void Move()

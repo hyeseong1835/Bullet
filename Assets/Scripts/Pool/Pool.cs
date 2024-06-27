@@ -39,7 +39,7 @@ public class Pool
 
     public GameObject prefab;
 
-    [SerializeField] Transform holder;
+    public Transform holder;
     public float destroyDelay;
     
     public int startCount;

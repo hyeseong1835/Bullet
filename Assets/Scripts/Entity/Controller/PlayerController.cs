@@ -6,39 +6,34 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody2D), typeof(Collider2D))]
 public class PlayerController : Entity
 {
+    public static PlayerController instance;
+
     public PlayerControllerData data;
     public override EntityData EntityData => data;
 
-    public static PlayerController instance;
-    static CameraController cam => CameraController.instance;
     static GameCanvas GameCanvas => GameCanvas.instance;
     static GameManager Game => GameManager.instance;
 
     [HideInInspector] public Rigidbody2D rigid;
     [HideInInspector] public Collider2D coll;
 
-    public Inventory inventory;
-
     [SerializeField] float speed = 1;
 
     [SerializeField] Box moveLock;
-
-    [SerializeField] float bulletSpeed = 5;
 
     [SerializeField] Weapon weapon;
     [SerializeField] List<Weapon> autoWeaponList = new List<Weapon>();
     void Awake()
     {
-        if (GameManager.isEditor) return;
+        if (GameManager.IsEditor) return;
 
         instance = this;
-        inventory = GetComponent<Inventory>();
         rigid = GetComponent<Rigidbody2D>();
         coll = GetComponent<Collider2D>();
     }
     void Update()
     {
-        if (GameManager.isEditor)
+        if (GameManager.IsEditor)
         {
             gameObject.layer = LayerMask.NameToLayer("Player");
 
@@ -84,7 +79,7 @@ public class PlayerController : Entity
     }
     void UseWeapon()
     {
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButton(0))
         {
             if (weapon == null) return;
 

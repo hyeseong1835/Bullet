@@ -11,12 +11,10 @@ public abstract class Enemy : Entity
 
     protected void Update()
     {
-#if UNITY_EDITOR
-        if (EditorApplication.isPlaying == false)
+        if (GameManager.IsEditor)
         {
             gameObject.layer = LayerMask.NameToLayer("Enemy");
         }
-#endif
     }
     protected void Drop()
     {

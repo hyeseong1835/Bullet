@@ -1096,7 +1096,7 @@ Camera:
   far clip plane: 1000
   field of view: 34
   orthographic: 1
-  orthographic size: 9.898089
+  orthographic size: 3.6824644
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -1121,7 +1121,7 @@ Transform:
   m_GameObject: {fileID: 519420028}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 9.898089, z: -10}
+  m_LocalPosition: {x: 0, y: 3.6824644, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1141,8 +1141,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cam: {fileID: 519420031}
   letterBox: {fileID: 109920615}
-  screenRatio: 4.9490447
-  pixelPerUnit: 39.25
+  screenRatio: 1.8412322
+  pixelPerUnit: 105.5
   onScreenRatioChangeEvent:
     m_PersistentCalls:
       m_Calls:
@@ -1565,7 +1565,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1c7378e5b4aec034bb7e922a80c1fbd9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  damage: 1
+  damage: 0.1
   cooltime: 0.5
   canUse: 1
   bulletPool:
@@ -2158,12 +2158,10 @@ MonoBehaviour:
   data: {fileID: 11400000, guid: 6092179b6f9a2e345ac16ba9e9bc6978, type: 2}
   rigid: {fileID: 975585800}
   coll: {fileID: 975585799}
-  inventory: {fileID: 0}
   speed: 2.5
   moveLock:
     size: {x: 0.5, y: 0.5}
     center: {x: 0, y: 0.1}
-  bulletSpeed: 5
   weapon: {fileID: 2144339706}
   autoWeaponList:
   - {fileID: 656967651}
@@ -2284,8 +2282,8 @@ Transform:
   m_GameObject: {fileID: 1095631457}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.1, z: 0}
-  m_LocalScale: {x: 0.05, y: 0.2, z: 1}
+  m_LocalPosition: {x: 0, y: 0.05, z: 0}
+  m_LocalScale: {x: 0.075, y: 0.2, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1797723409}
@@ -2896,7 +2894,7 @@ GameObject:
   - component: {fileID: 1337435773}
   - component: {fileID: 1337435772}
   m_Layer: 5
-  m_Name: UI
+  m_Name: Canvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2953,7 +2951,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_UiScaleMode: 0
   m_ReferencePixelsPerUnit: 100
-  m_ScaleFactor: 0.19165039
+  m_ScaleFactor: 0.5151367
   m_ReferenceResolution: {x: 800, y: 600}
   m_ScreenMatchMode: 0
   m_MatchWidthOrHeight: 0
@@ -3385,7 +3383,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1c7378e5b4aec034bb7e922a80c1fbd9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  damage: 1
+  damage: 0.1
   cooltime: 0.5
   canUse: 1
   bulletPool:

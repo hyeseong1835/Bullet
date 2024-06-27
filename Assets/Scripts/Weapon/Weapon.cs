@@ -4,15 +4,14 @@ using UnityEngine;
 
 public abstract class Weapon : MonoBehaviour
 {
-    public float damage;
-    public float cooltime;
+    public abstract WeaponData WeaponData { get; }
     public bool canUse = true;
 
     public virtual bool TryUse()
     {
         if (canUse)
         {
-            StartCoroutine(CoolTime(cooltime));
+            StartCoroutine(CoolTime(WeaponData.cooltime));
             Use();
             return true;
         }

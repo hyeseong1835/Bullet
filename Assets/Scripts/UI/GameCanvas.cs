@@ -10,12 +10,16 @@ public class GameCanvas : MonoBehaviour
     public RectTransform rect;
     [SerializeField] CanvasScaler canvasScaler;
 
-    public float screenRatio => cam.screenRatio;
-
     public float height = 1;
     public float width = 1;
     
     public float scaleFactor = 1024;
+    
+    public static float Up => instance.height;
+    public static float Down => 0;
+    public static float Right => 0.5f * instance.width;
+    public static float Left => -0.5f * instance.width;
+
 
     void Awake()
     {
