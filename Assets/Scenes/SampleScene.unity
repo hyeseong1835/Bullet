@@ -587,7 +587,7 @@ SpriteRenderer:
   m_SortingLayer: 3
   m_SortingOrder: 1
   m_Sprite: {fileID: 7482667652216324306, guid: 75f5f34dc1b5347e0b8351032682f224, type: 3}
-  m_Color: {r: 0.39215687, g: 1, b: 0.39215687, a: 1}
+  m_Color: {r: 0.49803922, g: 0.89411765, b: 0.42745098, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -1096,7 +1096,7 @@ Camera:
   far clip plane: 1000
   field of view: 34
   orthographic: 1
-  orthographic size: 3.630841
+  orthographic size: 3.264706
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -1121,7 +1121,7 @@ Transform:
   m_GameObject: {fileID: 519420028}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 3.630841, z: -10}
+  m_LocalPosition: {x: 0, y: 3.264706, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1140,24 +1140,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cam: {fileID: 519420031}
-  letterBox: {fileID: 109920615}
-  screenRatio: 1.8154205
-  pixelPerUnit: 107
-  onScreenRatioChangeEvent:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1337435775}
-        m_TargetAssemblyTypeName: Window, Assembly-CSharp
-        m_MethodName: OnChangeScreenRatio
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 1
+  screenRatio: 1.632353
+  pixelPerUnit: 119
   isDriveHeight: 0
 --- !u!1 &534708390
 GameObject:
@@ -1322,8 +1306,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.75, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -0.5, y: 0}
-  m_SizeDelta: {x: 1, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 2, y: 2}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &584342944
 MonoBehaviour:
@@ -1817,8 +1801,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0.25, y: 1}
-  m_AnchoredPosition: {x: 0.5, y: 0}
-  m_SizeDelta: {x: 1, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 2, y: 2}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &781066203
 MonoBehaviour:
@@ -2943,7 +2927,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_UiScaleMode: 0
   m_ReferencePixelsPerUnit: 100
-  m_ScaleFactor: 0.52246094
+  m_ScaleFactor: 0.5810547
   m_ReferenceResolution: {x: 800, y: 600}
   m_ScreenMatchMode: 0
   m_MatchWidthOrHeight: 0
@@ -3264,8 +3248,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 0}
-  m_AnchoredPosition: {x: 0, y: 512}
-  m_SizeDelta: {x: 409.6, y: 1024}
+  m_AnchoredPosition: {x: 0, y: 505.5462}
+  m_SizeDelta: {x: 404.43698, y: 1011.0924}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1534860703
 GameObject:
@@ -3470,7 +3454,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_SizeDelta: {x: 2, y: 2}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1563279747
 MonoBehaviour:
@@ -4298,8 +4282,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 0}
-  m_AnchoredPosition: {x: 0, y: 512}
-  m_SizeDelta: {x: 819.2, y: 1024}
+  m_AnchoredPosition: {x: 0, y: 505.5462}
+  m_SizeDelta: {x: 808.87396, y: 1011.0924}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &2144339704
 GameObject:

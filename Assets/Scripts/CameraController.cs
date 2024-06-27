@@ -10,42 +10,26 @@ public class CameraController : MonoBehaviour
     public static CameraController instance;
     static Window Screen => Window.instance;
     public Camera cam;
-    [SerializeField] LetterBox letterBox;
 
     public float screenRatio;
     public float pixelPerUnit;
-    float prevScreenRatio;
-
-    public UnityEvent onScreenRatioChangeEvent;
 
     public bool isDriveHeight;
+
 
     void Awake()
     {
         instance = this;
-        cam = GetComponent<Camera>();
+        if (cam == null) cam = GetComponent<Camera>();
 
         Refresh();
     }
     void Update()
     {
         screenRatio = (float)Window.Height / Window.Width;
-
-        if (screenRatio != prevScreenRatio)
-        {
-            Refresh();
-            onScreenRatioChangeEvent.Invoke();
-        }
-
-        prevScreenRatio = screenRatio;
-
-#if UNITY_EDITOR
-
-        instance = this;
-        Refresh();
-
-#endif
+        Screen.onScreenResized += Refresh;
     }
+
     void Refresh()
     {
         if (screenRatio < Screen.screenHeight / Screen.screenWidth)
@@ -66,7 +50,6 @@ public class CameraController : MonoBehaviour
     void OnValidate()
     {
         instance = this;
-        letterBox.Refresh();
     }
     void OnDrawGizmos()
     {

@@ -1,7 +1,6 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
+[ExecuteAlways]
 public class LetterBox : MonoBehaviour
 {
     static Window GameCanvas => Window.instance;
@@ -9,6 +8,10 @@ public class LetterBox : MonoBehaviour
     public Transform top, bottom, right, left;
     [SerializeField] float size;
 
+    void Update()
+    {
+        Window.instance.onScreenResized += Refresh;
+    }
     public void Refresh()
     {
         if (GameCanvas == null) return;

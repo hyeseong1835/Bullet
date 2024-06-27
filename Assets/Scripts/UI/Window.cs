@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+[ExecuteAlways]
 public class Window : MonoBehaviour
 {
     #region 정적 필드
@@ -40,16 +41,38 @@ public class Window : MonoBehaviour
     public float gameWidth = 1;
     
     public float scaleFactor = 1024;
-    
+
+    public delegate void OnScreenResized();
+    public OnScreenResized onScreenResized;
+
+    float prevWindowHeight;
+    float prevWindowWidth;
+
     void Awake()
     {
         instance = this;
     }
     void Start()
     {
-        cam.onScreenRatioChangeEvent.AddListener(OnChangeScreenRatio);
+
     }
-    public void OnChangeScreenRatio()
+    void Update()
+    {
+
+    }
+    private void LateUpdate()
+    {
+        if (Window.Height != prevWindowHeight || Window.Width != prevWindowWidth)
+        {
+            Refresh();
+            Debug.Log("Screen Resized");
+            onScreenResized.Invoke();
+        }
+
+        prevWindowHeight = Window.Height;
+        prevWindowWidth = Window.Width;
+    }
+    public void Refresh()
     {
         float scale;
         if (cam.isDriveHeight)
