@@ -10,6 +10,8 @@ public class PlayerController : Entity
 
     public static PlayerController instance;
     static CameraController cam => CameraController.instance;
+    static GameCanvas GameCanvas => GameCanvas.instance;
+    static GameManager Game => GameManager.instance;
 
     [HideInInspector] public Rigidbody2D rigid;
     [HideInInspector] public Collider2D coll;
@@ -25,12 +27,8 @@ public class PlayerController : Entity
 
     void Awake()
     {
-#if UNITY_EDITOR
-        if (EditorApplication.isPlaying == false)
-        {
-            return;
-        }
-#endif
+        if (GameManager.isEditor) return;
+
         instance = this;
         inventory = GetComponent<Inventory>();
         rigid = GetComponent<Rigidbody2D>();
@@ -38,33 +36,33 @@ public class PlayerController : Entity
     }
     void Start()
     {
-#if UNITY_EDITOR
-        if (EditorApplication.isPlaying == false)
-        {
-            return;
-        }
-#endif
+        if (GameManager.isEditor) return;
+
         bulletPool.Init((obj) => obj.GetComponent<Bullet>().Initialize(enter: BulletEnter));
     }
     void Update()
     {
-#if UNITY_EDITOR
-        if (EditorApplication.isPlaying == false)
+        if (GameManager.isEditor)
         {
-            if (instance == null) instance = this;
-
             gameObject.layer = LayerMask.NameToLayer("Player");
 
             return;
         }
-#endif
-        Move();
-        WallCollide();
 
-        if (Input.GetMouseButtonDown(0))
+        if (Game.state == GameState.Play)
         {
-            bulletPool.Use().transform.position = transform.position;
+            Move();
+            WallCollide();
+
+            if (Input.GetMouseButtonDown(0))
+            {
+                bulletPool.Use().transform.position = transform.position;
+            }
+            BulletMove();
         }
+    }
+    void BulletMove()
+    {
         for (int bulletIndex = 0; bulletIndex < bulletPool.count; bulletIndex++)
         {
             GameObject bulletObj = bulletPool.pool[bulletIndex];
@@ -72,7 +70,7 @@ public class PlayerController : Entity
             if (bulletObj.activeInHierarchy)
             {
                 bulletObj.transform.position += Vector3.up * bulletSpeed * Time.deltaTime;
-                if (bulletObj.transform.position.y > cam.height + 1)
+                if (bulletObj.transform.position.y > GameCanvas.height + 1)
                 {
                     bulletPool.DeUse(bulletObj);
                 }
@@ -99,7 +97,7 @@ public class PlayerController : Entity
             transform.position = new Vector3(offset, transform.position.y, transform.position.z);
         }
         //À§
-        if (transform.position.y > (offset = cam.height - 0.5f * moveLock.size.y - moveLock.center.y))
+        if (transform.position.y > (offset = GameCanvas.height - 0.5f * moveLock.size.y - moveLock.center.y))
         {
             transform.position = new Vector3(transform.position.x, offset, transform.position.z);
         }
@@ -115,6 +113,10 @@ public class PlayerController : Entity
         entity.TakeDamage(1);
 
         bulletPool.DeUse(bullet.gameObject);
+    }
+    void OnValidate()
+    {
+        instance = this;
     }
     void OnDrawGizmosSelected()
     {

@@ -25,8 +25,7 @@ public class Bullet : MonoBehaviour
     }
     void Update()
     {
-#if UNITY_EDITOR
-        if (Application.isPlaying == false)
+        if (GameManager.isEditor)
         {
             if (bulletType == BulletType.Player) gameObject.layer = LayerMask.NameToLayer("PlayerBullet");
             else if (bulletType == BulletType.Enemy) gameObject.layer = LayerMask.NameToLayer("EnemyBullet");
@@ -37,7 +36,6 @@ public class Bullet : MonoBehaviour
             CircleCollider2D collider = GetComponent<CircleCollider2D>();
             collider.isTrigger = true;
         }
-#endif
     }
 
     void OnTriggerEnter2D(Collider2D collision)

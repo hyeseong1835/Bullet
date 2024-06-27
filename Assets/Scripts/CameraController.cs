@@ -11,15 +11,15 @@ public class CameraController : MonoBehaviour
 
     public Camera cam;
     [SerializeField] LetterBox letterBox;
-
-    public float height = 5;
-    public float width = 2;
+    static GameCanvas GameCanvas => GameCanvas.instance;
 
     public float screenRatio;
     public float pixelPerUnit;
     float prevScreenRatio;
 
     public UnityEvent onScreenRatioChangeEvent;
+
+    public bool isDriveHeight;
 
     void Awake()
     {
@@ -49,17 +49,19 @@ public class CameraController : MonoBehaviour
     }
     void Refresh()
     {
-        if (screenRatio < height / width)
+        if (screenRatio < GameCanvas.height / GameCanvas.width)
         {
-            cam.orthographicSize = 0.5f * height;
-            transform.position = new Vector3(transform.position.x, 0.5f * height, transform.position.z);
-            pixelPerUnit = Screen.height / height;
+            cam.orthographicSize = 0.5f * GameCanvas.height;
+            transform.position = new Vector3(transform.position.x, 0.5f * GameCanvas.height, transform.position.z);
+            pixelPerUnit = Screen.height / GameCanvas.height;
+            isDriveHeight = true;
         }
         else
         {
-            cam.orthographicSize = 0.5f * screenRatio * width;
-            transform.position = new Vector3(transform.position.x, 0.5f * screenRatio * width, transform.position.z);
-            pixelPerUnit = Screen.width / width;
+            cam.orthographicSize = 0.5f * screenRatio * GameCanvas.width;
+            transform.position = new Vector3(transform.position.x, 0.5f * screenRatio * GameCanvas.width, transform.position.z);
+            pixelPerUnit = Screen.width / GameCanvas.width;
+            isDriveHeight = false;
         }
     }
     void OnValidate()
@@ -70,6 +72,6 @@ public class CameraController : MonoBehaviour
     void OnDrawGizmos()
     {
         Gizmos.color = Color.white;
-        Gizmos.DrawWireCube(new Vector2(0, 0.5f * height), new Vector2(2, height));
+        Gizmos.DrawWireCube(new Vector2(0, 0.5f * GameCanvas.height), new Vector2(2, GameCanvas.height));
     }
 }

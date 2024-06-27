@@ -7,4 +7,5 @@ public class PoolHolder : MonoBehaviour
     public static PoolHolder instance;
 
     void Awake() => instance = this;
+    void OnValidate() => instance = this;
 }

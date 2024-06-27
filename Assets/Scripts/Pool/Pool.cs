@@ -39,7 +39,7 @@ public class Pool
 
     public GameObject prefab;
 
-    Transform holder;
+    [SerializeField] Transform holder;
     public float destroyDelay;
     
     public int startCount;
@@ -50,13 +50,14 @@ public class Pool
 
     [SerializeField] Action<GameObject> addEvent;
 
-    public void Init(Action<GameObject> addEvent)
+    public void Init(Action<GameObject> addEvent = null)
     {
         this.addEvent = addEvent;
 
         holder = new GameObject(prefab.name).transform;
         holder.SetParent(PoolHolder.instance.transform);
 
+        pool.Clear();
         for (int i = 0; i < startCount; i++)
         {
             Add().SetActive(false);
@@ -119,8 +120,8 @@ public class Pool
     public GameObject Add()
     {
         GameObject obj = UnityEngine.Object.Instantiate(prefab, holder);
-        addEvent(obj);
         pool.Add(obj);
+        if(addEvent != null) addEvent(obj);
         return obj;
     }
 }
