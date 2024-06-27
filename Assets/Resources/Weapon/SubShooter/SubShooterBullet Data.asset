@@ -13,12 +13,30 @@ MonoBehaviour:
   m_Name: SubShooterBullet Data
   m_EditorClassIdentifier: 
   pool:
-    prefab: {fileID: 4026119069186307829, guid: 6c32088d52cab394db9e36aaf369b63e, type: 3}
+    prefab: {fileID: 4026119069186307829, guid: 13b6534241a59ae49bc5a91e4ed5be80, type: 3}
     holder: {fileID: 0}
     destroyDelay: 5
     startCount: 0
     stayCount: 5
-    pool: []
-    waitDestroy: []
+    pool:
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    waitDestroy:
+    - obj: {fileID: 0}
+    - obj: {fileID: 0}
+    - obj: {fileID: 0}
+    - obj: {fileID: 0}
   damage: 0.1
   speed: 5

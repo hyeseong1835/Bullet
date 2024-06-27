@@ -1,32 +1,14 @@
-using System.Collections;
-using System.Collections.Generic;
+using System;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 
 [ExecuteAlways]
 public class Window : MonoBehaviour
 {
-    #region 정적 필드
-
     public static Window instance;
-
-    public static int Height => Screen.height;
-    public static int Width => Screen.width;
-
-    public static float ScreenUp => instance.screenHeight;
-    public static float ScreenDown => 0;
-    public static float ScreenRight => 0.5f * instance.screenWidth;
-    public static float ScreenLeft => -0.5f * instance.screenWidth;
-
-    public static float GameUp => instance.gameHeight;
-    public static float GameDown => 0;
-    public static float GameRight => 0.5f * instance.gameWidth;
-    public static float GameLeft => -0.5f * instance.gameWidth;
-
-    #endregion
-
     static CameraController cam => CameraController.instance;
-
     public Canvas windowCanvas;
     public RectTransform screenRect;
     public RectTransform gameRect;
@@ -34,69 +16,111 @@ public class Window : MonoBehaviour
     public CanvasScaler canvasScaler;
 
 
-    public float screenHeight = 1;
-    public float screenWidth = 1;
+    public static int WindowHeight => Screen.height;
+    public static int WindowWidth => Screen.width;
+    public static float windowRatio { get; private set; }
 
-    public float gameHeight = 1;
-    public float gameWidth = 1;
-    
+    public static float ScreenHeight => instance.screenHeight;
+    [SerializeField] float screenHeight = 1;
+    public static float ScreenWidth => instance.screenWidth;
+    [SerializeField] float screenWidth = 1;
+    public static float screenRatio { get; private set; }
+    public static float screenUp { get; private set; }
+    public static float screenDown { get; private set; }
+    public static float screenRight { get; private set; }
+    public static float screenLeft { get; private set; }
+
+    public static float GameHeight => instance.gameHeight;
+    [SerializeField] float gameHeight = 1;
+    public static float GameWidth => instance.gameWidth;
+    [SerializeField] float gameWidth = 1;
+    public static float gameRatio { get; private set; }
+    public static float gameUp { get; private set; }
+    public static float gameDown { get; private set; }
+    public static float gameRight { get; private set; }
+    public static float gameLeft { get; private set; }
+
+
     public float scaleFactor = 1024;
 
-    public delegate void OnScreenResized();
-    public OnScreenResized onScreenResized;
+    public float pixelPerUnit { get; private set; }
+
+    public bool isDriveHeight { get; private set; }
+
+    public Action onScreenResized;
 
     float prevWindowHeight;
     float prevWindowWidth;
 
-    void Awake()
+    void Set()
     {
         instance = this;
-    }
-    void Start()
-    {
 
+        screenRatio = screenWidth / screenHeight;
+        screenUp = screenHeight;
+        screenDown = 0;
+        screenRight = 0.5f * screenWidth;
+        screenLeft = -0.5f * screenWidth;
+
+        gameRatio = gameWidth / gameHeight;
+        gameUp = gameHeight;
+        gameDown = 0;
+        gameRight = 0.5f * gameWidth;
+        gameLeft = -0.5f * gameWidth;
+    }
+    void Awake()
+    {
+        Set();
     }
     void Update()
     {
-
-    }
-    private void LateUpdate()
-    {
-        if (Window.Height != prevWindowHeight || Window.Width != prevWindowWidth)
+        if (WindowHeight != prevWindowHeight || WindowWidth != prevWindowWidth)
         {
+            windowRatio = (float)WindowHeight / WindowWidth;
+            
             Refresh();
-            Debug.Log("Screen Resized");
-            onScreenResized.Invoke();
-        }
 
-        prevWindowHeight = Window.Height;
-        prevWindowWidth = Window.Width;
+            if (onScreenResized.IsUnityNull() == false) onScreenResized.Invoke();
+
+            prevWindowHeight = WindowHeight;
+            prevWindowWidth = WindowWidth;
+        }
     }
     public void Refresh()
     {
+        isDriveHeight = windowRatio < screenRatio;
+
+        pixelPerUnit = isDriveHeight ? (WindowHeight / screenHeight) : (WindowWidth / screenWidth);
+        
+        Vector2 camPos = cam.transform.position;
         float scale;
-        if (cam.isDriveHeight)
+        if (isDriveHeight)
         {
-            scale = Height / scaleFactor;
+            camPos.y = 0.5f * screenHeight;
+
+            scale = WindowHeight / scaleFactor;
         }
         else
         {
-            scale = Width / scaleFactor * screenHeight / screenWidth;
+            camPos.y = 0.5f * windowRatio * screenWidth;
+
+            scale = WindowWidth * screenRatio / scaleFactor;
         }
+        cam.transform.position = camPos;
+        cam.cam.orthographicSize = camPos.y;
+
         canvasScaler.scaleFactor = scale;
 
-        screenRect.anchoredPosition = new Vector2(0, 0.5f * screenHeight * cam.pixelPerUnit / scale);
-        screenRect.sizeDelta = new Vector2(screenWidth * cam.pixelPerUnit / scale, screenHeight * cam.pixelPerUnit / scale);
-        
-        gameRect.anchoredPosition = new Vector2(0, 0.5f * gameHeight * cam.pixelPerUnit / scale);
-        gameRect.sizeDelta = new Vector2(gameWidth * cam.pixelPerUnit / scale, gameHeight * cam.pixelPerUnit / scale);
+        float factor = pixelPerUnit / scale;
+
+        screenRect.anchoredPosition = new Vector2(0, 0.5f * screenHeight) * factor;
+        screenRect.sizeDelta = new Vector2(screenWidth, screenHeight) * factor;
+
+        gameRect.anchoredPosition = new Vector2(0, 0.5f * gameHeight) * factor;
+        gameRect.sizeDelta = new Vector2(gameWidth , gameHeight) * factor;
     }
     void OnValidate()
     {
-        instance = this;
-        if (canvasScaler == null) canvasScaler = GetComponent<CanvasScaler>();
-        if (windowCanvas == null) windowCanvas = GetComponent<Canvas>();
-        if (screenRect == null) screenRect = transform.Find("Screen Canvas").GetComponent<RectTransform>();
-        if (gameRect == null) gameRect = transform.Find("Game Canvas").GetComponent<RectTransform>();
+        Set();
     }
 }

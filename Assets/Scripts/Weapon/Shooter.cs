@@ -9,10 +9,16 @@ public class Shooter : Weapon
     public override WeaponData WeaponData => data;
     
     [SerializeField] Transform tip;
+    Bullet bullet;
 
+    void Awake()
+    {
+        bullet = data.bulletPrefab.GetComponent<Bullet>();
+        if (bullet.BulletData.pool.holder == null) bullet.BulletData.pool.Init();
+    }
     protected override void Use()
     {
-        GameObject obj = Instantiate(data.bulletPrefab);
+        GameObject obj = bullet.BulletData.pool.Use();
         obj.transform.position = tip.position;
         obj.transform.rotation = tip.rotation;
         obj.GetComponent<Bullet>().Initialize();

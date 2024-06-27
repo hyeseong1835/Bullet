@@ -190,16 +190,16 @@ public struct Box
     #region ContactGame
 
     /// <returns>Box가 게임 외곽선에 접하거나 그 위일 때 true를 반환합니다.</returns>
-    public bool IsContactGameUp(float x) => IsContactUp(x, Window.GameUp);
+    public bool IsContactGameUp(float x) => IsContactUp(x, Window.gameUp);
 
     /// <returns>Box가 게임 외곽선에 접하거나 그 아래일 때 true를 반환합니다.</returns>
-    public bool IsContactGameDown(float x) => IsContactDown(x, Window.GameDown);
+    public bool IsContactGameDown(float x) => IsContactDown(x, Window.gameDown);
 
     /// <returns>Box가 게임 외곽선에 접하거나 그보다 오른쪽일 때 true를 반환합니다.</returns>
-    public bool IsContactGameRight(float y) => IsContactRight(y, Window.GameRight);
+    public bool IsContactGameRight(float y) => IsContactRight(y, Window.gameRight);
 
     /// <returns>Box가 게임 외곽선에 접하거나 그보다 왼쪽일 때 true를 반환합니다.</returns>
-    public bool IsContactGameLeft(float y) => IsContactLeft(y, Window.GameLeft);
+    public bool IsContactGameLeft(float y) => IsContactLeft(y, Window.gameLeft);
 
     /// <param name="pos">box의 WorldPosition</param>
     /// <returns>Box가 게임 외곽선에 접하거나 그 밖일 때 true를 반환합니다.</returns>
@@ -217,32 +217,32 @@ public struct Box
 
     /// <param name="x">box의 X 좌표</param>
     /// <returns>Box가 게임 외곽선에 접하거나 그 위일 때 true를 반환합니다.</returns>
-    public bool IsContactGameUp(float x, out float contact) => IsContactUp(x, Window.GameUp, out contact);
+    public bool IsContactGameUp(float x, out float contact) => IsContactUp(x, Window.gameUp, out contact);
 
     /// <param name="x">box의 X 좌표</param>
     /// <returns>Box가 게임 외곽선에 접하거나 그 아래일 때 true를 반환합니다.</returns>
-    public bool IsContactGameDown(float x, out float contact) => IsContactDown(x, Window.GameDown, out contact);
+    public bool IsContactGameDown(float x, out float contact) => IsContactDown(x, Window.gameDown, out contact);
 
     /// <param name="y">box의 Y 좌표</param>
     /// <returns>Box가 게임 외곽선에 접하거나 그보다 오른쪽일 때 true를 반환합니다.</returns>
-    public bool IsContactGameRight(float y, out float contact) => IsContactRight(y, Window.GameRight, out contact);
+    public bool IsContactGameRight(float y, out float contact) => IsContactRight(y, Window.gameRight, out contact);
 
     /// <param name="y">box의 Y 좌표</param>
     /// <returns>Box가 게임 외곽선에 접하거나 그보다 왼쪽일 때 true를 반환합니다.</returns>
-    public bool IsContactGameLeft(float y, out float contact) => IsContactLeft(y, Window.GameLeft, out contact);
+    public bool IsContactGameLeft(float y, out float contact) => IsContactLeft(y, Window.gameLeft, out contact);
 
     /// <param name="pos">box의 WorldPosition</param>
     /// <returns>Box가 게임 외곽선에 접하거나 그 밖일 때 true를 반환합니다. // false일 때 contact = pos</returns>
     public bool IsContactGame(Vector2 pos, out Vector2 contact)
     {
-        return IsContact(pos, Window.GameUp, Window.GameDown, Window.GameRight, Window.GameLeft, out contact);
+        return IsContact(pos, Window.gameUp, Window.gameDown, Window.gameRight, Window.gameLeft, out contact);
     }
 
     /// <param name="pos">box의 WorldPosition</param>
     /// <returns>Box가 게임 외곽선에 접하거나 그 밖일 때 true를 반환합니다. // false일 때 contact = pos</returns>
     public bool IsContactGame(Vector3 pos, out Vector3 contact)
     {
-        return IsContact(pos, Window.GameUp, Window.GameDown, Window.GameRight, Window.GameLeft, out contact);
+        return IsContact(pos, Window.gameUp, Window.gameDown, Window.gameRight, Window.gameLeft, out contact);
     }
 
     #endregion
@@ -345,16 +345,16 @@ public struct Box
     #region ExitGame
 
     /// <returns>Box가 게임 외곽선에 접하거나 그 위일 때 true를 반환합니다.</returns>
-    public bool IsExitGameUp(float x) => IsExitUp(x, Window.GameUp);
+    public bool IsExitGameUp(float x) => IsExitUp(x, Window.gameUp);
 
     /// <returns>Box가 게임 외곽선에 접하거나 그 위일 때 true를 반환합니다.</returns>
-    public bool IsExitGameDown(float x) => IsExitDown(x, Window.GameDown);
+    public bool IsExitGameDown(float x) => IsExitDown(x, Window.gameDown);
     
     /// <returns>Box가 게임 외곽선에 접하거나 그보다 오른쪽일 때 true를 반환합니다.</returns>
-    public bool IsExitGameRight(float y) => IsExitRight(y, Window.GameRight);
+    public bool IsExitGameRight(float y) => IsExitRight(y, Window.gameRight);
     
     /// <returns>Box가 게임 외곽선에 접하거나 그보다 왼쪽일 때 true를 반환합니다.</returns>
-    public bool IsExitGameLeft(float y) => IsExitLeft(y, Window.GameLeft);
+    public bool IsExitGameLeft(float y) => IsExitLeft(y, Window.gameLeft);
 
     /// <param name="pos">box의 WorldPosition</param>
     /// <returns>Box가 게임 외곽선 밖에 있을 때 true를 반환합니다.</returns>
