@@ -2,17 +2,29 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Weapon : MonoBehaviour
+public abstract class Weapon : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    public float damage;
+    public float cooltime;
+    public bool canUse = true;
 
-    // Update is called once per frame
-    void Update()
+    public virtual bool TryUse()
     {
-        
+        if (canUse)
+        {
+            StartCoroutine(CoolTime(cooltime));
+            Use();
+            return true;
+        }
+        return false;
     }
+    IEnumerator CoolTime(float time)
+    {
+        canUse = false;
+
+        yield return new WaitForSeconds(time);
+
+        canUse = true;
+    }
+    protected abstract void Use();
 }

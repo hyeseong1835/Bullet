@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
@@ -22,9 +23,10 @@ public class PlayerController : Entity
 
     [SerializeField] Box moveLock;
 
-    [SerializeField] Pool bulletPool;
     [SerializeField] float bulletSpeed = 5;
 
+    [SerializeField] Weapon weapon;
+    [SerializeField] List<Weapon> autoWeaponList = new List<Weapon>();
     void Awake()
     {
         if (GameManager.isEditor) return;
@@ -33,12 +35,6 @@ public class PlayerController : Entity
         inventory = GetComponent<Inventory>();
         rigid = GetComponent<Rigidbody2D>();
         coll = GetComponent<Collider2D>();
-    }
-    void Start()
-    {
-        if (GameManager.isEditor) return;
-
-        bulletPool.Init((obj) => obj.GetComponent<Bullet>().Initialize(enter: BulletEnter));
     }
     void Update()
     {
@@ -53,28 +49,7 @@ public class PlayerController : Entity
         {
             Move();
             WallCollide();
-
-            if (Input.GetMouseButtonDown(0))
-            {
-                bulletPool.Use().transform.position = transform.position;
-            }
-            BulletMove();
-        }
-    }
-    void BulletMove()
-    {
-        for (int bulletIndex = 0; bulletIndex < bulletPool.count; bulletIndex++)
-        {
-            GameObject bulletObj = bulletPool.pool[bulletIndex];
-
-            if (bulletObj.activeInHierarchy)
-            {
-                bulletObj.transform.position += Vector3.up * bulletSpeed * Time.deltaTime;
-                if (bulletObj.transform.position.y > GameCanvas.height + 1)
-                {
-                    bulletPool.DeUse(bulletObj);
-                }
-            }
+            UseWeapon();
         }
     }
     void Move()
@@ -107,12 +82,18 @@ public class PlayerController : Entity
             transform.position = new Vector3(transform.position.x, offset, transform.position.z);
         }
     }
-    void BulletEnter(Bullet bullet, Collider2D coll)
+    void UseWeapon()
     {
-        Entity entity = coll.GetComponent<Entity>();
-        entity.TakeDamage(1);
+        if (Input.GetMouseButtonDown(0))
+        {
+            if (weapon == null) return;
 
-        bulletPool.DeUse(bullet.gameObject);
+            weapon.TryUse();
+        }
+        foreach (Weapon autoWeapon in autoWeaponList)
+        {
+            autoWeapon.TryUse();
+        }
     }
     void OnValidate()
     {

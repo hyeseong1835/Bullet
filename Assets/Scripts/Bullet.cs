@@ -13,12 +13,17 @@ public class Bullet : MonoBehaviour
     }
     [SerializeField] BulletType bulletType = BulletType.Enemy;
 #endif
+    float speed;
+
+    Action<Bullet> deleteEvent;
     Action<Bullet, Collider2D> enterEvent;
     Action<Bullet, Collider2D> stayEvent;
     Action<Bullet, Collider2D> exitEvent;
 
-    public void Initialize(Action<Bullet, Collider2D> enter = null, Action<Bullet, Collider2D> stay = null, Action<Bullet, Collider2D> exit = null)
+    public void Initialize(float speed, Action<Bullet> delete ,Action<Bullet, Collider2D> enter = null, Action<Bullet, Collider2D> stay = null, Action<Bullet, Collider2D> exit = null)
     {
+        this.speed = speed;
+        deleteEvent = delete;
         enterEvent = enter;
         stayEvent = stay;
         exitEvent = exit;
@@ -35,6 +40,14 @@ public class Bullet : MonoBehaviour
 
             CircleCollider2D collider = GetComponent<CircleCollider2D>();
             collider.isTrigger = true;
+
+            return;
+        }
+        transform.position += Vector3.up * speed * Time.deltaTime;
+
+        if (transform.position.y > GameCanvas.instance.height + 1)
+        {
+            deleteEvent(this);
         }
     }
 
