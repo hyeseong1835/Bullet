@@ -1,7 +1,6 @@
 using System;
 using UnityEngine;
 
-[ExecuteAlways]
 [RequireComponent(typeof(Rigidbody2D), typeof(Collider2D))]
 public abstract class Bullet : MonoBehaviour
 {
@@ -15,29 +14,21 @@ public abstract class Bullet : MonoBehaviour
     [SerializeField] BulletType bulletType = BulletType.Enemy;
 #endif
 
-    protected float damage;
-    protected float speed;
-
     Action<Bullet> updateEvent;
-    public Action<Bullet> destroyEvent;
+    Action<Bullet> destroyEvent;
 
     Action<Bullet, Collider2D> enterEvent;
     Action<Bullet, Collider2D> stayEvent;
     Action<Bullet, Collider2D> exitEvent;
 
     public void Initialize(
-        float damage, float speed,
         Action<Bullet> updateEvent = null,
         Action<Bullet> destroyEvent = null,
         Action<Bullet, Collider2D> enterEvent = null, 
         Action<Bullet, Collider2D> stayEvent = null, 
-        Action<Bullet, Collider2D> exitEvent = null,
-        Rigidbody2D rigid = null, Collider2D coll = null
+        Action<Bullet, Collider2D> exitEvent = null
         )
     {
-        this.damage = damage;
-        this.speed = speed;
-
         this.updateEvent = updateEvent;
         this.destroyEvent = destroyEvent;
 
@@ -45,11 +36,7 @@ public abstract class Bullet : MonoBehaviour
         this.stayEvent = stayEvent;
         this.exitEvent = exitEvent;
 
-        if (rigid == null) this.rigid = GetComponent<Rigidbody2D>();
-        else this.rigid = rigid;
-
-        if (coll == null) this.coll = GetComponent<Collider2D>();
-        else this.coll = coll;
+        if (BulletData.pool.holder == null) BulletData.pool.Init();
     }
     protected void Update()
     {
@@ -66,19 +53,22 @@ public abstract class Bullet : MonoBehaviour
 
             return;
         }
+        if (updateEvent != null) updateEvent.Invoke(this);
     }
     protected virtual void Enter(Collider2D coll)
     {
         Entity entity = coll.GetComponent<Entity>();
-        entity.TakeDamage(damage);
+        entity.TakeDamage(BulletData.damage);
 
-        DeUse();
+        Destroy();
     }
     protected virtual void Stay(Collider2D coll) { }
     protected virtual void Exit(Collider2D coll) { }
 
-    public virtual void DeUse()
+    public void Destroy()
     {
+        if (destroyEvent != null) destroyEvent.Invoke(this);
+
         BulletData.pool.DeUse(gameObject);
     }
 
@@ -96,5 +86,16 @@ public abstract class Bullet : MonoBehaviour
     {
         Exit(collision);
         if (exitEvent != null) exitEvent(this, collision);
+    }
+    protected void OnValidate()
+    {
+        if (bulletType == BulletType.Player) gameObject.layer = LayerMask.NameToLayer("PlayerBullet");
+        else if (bulletType == BulletType.Enemy) gameObject.layer = LayerMask.NameToLayer("EnemyBullet");
+
+        if (rigid == null) rigid = GetComponent<Rigidbody2D>();
+        rigid.bodyType = RigidbodyType2D.Kinematic;
+
+        if (coll == null) coll = GetComponent<CircleCollider2D>();
+        coll.isTrigger = true;
     }
 }

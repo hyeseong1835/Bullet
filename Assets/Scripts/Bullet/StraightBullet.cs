@@ -12,14 +12,14 @@ public class StraightBullet : Bullet
         base.Update();
 
         Vector3 dir = Vector3.zero;
-        dir.x = Mathf.Cos(Mathf.Deg2Rad * transform.rotation.z);
-        dir.y = Mathf.Sin(Mathf.Deg2Rad * transform.rotation.z);
+        dir.x = Mathf.Sin(Mathf.Deg2Rad * transform.rotation.z); 
+        dir.y = Mathf.Cos(Mathf.Deg2Rad * transform.rotation.z);
 
-        transform.position += dir * speed * Time.deltaTime;
+        transform.position += dir * data.speed * Time.deltaTime;
 
         if (coll.ToBox().IsExitGame(transform.position))
         {
-            destroyEvent.Invoke(this);
+            Destroy();
         }
     }
 }

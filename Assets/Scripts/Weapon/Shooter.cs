@@ -7,15 +7,19 @@ public class Shooter : Weapon
 {
     public ShooterData data;
     public override WeaponData WeaponData => data;
-
-    [SerializeField] float damage;
-    [SerializeField] float speed;
+    
+    [SerializeField] Transform tip;
 
     protected override void Use()
     {
         GameObject obj = Instantiate(data.bulletPrefab);
-        obj.transform.position = data.tip.position;
-        obj.transform.rotation = data.tip.rotation;
-        obj.GetComponent<Bullet>().Initialize(damage, speed);
+        obj.transform.position = tip.position;
+        obj.transform.rotation = tip.rotation;
+        obj.GetComponent<Bullet>().Initialize();
+    }
+    void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.cyan;
+        Gizmos.DrawLine(tip.position, tip.position + 0.1f * tip.up);
     }
 }

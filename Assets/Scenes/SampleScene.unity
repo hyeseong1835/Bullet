@@ -1562,9 +1562,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 656967649}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1c7378e5b4aec034bb7e922a80c1fbd9, type: 3}
+  m_Script: {fileID: 11500000, guid: 3f7a374fb84698d40a42a88f504ccd39, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  canUse: 1
+  data: {fileID: 11400000, guid: c1b3633329d0e60489260e2745c5ebb3, type: 2}
+  tip: {fileID: 2098546631}
 --- !u!1 &698708180
 GameObject:
   m_ObjectHideFlags: 0
@@ -1655,7 +1658,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &699863005
 Transform:
   m_ObjectHideFlags: 0
@@ -2149,8 +2152,10 @@ MonoBehaviour:
   moveLock:
     size: {x: 0.5, y: 0.5}
     center: {x: 0, y: 0.1}
-  weapon: {fileID: 0}
-  autoWeaponList: []
+  weapon: {fileID: 2144339706}
+  autoWeaponList:
+  - {fileID: 656967651}
+  - {fileID: 1554272288}
 --- !u!1 &1017030525
 GameObject:
   m_ObjectHideFlags: 0
@@ -3423,9 +3428,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 1554272286}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1c7378e5b4aec034bb7e922a80c1fbd9, type: 3}
+  m_Script: {fileID: 11500000, guid: 3f7a374fb84698d40a42a88f504ccd39, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  canUse: 1
+  data: {fileID: 11400000, guid: c1b3633329d0e60489260e2745c5ebb3, type: 2}
+  tip: {fileID: 1470123453}
 --- !u!1 &1563279745
 GameObject:
   m_ObjectHideFlags: 0
@@ -4335,9 +4343,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 2144339704}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1c7378e5b4aec034bb7e922a80c1fbd9, type: 3}
+  m_Script: {fileID: 11500000, guid: 3f7a374fb84698d40a42a88f504ccd39, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  canUse: 1
+  data: {fileID: 11400000, guid: 215b4c94d352075499669c8b14b13ddb, type: 2}
+  tip: {fileID: 1797723409}
 --- !u!1001 &5990378196775089744
 PrefabInstance:
   m_ObjectHideFlags: 0
