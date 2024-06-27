@@ -22,20 +22,6 @@ public class LetterBox : MonoBehaviour
     }
     void OnValidate()
     {
-        SubScribe();
-    }
-    void SubScribe()
-    {
-        if (Window.instance.onScreenResized == null)
-        {
-            Window.instance.onScreenResized = Refresh;
-            return;
-        }
-        Delegate[] delegateArray = Window.instance.onScreenResized.GetInvocationList();
-
-        if (delegateArray.Contains((Action)Refresh) == false)
-        {
-            Window.instance.onScreenResized += Refresh;
-        }
+        Refresh();
     }
 }
