@@ -54,10 +54,21 @@ public class Pool
     {
         this.addEvent = addEvent;
 
-        holder = new GameObject(prefab.name).transform;
-        holder.SetParent(PoolHolder.instance.transform);
-
+        if (holder == null)
+        {
+            holder = new GameObject(prefab.name).transform;
+            holder.SetParent(PoolHolder.instance.transform);
+        }
+        foreach (GameObject obj in pool)
+        {
+            if (obj != null) UnityEngine.Object.Destroy(obj);
+        }
+        foreach (WaitDestroyElement element in waitDestroy)
+        {
+            if (element.obj != null) UnityEngine.Object.Destroy(element.obj);
+        }
         pool.Clear();
+        waitDestroy.Clear();
         for (int i = 0; i < startCount; i++)
         {
             Add().SetActive(false);
@@ -88,11 +99,12 @@ public class Pool
             GameObject obj = element.obj;
             if (obj == null)
             {
-                Debug.LogWarning("Pool has null element");
+                Debug.LogWarning("WaitDestroy has null element");
+                waitDestroy.Remove(element);
                 return Use();
             }
-            obj.SetActive(true);
             element.CancelDestroy(this);
+            obj.SetActive(true);
             return obj;
         }
         //모두 사용 중일 때

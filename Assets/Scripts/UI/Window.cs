@@ -1,9 +1,5 @@
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.UI;
 
 public interface IOnWindowValidateReceiver
@@ -23,7 +19,6 @@ public class Window : MonoBehaviour
     public RectTransform gameRect;
     
     public CanvasScaler canvasScaler;
-
 
     public static int WindowHeight => Screen.height;
     public static int WindowWidth => Screen.width;
