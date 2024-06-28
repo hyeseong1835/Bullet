@@ -15,7 +15,12 @@ public class GameManager : MonoBehaviour
     public GameState state;
     public static bool IsEditor => instance.state == GameState.Editor;
 
+    public List<Enemy> enemyList = new List<Enemy>();
+
+
     [SerializeField] GameObject mainPanel;
+
+
 
     void Awake()
     {
