@@ -19,4 +19,5 @@ MonoBehaviour:
   - prefab: {fileID: 0}
     ratio: 2
   ratioMax: 3
+  exp: 10
   speed: 1.5

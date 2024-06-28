@@ -14,6 +14,7 @@ public abstract class EnemyData : EntityData
 {
     public List<DropInfo> drops = new List<DropInfo>();
     public float ratioMax;
+    public float exp;
 
     void OnValidate()
     {

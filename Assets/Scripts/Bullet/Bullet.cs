@@ -44,6 +44,7 @@ public abstract class Bullet : MonoBehaviour
     }
     protected void Update()
     {
+#if UNITY_EDITOR
         if (GameManager.IsEditor)
         {
             if (bulletType == BulletType.Player) gameObject.layer = LayerMask.NameToLayer("PlayerBullet");
@@ -57,6 +58,7 @@ public abstract class Bullet : MonoBehaviour
         
             return;
         }
+#endif
         if (updateEvent != null) updateEvent.Invoke(this);
     }
     protected virtual void Enter(Collider2D coll)

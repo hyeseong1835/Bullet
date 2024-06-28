@@ -75,6 +75,19 @@ public class Window : MonoBehaviour
     void Awake()
     {
         Set();
+
+        var onWindowValidaterecieverIt = FindObjectsOfType<MonoBehaviour>()
+                                                   .OfType<IOnWindowValidateReceiver>();
+
+        foreach (IOnWindowValidateReceiver receiver in onWindowValidaterecieverIt)
+        {
+            receiver.OnWindowValidate();
+        }
+
+        var onScreenResizedRecieverIt = FindObjectsOfType<MonoBehaviour>()
+                                                  .OfType<IOnScreenResizedReceiver>();
+
+        onScreenResizedReceivers = onScreenResizedRecieverIt.ToArray();
     }
     void Update()
     {

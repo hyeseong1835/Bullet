@@ -13,3 +13,8 @@ MonoBehaviour:
   m_Name: PlayerController Data
   m_EditorClassIdentifier: 
   maxHp: 10
+  levelUpExp:
+  - 0
+  - 10
+  - 30
+  - 60

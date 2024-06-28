@@ -23,6 +23,10 @@ public class PlayerController : Entity
 
     [SerializeField] Weapon weapon;
     [SerializeField] List<Weapon> autoWeaponList = new List<Weapon>();
+
+    public float exp;
+    public int level;
+
     void Awake()
     {
         if (GameManager.IsEditor) return;
@@ -69,6 +73,20 @@ public class PlayerController : Entity
         {
             autoWeapon.TryUse();
         }
+    }
+    public void AddExp(float amount)
+    {
+        exp += amount;
+        for (int levelIndex = level + 1; levelIndex < data.levelUpExp.Length; levelIndex++)
+        {
+            if (exp >= data.levelUpExp[levelIndex]) LevelUp();
+            else break;
+        }
+    }
+    void LevelUp()
+    {
+        level++;
+        Debug.Log("Level Up! " + level);
     }
     void OnValidate()
     {

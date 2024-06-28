@@ -31,6 +31,7 @@ public abstract class Enemy : Entity
             }
             random -= drop.ratio;
         }
+        PlayerController.instance.AddExp(EnemyData.exp);
     }
     protected override void OnDead()
     {

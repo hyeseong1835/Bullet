@@ -34,7 +34,7 @@ public class GameManager : MonoBehaviour
 #if UNITY_EDITOR
 
 #else
-    GameState = GameState.Ready;
+    state = GameState.Ready;
 #endif
     }
 
