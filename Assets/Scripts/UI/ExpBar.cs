@@ -21,7 +21,7 @@ public class ExpBar : MonoBehaviour
         }
         else
         {
-            if (player.level >= player.data.levelUpExp.Length)
+            if (player.level + 1 >= player.data.levelUpExp.Length)
             {
                 slider.value = 1;
                 return;

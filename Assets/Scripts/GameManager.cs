@@ -15,18 +15,17 @@ public class GameManager : MonoBehaviour
     public GameState state;
     public static bool IsEditor => instance.state == GameState.Editor;
 
-    public List<Enemy> enemyList = new List<Enemy>();
+    public List<Enemy> enableEnemyList = new List<Enemy>();
 
 
     [SerializeField] GameObject mainPanel;
-
-
+    [SerializeField] GameObject stage1;
 
     void Awake()
     {
         instance = this;
 
-
+        enableEnemyList.Clear();
 #if UNITY_EDITOR
         if (EditorApplication.isPlaying) state = GameState.Ready;
         else state = GameState.Editor;
@@ -36,11 +35,7 @@ public class GameManager : MonoBehaviour
     }
     void Start()
     {
-#if UNITY_EDITOR
 
-#else
-    state = GameState.Ready;
-#endif
     }
 
     void Update()
@@ -65,6 +60,7 @@ public class GameManager : MonoBehaviour
             state = GameState.Play;
 
             mainPanel.SetActive(false);
+            stage1.SetActive(true);
         }
     }
     void Play()

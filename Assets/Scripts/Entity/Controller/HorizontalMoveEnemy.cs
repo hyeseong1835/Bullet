@@ -8,9 +8,10 @@ public class HorizontalMoveEnemy : Enemy
     public HorizontalMoveEnemyData data;
     public override EnemyData EnemyData => data;
 
+    [SerializeField] Weapon weapon;
     [SerializeField] float move;
 
-    void Start()
+    void Awake()
     {
         move = data.speed;
     }
@@ -20,8 +21,12 @@ public class HorizontalMoveEnemy : Enemy
         base.Update();
 
         if (GameManager.IsEditor) return;
-        
-        Move();
+
+        if (state == EntityState.Enable)
+        {
+            Move();
+            UseWeapon();
+        }
     }
     void Move()
     {
@@ -29,5 +34,11 @@ public class HorizontalMoveEnemy : Enemy
         else if (transform.position.x > 0.8f) move = -data.speed;
         
         transform.position += Vector3.right * move * Time.deltaTime;
+    }
+    void UseWeapon()
+    {
+        if (weapon == null) return;
+
+        weapon.TryUse();
     }
 }

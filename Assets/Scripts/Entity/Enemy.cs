@@ -16,6 +16,14 @@ public abstract class Enemy : Entity
             gameObject.layer = LayerMask.NameToLayer("Enemy");
         }
     }
+    private void OnEnable()
+    {
+        GameManager.instance.enableEnemyList.Add(this);
+    }
+    private void OnDisable()
+    {
+        GameManager.instance.enableEnemyList.Remove(this);
+    }
     protected void Drop()
     {
         float random = Random.Range(0, EnemyData.ratioMax);

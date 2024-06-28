@@ -2,8 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum EntityState
+{
+    Disable, Push, Enable
+}
 public abstract class Entity : MonoBehaviour
 {
+    public EntityState state = EntityState.Disable;
     public abstract EntityData EntityData { get; }
     public float hp;
 

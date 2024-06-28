@@ -9,8 +9,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: de5f096d3de00d74aa74288df3e69376, type: 3}
-  m_Name: AllKillWave
+  m_Script: {fileID: 11500000, guid: 997dc958854b1b542a63d5d826200702, type: 3}
+  m_Name: Stage 1
   m_EditorClassIdentifier: 
-  spawns: []
-  enemyList: []
+  waves:
+  - {fileID: 11400000, guid: aa24472d845fefb47b3ca39346dd5757, type: 2}
