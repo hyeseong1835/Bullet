@@ -3,9 +3,26 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public abstract class WaveTrigger : MonoBehaviour
+public class WaveTrigger : MonoBehaviour
 {
     public GameObject wave;
+
+    [SerializeField] int remainEnemyCount;
+    [SerializeField] float time;
+
+    void Update()
+    {
+        if (GameManager.instance.enableEnemyList.Count <= remainEnemyCount)
+        {
+            wave.SetActive(true);
+            Invoke("Timer", time);
+        }
+    }
+    void Timer()
+    {
+        wave.SetActive(true);
+        Destroy(this);
+    }
 
     void OnValidate()
     {
