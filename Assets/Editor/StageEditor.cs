@@ -1,5 +1,5 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
 
@@ -9,29 +9,44 @@ public class StageEditor : EditorWindow
     {
         public Vector2 screenPos;
         public Vector2 worldPos;
-
+        public Vector2 definition;
         public float spawnTime;
 
-        public EditorEnemyData(Vector2 screenPos, Vector2 worldPos, float spawnTime)
+        public EditorEnemyData(Vector2 worldPos, Vector2 definition, float spawnTime)
         {
-            this.screenPos = screenPos;
             this.worldPos = worldPos;
+            screenPos = WorldToScreenPos(worldPos);
+
+            this.definition = definition;
 
             this.spawnTime = spawnTime;
         }
     }
-    List<EditorEnemyData> editorEnemyDataList = new List<EditorEnemyData>();
+    static List<EditorEnemyData> editorEnemyDataList = new List<EditorEnemyData>();
 
-    EditorEnemyData selectedEnemyData = new EditorEnemyData(new Vector2(100, 300), Vector2.zero, 0);
+    static Vector2 center = Vector2.zero;
+    static EditorEnemyData selectedEnemyData;
 
-    Vector2 center;
 
-    float inspectorLinePosX = 100;
-    bool holdInspectorLine = false;
+    static float inspectorLinePosX = 100;
+    static bool holdInspectorLine = false;
     const float defaultInspectorWidth = 300;
     const float inspectorTopSpace = 10;
     const float inspectorRightSpace = 5;
     const float inspectorLeftSpace = 5;
+    const float cellSize = 50;
+
+    Vector2Int cellCount = new Vector2Int(Window.GameWidth + 4, Window.GameHeight + 4);
+    static float timeLength = 100;
+    const float timeCubeSize = 10;
+    const float timeHorizontalSpace = 100;
+    const float timeBottomSpace = 50;
+    const float screenMoveSpeed = 100;
+    const float inspectorLineHoldWidth = 10;
+    static Vector2 Origin => center + Vector2.up * cellSize * (0.5f * Window.GameHeight);
+
+    const float definitionGizmoSize = 10;
+    
 
     [MenuItem("Window/StageEditor")]
     static void CreateWindow()
@@ -42,24 +57,13 @@ public class StageEditor : EditorWindow
     void OnGUI()
     {
         Event e = Event.current;
-        float cellSize = 50;
-        Vector2Int cellCount = new Vector2Int(Window.GameWidth + 4, Window.GameHeight + 4);
-        float timeLength = 100;
-        float timeCubeSize = 10;
-        float timeHorizontalSpace = 100;
-        float timeBottomSpace = 50;
-        float screenMoveSpeed = 100;
-        float inspectorLineHoldWidth = 10;
 
-        Vector2 origin = center + Vector2.up * cellSize * (0.5f * Window.GameHeight);
 
         if (center.x < 0 || inspectorLinePosX < center.x || center.y < 0 || position.height < center.y)
         {
             Debug.Log($"Center({center.x}, {center.y}) is out of Window({position.size.x}, {position.size.y})");
             center = 0.5f * new Vector2(inspectorLinePosX, position.height);
-            origin = center + Vector2.up * cellSize * (0.5f * Window.GameHeight);
             selectedEnemyData.screenPos = WorldToScreenPos(selectedEnemyData.worldPos);
-
         }
         #region Screen Move
 
@@ -92,7 +96,6 @@ public class StageEditor : EditorWindow
             if (move != Vector2.zero)
             {
                 center += move * screenMoveSpeed;
-                origin = center + Vector2.up * cellSize * (0.5f * Window.GameHeight);
                 selectedEnemyData.screenPos = WorldToScreenPos(selectedEnemyData.worldPos);
 
                 e.Use();
@@ -138,21 +141,6 @@ public class StageEditor : EditorWindow
 
         #endregion
 
-        #region Enemy
-
-        Handles.DrawSolidDisc(selectedEnemyData.screenPos, Vector3.forward, 10);
-
-        float timeLineY = position.height - timeBottomSpace;
-        Handles.DrawLine(
-            new Vector3(timeHorizontalSpace, timeLineY), 
-            new Vector3(inspectorLinePosX - timeHorizontalSpace, timeLineY)
-        );
-        Handles.DrawWireCube(
-            new Vector3(timeHorizontalSpace + (selectedEnemyData.spawnTime / timeLength) * (inspectorLinePosX - 2 * timeHorizontalSpace), timeLineY), 
-            Vector3.one * timeCubeSize
-        );
-
-        #endregion
 
         #region Inspector
 
@@ -199,12 +187,19 @@ public class StageEditor : EditorWindow
         }
         #endregion
 
-        #region Value
+        DrawEnemyDataInInspector();
+        DrawEnemyDataGizmos();
+
+        #endregion
+    }
+    void DrawEnemyDataInInspector()
+    {
+        if (selectedEnemyData.IsUnityNull()) selectedEnemyData = new EditorEnemyData(Vector2.zero, Vector2.zero, 0);
 
         GUILayout.BeginArea(new Rect(
-            inspectorLinePosX + inspectorLeftSpace, inspectorTopSpace, 
+            inspectorLinePosX + inspectorLeftSpace, inspectorTopSpace,
             position.width - inspectorLinePosX - inspectorLeftSpace - inspectorRightSpace, position.height));
-        
+
         GUILayout.Label("Enemy Inspector", EditorStyles.boldLabel);
 
         EditorGUILayout.Vector2Field("Screen Pos", selectedEnemyData.screenPos);
@@ -214,26 +209,42 @@ public class StageEditor : EditorWindow
             selectedEnemyData.worldPos = editedselectedEnemyDataWorldPos;
             selectedEnemyData.screenPos = WorldToScreenPos(editedselectedEnemyDataWorldPos);
         }
-        
+
+        selectedEnemyData.definition = EditorGUILayout.Vector2Field("Definition", selectedEnemyData.definition);
+
         selectedEnemyData.spawnTime = EditorGUILayout.FloatField("Spawn Time", selectedEnemyData.spawnTime);
 
         GUILayout.EndArea();
+    }
+    void DrawEnemyDataGizmos()
+    {
+        Handles.DrawSolidDisc(selectedEnemyData.screenPos, Vector3.forward, 10);
 
-        #endregion
+        float timeLineY = position.height - timeBottomSpace;
+        Handles.DrawLine(
+            new Vector3(timeHorizontalSpace, timeLineY),
+            new Vector3(inspectorLinePosX - timeHorizontalSpace, timeLineY)
+        );
+        Handles.DrawWireCube(
+            new Vector3(timeHorizontalSpace + (selectedEnemyData.spawnTime / timeLength) * (inspectorLinePosX - 2 * timeHorizontalSpace), timeLineY),
+            Vector3.one * timeCubeSize
+        );
+        Handles.color = Color.cyan;
+        Vector2 definitionScreenPos = WorldToScreenPos(selectedEnemyData.definition);
 
-        #endregion
+        Handles.DrawLine(selectedEnemyData.screenPos, definitionScreenPos);
+        Vector2 X = new Vector2(definitionGizmoSize, -definitionGizmoSize);
+        Handles.DrawLine(definitionScreenPos + X, definitionScreenPos - X);
+        Handles.DrawLine(definitionScreenPos + Vector2.one * definitionGizmoSize, definitionScreenPos - Vector2.one * definitionGizmoSize);
 
-        #region Utility
+    }
 
-        Vector2 ScreenToWorldPos(Vector2 screenPos)
-        {
-            return new Vector2(screenPos.x, -screenPos.y) / cellSize - origin;
-        }
-        Vector2 WorldToScreenPos(Vector2 worldPos)
-        {
-            return new Vector2(worldPos.x, - worldPos.y) * cellSize + origin;
-        }
-
-        #endregion
+    public static Vector2 ScreenToWorldPos(Vector2 screenPos)
+    {
+        return new Vector2(screenPos.x, -screenPos.y) / cellSize - Origin;
+    }
+    public static Vector2 WorldToScreenPos(Vector2 worldPos)
+    {
+        return new Vector2(worldPos.x, -worldPos.y) * cellSize + Origin;
     }
 }
