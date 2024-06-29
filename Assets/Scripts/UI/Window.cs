@@ -24,20 +24,20 @@ public class Window : MonoBehaviour
     public static int WindowWidth => Screen.width;
     public static float windowRatio { get; private set; }
 
-    public static float ScreenHeight => instance.screenHeight;
-    [SerializeField] float screenHeight = 1;
-    public static float ScreenWidth => instance.screenWidth;
-    [SerializeField] float screenWidth = 1;
+    public static int ScreenHeight => instance.screenHeight;
+    [SerializeField] int screenHeight = 1;
+    public static int ScreenWidth => instance.screenWidth;
+    [SerializeField] int screenWidth = 1;
     public static float screenRatio { get; private set; }
     public static float screenUp { get; private set; }
     public static float screenDown { get; private set; }
     public static float screenRight { get; private set; }
     public static float screenLeft { get; private set; }
 
-    public static float GameHeight => instance.gameHeight;
-    [SerializeField] float gameHeight = 1;
-    public static float GameWidth => instance.gameWidth;
-    [SerializeField] float gameWidth = 1;
+    public static int GameHeight => instance.gameHeight;
+    [SerializeField] int gameHeight = 1;
+    public static int GameWidth => instance.gameWidth;
+    [SerializeField] int gameWidth = 1;
     public static float gameRatio { get; private set; }
     public static float gameUp { get; private set; }
     public static float gameDown { get; private set; }
