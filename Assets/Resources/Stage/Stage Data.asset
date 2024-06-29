@@ -9,8 +9,16 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 997dc958854b1b542a63d5d826200702, type: 3}
-  m_Name: Stage 1
+  m_Script: {fileID: 11500000, guid: 716bf7d622075f147aeeea90e2564d49, type: 3}
+  m_Name: Stage Data
   m_EditorClassIdentifier: 
-  waves:
-  - {fileID: 11400000, guid: aa24472d845fefb47b3ca39346dd5757, type: 2}
+  enemyPool:
+  - prefab: {fileID: 0}
+    holder: {fileID: 0}
+    destroyDelay: 0
+    startCount: 0
+    stayCount: 0
+    pool: []
+    waitDestroy: []
+  waveData: []
+  waveIndex: 0

@@ -60,7 +60,7 @@ public class GameManager : MonoBehaviour
             state = GameState.Play;
 
             mainPanel.SetActive(false);
-            stage1.SetActive(true);
+            //stage1.SetActive(true);
         }
     }
     void Play()

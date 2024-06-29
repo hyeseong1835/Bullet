@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 716bf7d622075f147aeeea90e2564d49, type: 3}
+  m_Name: Stage Data
+  m_EditorClassIdentifier: 
+  enemyPool:
+  - prefab: {fileID: 3165707502109179637, guid: 82853a872a1008f4dbea4bbc8b44b5b9, type: 3}
+    holder: {fileID: 0}
+    destroyDelay: 0
+    startCount: 0
+    stayCount: 0
+    pool: []
+    waitDestroy: []
+  waveData:
+  - spawnData:
+    - enemySpawnID: 0
+      pusherData: {fileID: 0}
+    trigger:
+      remainEnemyCount: 0
+      time: 0
+  waveIndex: 0

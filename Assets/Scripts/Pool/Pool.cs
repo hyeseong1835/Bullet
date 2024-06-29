@@ -95,12 +95,12 @@ public class Pool
         //파괴 예정 오브젝트가 있을 때
         if (waitDestroy.Count > 0)
         {
-            WaitDestroyElement element = waitDestroy[0];
+            WaitDestroyElement element = waitDestroy[^1];
             GameObject obj = element.obj;
             if (obj == null)
             {
                 Debug.LogWarning("WaitDestroy has null element");
-                waitDestroy.Remove(element);
+                waitDestroy.RemoveAt(waitDestroy.Count - 1);
                 return Use();
             }
             element.CancelDestroy(this);

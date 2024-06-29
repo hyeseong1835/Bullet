@@ -3,13 +3,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-
-public class StageData : ScriptableObject
+[CreateAssetMenu(fileName = "Stage", menuName = "Data/Stage")]
+public class Stage : ScriptableObject
 {
     [Serializable]
     public class EnemySpawnData
     {
-
+        public int enemySpawnID;
+        public PusherData pusherData;
     }
 
     [Serializable]
@@ -28,19 +29,28 @@ public class StageData : ScriptableObject
 
         void Timer() => triggerTime = true;
     }
-
+    [Serializable]
     public struct WaveData
     {
-        public EnemySpawnData[] spawnDataArray;
+        public EnemySpawnData[] spawnData;
         public WaveTrigger trigger;
 
-        public WaveData(EnemySpawnData[] spawnDataArray, WaveTrigger trigger)
+        public WaveData(EnemySpawnData[] spawnData, WaveTrigger trigger)
         {
-            this.spawnDataArray = spawnDataArray;
+            this.spawnData = spawnData;
             this.trigger = trigger;
         }
     }
-    public WaveData[] waveDataArray;
+    public Pool[] enemyPool;
+    public WaveData[] waveData;
     public int waveIndex = 0;
+
+    public void Start()
+    {
+        foreach (Pool pool in enemyPool)
+        {
+            if (pool.holder == null) pool.Init();
+        }
+    }
 }
 

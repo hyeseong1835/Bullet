@@ -14,14 +14,8 @@ public class Pusher : MonoBehaviour
     
     Entity entity;
 
-    [SerializeField] Vector2 startPos;
-    [SerializeField] Vector2 endPos;
-    [SerializeField] Vector2 handlePos;
-
-    [SerializeField] AnimationCurve moveCurve;
-    [SerializeField] float startTime;
-    [SerializeField] float endTime;
-
+    public PusherData data;
+    
 
     private void Start()
     {
@@ -31,15 +25,15 @@ public class Pusher : MonoBehaviour
     {
         entity = GetComponent<Entity>();
         entity.state = EntityState.Push;
-        yield return new WaitForSeconds(startTime);
+        yield return new WaitForSeconds(data.startTime);
         
-        float time = startTime;
-        while (time != endTime)
+        float time = data.startTime;
+        while (time != data.endTime)
         {
             time += Time.deltaTime;
-            if (time > endTime) time = endTime;
+            if (time > data.endTime) time = data.endTime;
 
-            float t = moveCurve.Evaluate(time);
+            float t = data.moveCurve.Evaluate(time);
             transform.position = Bezier(t);
 
             yield return null;
@@ -49,24 +43,26 @@ public class Pusher : MonoBehaviour
     }
     Vector2 Bezier(float t)
     {
-        Vector2 a = Vector2.Lerp(startPos, handlePos, t);
-        Vector2 b = Vector2.Lerp(handlePos, endPos, t);
+        Vector2 a = Vector2.Lerp(data.startPos, data.handlePos, t);
+        Vector2 b = Vector2.Lerp(data.handlePos, data.endPos, t);
 
         return Vector2.Lerp(a, b, t);
     }
     private void OnDrawGizmosSelected()
     {
+        if (data == null) return;
+
         Gizmos.color = Color.blue;
        
-        Gizmos.DrawWireSphere(startPos, startPosGizmosSize);
+        Gizmos.DrawWireSphere(data.startPos, startPosGizmosSize);
         
         Vector2 two = new Vector2(1, -1);
-        Gizmos.DrawLine(endPos + Vector2.one * endPosGizmosSize, endPos - Vector2.one * endPosGizmosSize);
-        Gizmos.DrawLine(endPos + two * endPosGizmosSize, endPos - two * endPosGizmosSize);
+        Gizmos.DrawLine(data.endPos + Vector2.one * endPosGizmosSize, data.endPos - Vector2.one * endPosGizmosSize);
+        Gizmos.DrawLine(data.endPos + two * endPosGizmosSize, data.endPos - two * endPosGizmosSize);
 
-        Gizmos.DrawWireCube(handlePos, Vector2.one * handlePosGizmosSize);
+        Gizmos.DrawWireCube(data.handlePos, Vector2.one * handlePosGizmosSize);
 
-        Vector2 prevPos = startPos;
+        Vector2 prevPos = data.startPos;
 
         for (int i = 1; i <= detail; i++)
         {
@@ -79,21 +75,23 @@ public class Pusher : MonoBehaviour
     }
     private void OnValidate()
     {
-        transform.position = new Vector3(startPos.x, startPos.y, transform.position.z);
+        if (data == null) return;
 
-        if (moveCurve.length == 0)
+        transform.position = new Vector3(data.startPos.x, data.startPos.y, transform.position.z);
+
+        if (data.moveCurve.length == 0)
         {
-            moveCurve.AddKey(0, 0);
-            moveCurve.AddKey(1, 1);
+            data.moveCurve.AddKey(0, 0);
+            data.moveCurve.AddKey(1, 1);
         }
-        foreach(Keyframe key in moveCurve.keys)
+        foreach(Keyframe key in data.moveCurve.keys)
         {
             if (key.value > 1)
             {
                 Debug.LogWarning("MoveCurve의 값은 1보다 작거나 같아야 합니다.");
             }
         }
-        startTime = moveCurve.keys[0].time;
-        endTime = moveCurve.keys[^1].time;
+        data.startTime = data.moveCurve.keys[0].time;
+        data.endTime = data.moveCurve.keys[^1].time;
     }
 }
