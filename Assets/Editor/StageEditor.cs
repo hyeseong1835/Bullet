@@ -25,6 +25,8 @@ public class StageEditor : EditorWindow
     static List<EditorEnemyData> editorEnemyDataList = new List<EditorEnemyData>();
 
     static Vector2 center = Vector2.zero;
+    
+    static Stage.EnemySpawnData selectedData;
     static EditorEnemyData selectedEnemyData;
 
 
@@ -32,11 +34,12 @@ public class StageEditor : EditorWindow
     static bool holdInspectorLine = false;
     const float defaultInspectorWidth = 300;
     const float inspectorTopSpace = 10;
+    const float inspectorBottomSpace = 5;
     const float inspectorRightSpace = 5;
     const float inspectorLeftSpace = 5;
     const float cellSize = 50;
 
-    Vector2Int cellCount = new Vector2Int(Window.GameWidth + 4, Window.GameHeight + 4);
+    Vector2Int cellCount;
     static float timeLength = 100;
     const float timeCubeSize = 10;
     const float timeHorizontalSpace = 100;
@@ -57,7 +60,7 @@ public class StageEditor : EditorWindow
     void OnGUI()
     {
         Event e = Event.current;
-
+        cellCount = new Vector2Int(Window.GameWidth + 4, Window.GameHeight + 4);
 
         if (center.x < 0 || inspectorLinePosX < center.x || center.y < 0 || position.height < center.y)
         {
@@ -209,12 +212,35 @@ public class StageEditor : EditorWindow
             selectedEnemyData.worldPos = editedselectedEnemyDataWorldPos;
             selectedEnemyData.screenPos = WorldToScreenPos(editedselectedEnemyDataWorldPos);
         }
-
         selectedEnemyData.definition = EditorGUILayout.Vector2Field("Definition", selectedEnemyData.definition);
 
         selectedEnemyData.spawnTime = EditorGUILayout.FloatField("Spawn Time", selectedEnemyData.spawnTime);
 
         GUILayout.EndArea();
+
+
+        float buttonHeight = 20;
+        float buttonWidth = 50;
+
+        Rect applyButtonRect = new Rect();
+        applyButtonRect.x = position.width - (buttonWidth + inspectorRightSpace);
+        applyButtonRect.y = position.height - 10 - 0.5f * buttonHeight - inspectorBottomSpace;
+        applyButtonRect.width = buttonWidth;
+        applyButtonRect.height = buttonHeight;
+
+        Rect loadButtonRect = new Rect();
+        loadButtonRect.x = inspectorLinePosX + (inspectorLeftSpace);
+        loadButtonRect.y = position.height - 10 - 0.5f * buttonHeight - inspectorBottomSpace;
+        loadButtonRect.width = buttonWidth;
+        loadButtonRect.height = buttonHeight;
+        if (GUI.Button(applyButtonRect, "Apply"))
+        {
+
+        }
+        if (GUI.Button(loadButtonRect, "Load"))
+        {
+
+        }
     }
     void DrawEnemyDataGizmos()
     {
