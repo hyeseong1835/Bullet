@@ -12,13 +12,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1746f1f309873d94e9bce51beeecd3b9, type: 3}
   m_Name: Setting
   m_EditorClassIdentifier: 
+  lineHoldWidth: 10
+  minDistanceBetweenLines: 10
   inspectorTopSpace: 10
   inspectorBottomSpace: 5
   inspectorRightSpace: 5
   inspectorLeftSpace: 5
-  defaultInspectorWidth: 300
+  fileTopSpace: 10
+  fileBottomSpace: 5
+  fileRightSpace: 5
+  fileLeftSpace: 5
   timeCubeSize: 10
   timeHorizontalSpace: 100
   timeBottomSpace: 50
   screenMoveSpeed: 1
   definitionGizmoSize: 10
+  buttonHeight: 20
+  buttonWidth: 100

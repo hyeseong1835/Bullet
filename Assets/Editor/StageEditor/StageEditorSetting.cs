@@ -27,5 +27,5 @@ public class StageEditorSetting : ScriptableObject
     public float definitionGizmoSize = 10;
 
     public float buttonHeight = 20;
-    public float buttonWidth = 50;
+    public float buttonWidth = 100;
 }

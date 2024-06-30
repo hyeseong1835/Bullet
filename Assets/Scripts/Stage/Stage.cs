@@ -6,11 +6,6 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "Stage", menuName = "Data/Stage")]
 public class Stage : ScriptableObject
 {
-    public class EnemyData : ScriptableObject
-    {
-        public int enemySpawnID;
-    }
-
     [Serializable]
     public class WaveTrigger
     {
@@ -30,10 +25,10 @@ public class Stage : ScriptableObject
     [Serializable]
     public struct WaveData
     {
-        public EnemyData[] spawnData;
+        public EnemySpawnData[] spawnData;
         public WaveTrigger trigger;
 
-        public WaveData(EnemyData[] spawnData, WaveTrigger trigger)
+        public WaveData(EnemySpawnData[] spawnData, WaveTrigger trigger)
         {
             this.spawnData = spawnData;
             this.trigger = trigger;

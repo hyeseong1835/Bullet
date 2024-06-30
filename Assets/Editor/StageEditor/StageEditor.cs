@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UnityEditor;
 using UnityEditor.Experimental;
 using UnityEngine;
@@ -37,12 +38,16 @@ public class StageEditor : EditorWindow
         InspectorLineHold();
         FileLineHold();
 
-        ShowEnemyDataOnInspector();
+        if (data.selectedEnemy != null)
+        {
+            DrawEnemyDataGizmos();
+            DrawTimeLine();
+
+            ShowEnemyDataOnInspector();
+        }
+
         ShowFilesOnFileViewer();
 
-        DrawEnemyDataGizmos();
-        DrawTimeLine();
-        
 
 
 
@@ -244,8 +249,6 @@ public class StageEditor : EditorWindow
 
             GUILayout.EndArea();
 
-
-
             Rect applyButtonRect = new Rect();
             applyButtonRect.x = position.width - (setting.buttonWidth + setting.inspectorRightSpace);
             applyButtonRect.y = position.height - 10 - 0.5f * setting.buttonHeight - setting.inspectorBottomSpace;
@@ -270,24 +273,49 @@ public class StageEditor : EditorWindow
         {
             Rect area = new Rect();
             area.position = new Vector2(setting.fileLeftSpace, setting.fileTopSpace);
-            area.size = new Vector2(data.filesLinePosX - setting.fileRightSpace - setting.fileLeftSpace, position.height - setting.fileTopSpace - setting.fileBottomSpace);
+            area.size = new Vector2(
+                data.filesLinePosX - setting.fileRightSpace - setting.fileLeftSpace, 
+                position.height - setting.fileTopSpace - setting.fileBottomSpace
+            );
 
             GUILayout.BeginArea(area);
 
             Rect stageFolderPathFieldRect = new Rect();
-            stageFolderPathFieldRect.position = area.position + new Vector2(0, setting.buttonHeight);
+            stageFolderPathFieldRect.position = area.position;
             stageFolderPathFieldRect.size = new Vector2(area.width - setting.buttonWidth, EditorGUIUtility.singleLineHeight);
-            openStageFolderPath = EditorGUI.TextField(stageFolderPathFieldRect, "Stage Folder Path", openStageFolderPath);
+            EditorGUIUtility.labelWidth = 100;
+            openStageFolderPath = EditorGUI.TextField(stageFolderPathFieldRect, "Stage Name", openStageFolderPath);
             
             Rect refreshButtonRect = new Rect();
-            refreshButtonRect.position = area.position + new Vector2(stageFolderPathFieldRect.width, setting.buttonHeight);
+            refreshButtonRect.position = stageFolderPathFieldRect.position + new Vector2(stageFolderPathFieldRect.width, 0);
             refreshButtonRect.size = new Vector2(setting.buttonWidth, EditorGUIUtility.singleLineHeight);
+
             if (GUI.Button(refreshButtonRect, "Refresh"))
             {
                 string folderResourcePath = $"Stage/{openStageFolderPath}";
                 if (openStageFolderPath != "" && Directory.Exists($"Assets/Resources/{folderResourcePath}"))
                 {
-                    // = (EnemyData)Resources.LoadAll(folderResourcePath + "Enemies");
+                    data.editorEnemyDataList = Resources.LoadAll<EnemySpawnData>(folderResourcePath + "/Enemies").ToList();
+                }
+            }
+
+            if (data.editorEnemyDataList != null)
+            {
+                int i = 2;
+                foreach (EnemySpawnData data in data.editorEnemyDataList)
+                {
+                    Rect dataRect = new Rect();
+                    dataRect.position = area.position + new Vector2(0, i * EditorGUIUtility.singleLineHeight);
+                    dataRect.size = new Vector2(area.width, EditorGUIUtility.singleLineHeight);
+                    Rect worldRect = new Rect(position.position + dataRect.position, dataRect.size);
+                    if (e.keyCode == KeyCode.Mouse0 && worldRect.Contains(e.mousePosition))
+                    {
+                        Debug.Log("Select" + data);
+                        StageEditor.data.selectedEnemy = data;
+                        e.Use();
+                    }
+                    EditorGUI.ObjectField(dataRect, data, typeof(EnemyData), false);
+                    i++;
                 }
             }
 

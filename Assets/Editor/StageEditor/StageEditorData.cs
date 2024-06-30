@@ -24,9 +24,9 @@ public class StageEditorData : ScriptableObject
     public Box preview;
     public Vector2 previewPos;
 
-    public List<EditorEnemyData> editorEnemyDataList = new List<EditorEnemyData>();
+    public List<EnemySpawnData> editorEnemyDataList = new List<EnemySpawnData>();
 
-    public EditorEnemyData selectedEnemy;
+    public EnemySpawnData selectedEnemy;
 
     public float cellSize = 50;
 
