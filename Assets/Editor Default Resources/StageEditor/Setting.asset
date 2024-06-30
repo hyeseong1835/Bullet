@@ -20,5 +20,5 @@ MonoBehaviour:
   timeCubeSize: 10
   timeHorizontalSpace: 100
   timeBottomSpace: 50
-  screenMoveSpeed: 100
+  screenMoveSpeed: 1
   definitionGizmoSize: 10

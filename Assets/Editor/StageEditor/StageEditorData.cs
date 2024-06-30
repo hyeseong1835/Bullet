@@ -30,7 +30,8 @@ public class StageEditorData : ScriptableObject
 
     public float cellSize = 50;
 
-    public float inspectorLinePosX = 100;
+    public float inspectorLinePosX;
+    public float filesLinePosX;
 
     private void OnValidate()
     {
