@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using Unity.VisualScripting;
+﻿using System;
+using System.Collections.Generic;
 using UnityEditor;
 using UnityEditor.Experimental;
 using UnityEngine;
@@ -11,10 +11,8 @@ public class StageEditor : EditorWindow
 
     bool holdInspectorLine = false;
 
-    Vector2Int cellCount;
     static float timeLength = 100;
     const float inspectorLineHoldWidth = 10;
-
 
     [MenuItem("Window/StageEditor")]
     static void CreateWindow()
@@ -28,50 +26,42 @@ public class StageEditor : EditorWindow
         if (data == null) data = (StageEditorData)EditorResources.Load<ScriptableObject>("StageEditor/Data.asset");
         if (setting == null) setting = (StageEditorSetting)EditorResources.Load<ScriptableObject>("StageEditor/Setting.asset");
         
-        cellCount = new Vector2Int(Window.GameWidth + 4, Window.GameHeight + 4);
-
         if (data.preview.IsContact(data.previewPos, position.height, 0, data.inspectorLinePosX, 0, out Vector2 previewContact))
         {
             data.previewPos = previewContact;
         }
-        Handles.DrawSolidDisc(data.previewPos, Vector3.forward, 10);
 
         #region Screen Move
 
         Vector2 move;
-
-        if (e.type == EventType.KeyDown)
+        switch (e.keyCode)
         {
-            switch (e.keyCode)
-            {
-                case KeyCode.LeftArrow:
-                    move = Vector2.left;
-                    break;
+            case KeyCode.LeftArrow:
+                move = Vector2.left;
+                break;
 
-                case KeyCode.RightArrow:
-                    move = Vector2.right;
-                    break;
+            case KeyCode.RightArrow:
+                move = Vector2.right;
+                break;
 
-                case KeyCode.UpArrow:
-                    move = Vector2.down;
-                    break;
+            case KeyCode.UpArrow:
+                move = Vector2.down;
+                break;
 
-                case KeyCode.DownArrow:
-                    move = Vector2.up;
-                    break;
+            case KeyCode.DownArrow:
+                move = Vector2.up;
+                break;
 
-                default:
-                    move = Vector2.zero;
-                    break;
-            }
-            if (move != Vector2.zero)
-            {
-                data.previewPos += move * setting.screenMoveSpeed;
-
-                e.Use();
-                OnGUI();
-            }
+            default:
+                move = Vector2.zero;
+                break;
         }
+        if (move != Vector2.zero)
+        {
+            data.previewPos += move * setting.screenMoveSpeed;
+            Repaint();
+        }
+
 
         #endregion
 
@@ -237,7 +227,6 @@ public class StageEditor : EditorWindow
         Vector2 X = new Vector2(setting.definitionGizmoSize, -setting.definitionGizmoSize);
         Handles.DrawLine(definitionScreenPos + X, definitionScreenPos - X);
         Handles.DrawLine(definitionScreenPos + Vector2.one * setting.definitionGizmoSize, definitionScreenPos - Vector2.one * setting.definitionGizmoSize);
-
     }
 
     public static Vector2 ScreenToWorldPos(Vector2 screenPos)
