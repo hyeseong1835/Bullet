@@ -21,8 +21,8 @@ public class StageEditor : EditorWindow
     string openStageFolderPath = "";
 
     bool isPrefabDropDownExpanded = false;
-    int selectedPrefabIndex = 0;
-    string[] prefabPopupNameArray = new string[0];
+    Vector2 offset;
+    public bool mouse0 = false;
 
     [MenuItem("Window/StageEditor")]
     static void CreateWindow()
@@ -37,13 +37,23 @@ public class StageEditor : EditorWindow
 
         LoadData();
 
-        PreviewMove();
 
         DrawGrid();
-
+        if (data.selectedEnemySpawnData != null && data.selectedEnemyEditorGUI != null)
+        {
+            data.selectedEnemyEditorGUI.DrawEnemyDataGizmos(data.selectedEnemySpawnData);
+        }
         InspectorLineHold();
         FileLineHold();
-        
+
+        Rect previewRect = new Rect();
+        previewRect.x = data.filesLinePosX;
+        previewRect.y = 0;
+        previewRect.width = data.inspectorLinePosX - data.filesLinePosX;
+        previewRect.height = position.height;
+
+        PreviewMove();
+
         OnFileViewerGUI();
 
         if (data.selectedEnemySpawnData != null)
@@ -125,61 +135,75 @@ public class StageEditor : EditorWindow
             GUILayout.BeginArea(area);
 
             GUILayout.Label("Enemy Inspector", EditorStyles.boldLabel);
-            Rect prefabDropDownTitleRect = new Rect();
-            prefabDropDownTitleRect.position = Vector2.zero.GetSetY(EditorStyles.boldLabel.lineHeight);
-            prefabDropDownTitleRect.size = area.size.GetSetY(EditorGUIUtility.singleLineHeight);
-
-            string previewName;
-            if (data.selectedEnemySpawnData.enemyPrefab != null) previewName = data.selectedEnemySpawnData.enemyPrefab.name;
-            else previewName = "None";
-
-            if (EditorGUI.DropdownButton(prefabDropDownTitleRect, new GUIContent(previewName), FocusType.Passive))
-            {
-                if (isPrefabDropDownExpanded)
-                {
-                    isPrefabDropDownExpanded = false;
-                }
-                else
-                {
-                    isPrefabDropDownExpanded = true;
-                    data.prefabs = Resources.LoadAll<GameObject>($"Stage/{openStageFolderPath}/EnemyPrefabs");
-                    
-                    prefabPopupNameArray = new string[data.prefabs.Length];
-
-                    for (int i = 0; i < data.prefabs.Length; i++)
-                    {
-                        prefabPopupNameArray[i] = data.prefabs[i].name;
-                    }
-                }
-            }
-            GUILayout.Space(prefabDropDownTitleRect.size.y);
 
             data.selectedEnemySpawnData.spawnTime = EditorGUILayout.FloatField("Spawn Time", data.selectedEnemySpawnData.spawnTime);
 
-
+            Rect prefabDropDownButtonRect = PrefabSelectDropDownHeader();
+            
             if (data.selectedEnemyEditorGUI != null)
+            {
+                EnemySpawnData();
+            }
+            
+            PrefabSelectDropDown(prefabDropDownButtonRect);
+
+            GUILayout.EndArea();
+
+            void EnemySpawnData() 
             {
                 data.selectedEnemySpawnData = (EnemySpawnData)EditorGUILayout.ObjectField(data.selectedEnemySpawnData, typeof(EnemySpawnData), false);
                 data.selectedEnemyEditorGUI.DrawInspectorGUI(data.selectedEnemySpawnData);
             }
-
-            if (true)
+            Rect PrefabSelectDropDownHeader()
             {
-                Rect dropDownRect = prefabDropDownTitleRect;
-                dropDownRect.size = dropDownRect.size.GetSetY((data.prefabs.Length + 1) * prefabDropDownTitleRect.size.y);
+                string selectedName;
+                if (data.selectedEnemySpawnData.enemyPrefab != null) selectedName = data.selectedEnemySpawnData.enemyPrefab.name;
+                else selectedName = "None";
 
-                int inputIndex = EditorGUI.Popup(dropDownRect, selectedPrefabIndex, prefabPopupNameArray);
-                if (inputIndex != selectedPrefabIndex)
+                if (EditorGUILayout.DropdownButton(new GUIContent(selectedName), FocusType.Passive))
                 {
-                    selectedPrefabIndex = inputIndex;
-                    data.selectedEnemySpawnData.enemyPrefab = data.prefabs[inputIndex];
-                    //isPrefabDropDownExpanded = false;
+                    if (isPrefabDropDownExpanded)
+                    {
+                        isPrefabDropDownExpanded = false;
+                    }
+                    else
+                    {
+                        data.prefabs = Resources.LoadAll<GameObject>($"Stage/{openStageFolderPath}/EnemyPrefabs");
+                        isPrefabDropDownExpanded = true;
+                    }
                 }
-
-                //if (dropDownRect.Contains(e.mousePosition) == false) isPrefabDropDownExpanded = false;
+                return GUILayoutUtility.GetLastRect();
             }
+            void PrefabSelectDropDown(Rect headerRect)
+            {
+                if (isPrefabDropDownExpanded)
+                {
+                    for (int i = 0; i < data.prefabs.Length; i++)
+                    {
+                        GameObject prefab = data.prefabs[i];
+                        Rect rect = headerRect;
+                        rect.position = rect.position.GetAddY((i + 1) * headerRect.height);
+                        GUI.Box(rect, prefab.name);
 
-            GUILayout.EndArea();
+                        if (rect.Contains(e.mousePosition))
+                        {
+                            Handles.DrawSolidRectangleWithOutline(rect, new Color(1, 1, 1, 0.1f), Color.white);
+                            if (e.isMouse)
+                            {
+                                if (e.type == EventType.MouseDown)
+                                {
+                                    data.selectedEnemySpawnData.enemyPrefab = prefab;
+                                    isPrefabDropDownExpanded = false;
+                                }
+                                e.Use();
+                            }
+                        }
+                        Repaint();
+                    }
+
+                    //if (dropDownRect.Contains(e.mousePosition) == false){ Debug.Log("닫음 : 범위 벗어남"); isPrefabDropDownExpanded = false; }
+                }
+            }
         }
 
         void LoadData()
@@ -194,6 +218,7 @@ public class StageEditor : EditorWindow
         }
         void DrawGrid()
         {
+            Handles.DrawSolidDisc(WorldToScreenPos(Vector2.zero), Vector3.forward, 0.1f * data.cellSize);
             Handles.color = Color.gray;
             for (float x = data.previewPos.x % data.cellSize; x < data.inspectorLinePosX; x += data.cellSize)
             {
@@ -244,6 +269,26 @@ public class StageEditor : EditorWindow
         }
         void PreviewMove()
         {
+            if (e.type == EventType.MouseDown && previewRect.Contains(e.mousePosition))
+            {
+                offset = data.previewPos - e.mousePosition;
+                mouse0 = true;
+            }
+            if (e.type == EventType.MouseUp)
+            {
+                mouse0 = false;
+            }
+            if (mouse0)
+            {
+                data.previewPos = e.mousePosition + offset;
+                Repaint();
+
+                if (data.preview.IsContact(data.previewPos, position.height, 0, data.inspectorLinePosX, data.filesLinePosX, out Vector2 previewContact))
+                {
+                    data.previewPos = previewContact;
+                }
+            }
+            /*
             Vector2 move;
             switch (e.keyCode)
             {
@@ -276,6 +321,7 @@ public class StageEditor : EditorWindow
             {
                 data.previewPos = previewContact;
             }
+            */
         }
         void TimeLineMove()
         {

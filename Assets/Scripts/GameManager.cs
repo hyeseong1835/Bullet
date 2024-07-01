@@ -19,7 +19,7 @@ public class GameManager : MonoBehaviour
 
 
     [SerializeField] GameObject mainPanel;
-    [SerializeField] GameObject stage1;
+    [SerializeField] Stage stage1;
 
     void Awake()
     {
@@ -60,7 +60,7 @@ public class GameManager : MonoBehaviour
             state = GameState.Play;
 
             mainPanel.SetActive(false);
-            //stage1.SetActive(true);
+            StartCoroutine(stage1.Start());
         }
     }
     void Play()

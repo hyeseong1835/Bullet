@@ -6,7 +6,6 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "Stage", menuName = "Data/Stage")]
 public class Stage : ScriptableObject
 {
-    public string stageName;
     public EnemySpawnData[] enemySpawnData;
     //public Pool[] enemyPool;
 

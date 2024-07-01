@@ -16,7 +16,6 @@ public class InstantEnemyEditorGUI : EnemyEditorGUI
         InstantEnemySpawnData instantEnemy = (InstantEnemySpawnData)spawnData;
 
         Vector2 screenPos = StageEditor.WorldToScreenPos(instantEnemy.startPos);
-
         Handles.color = Color.cyan;
 
         Handles.DrawWireDisc(screenPos, Vector3.forward, 10);
@@ -27,5 +26,6 @@ public class InstantEnemyEditorGUI : EnemyEditorGUI
         Vector2 X = new Vector2(StageEditor.setting.definitionGizmoSize, -StageEditor.setting.definitionGizmoSize);
         Handles.DrawLine(definitionScreenPos + X, definitionScreenPos - X);
         Handles.DrawLine(definitionScreenPos + Vector2.one * StageEditor.setting.definitionGizmoSize, definitionScreenPos - Vector2.one * StageEditor.setting.definitionGizmoSize);
+        Handles.color = Color.white;
     }
 }
