@@ -8,10 +8,13 @@ using UnityEngine;
 
 public class StageEditor : EditorWindow
 {
-    static StageEditorData data;
-    static StageEditorSetting setting;
+    public static StageEditorData data;
+    public static StageEditorSetting setting;
 
-    Enemy selectedEnemy;
+    static Dictionary<Type, EnemyEditorGUI> enemyEditorGUIDictionary = new Dictionary<Type, EnemyEditorGUI>();
+    EnemyEditorGUI selectedEnemyEditorGUI;
+
+    EnemySpawnData selectedEnemySpawnData;
 
     bool holdInspectorLine = false;
     bool holdFilesLine = false;
@@ -39,26 +42,120 @@ public class StageEditor : EditorWindow
 
         InspectorLineHold();
         FileLineHold();
+        
+        OnFileViewerGUI();
 
         if (data.selectedEnemy != null)
         {
-            DrawEnemyDataGizmos();
-
             TimeLineMove();
             DrawTimeLine();
 
-            ShowEnemyDataOnInspector();
+            OnInspectorGUI();
+            
         }
 
-        ShowFilesOnFileViewer();
+        void OnFileViewerGUI()
+        {
+            Rect area = new Rect();
+            area.position = new Vector2(setting.fileLeftSpace, setting.fileTopSpace);
+            area.size = new Vector2(
+                data.filesLinePosX - setting.fileRightSpace - setting.fileLeftSpace,
+                position.height - setting.fileTopSpace - setting.fileBottomSpace
+            );
+
+            GUILayout.BeginArea(area);
+
+            Rect stageFolderPathFieldRect = new Rect();
+            stageFolderPathFieldRect.position = area.position;
+            stageFolderPathFieldRect.size = new Vector2(area.width - setting.buttonWidth, EditorGUIUtility.singleLineHeight);
+            EditorGUIUtility.labelWidth = 100;
+            openStageFolderPath = EditorGUI.TextField(stageFolderPathFieldRect, "Stage Name", openStageFolderPath);
+
+            Rect refreshButtonRect = new Rect();
+            refreshButtonRect.position = stageFolderPathFieldRect.position + new Vector2(stageFolderPathFieldRect.width, 0);
+            refreshButtonRect.size = new Vector2(setting.buttonWidth, EditorGUIUtility.singleLineHeight);
+
+            if (GUI.Button(refreshButtonRect, "Refresh"))
+            {
+                string folderResourcePath = $"Stage/{openStageFolderPath}";
+                if (openStageFolderPath != "" && Directory.Exists($"Assets/Resources/{folderResourcePath}"))
+                {
+                    data.editorEnemyDataList = Resources.LoadAll<EnemySpawnData>(folderResourcePath + "/Enemies").ToList();
+                }
+            }
+
+            if (data.editorEnemyDataList != null)
+            {
+                for (int i = 0; i < data.editorEnemyDataList.Count; i++)
+                {
+                    EnemySpawnData spawnData = data.editorEnemyDataList[i];
+                    Rect dataObjectRect = new Rect();
+                    dataObjectRect.position = area.position + new Vector2(0, i * EditorGUIUtility.singleLineHeight + 2 * EditorGUIUtility.singleLineHeight);
+                    dataObjectRect.size = new Vector2(area.width - setting.buttonWidth, EditorGUIUtility.singleLineHeight);
+                    EditorGUI.ObjectField(dataObjectRect, spawnData, typeof(EnemyData), false);
+
+                    Rect dataSelectButtonRect = new Rect();
+                    dataSelectButtonRect.position = dataObjectRect.position + new Vector2(dataObjectRect.width, 0);
+                    dataSelectButtonRect.size = new Vector2(setting.buttonWidth, EditorGUIUtility.singleLineHeight);
+                    if (GUI.Button(dataSelectButtonRect, "Select"))
+                    {
+                        data.selectedEnemy = spawnData;
+                        data.selectedEnemyIndex = i;
+                    }
+                }
+            }
+            if (data.selectedEnemy == null) data.selectedEnemyIndex = -1;
+            else
+            {
+                Rect selectBoxRect = new Rect();
+                selectBoxRect.position = area.position + new Vector2(0, data.selectedEnemyIndex * EditorGUIUtility.singleLineHeight + 2 * EditorGUIUtility.singleLineHeight);
+                selectBoxRect.size = new Vector2(area.width, EditorGUIUtility.singleLineHeight);
+                Handles.DrawSolidRectangleWithOutline(selectBoxRect, setting.selectBoxFaceColor, setting.selectBoxOutlineColor);
+            }
+
+            GUILayout.EndArea();
+        }
+
+        void OnInspectorGUI()
+        {
+            Rect area = new Rect();
+            area.position = new Vector2(data.inspectorLinePosX + setting.inspectorLeftSpace, setting.inspectorTopSpace);
+            area.size = new Vector2(position.width - data.inspectorLinePosX - setting.inspectorLeftSpace - setting.inspectorRightSpace, position.height);
+
+            GUILayout.BeginArea(area);
+
+            GUILayout.Label("Enemy Inspector", EditorStyles.boldLabel);
+            //data.selectedEnemy.enemyPrefab
+            EditorGUILayout.ObjectField("Enemy Prefab", , typeof(GameObject), false);
+
+            string previewName;
+
+            if (data.selectedEnemy.enemyPrefab != null) previewName = data.selectedEnemy.enemyPrefab.name;
+            else previewName = "None";
+
+            if (EditorGUI.DropdownButton(GUIContent.none, FocusType.Passive))
+            {
+                Debug.Log("DropdownButton");
+            }
+            data.selectedEnemy.spawnTime = EditorGUILayout.FloatField("Spawn Time", data.selectedEnemy.spawnTime);
+
+
+            if (selectedEnemyEditorGUI != null)
+            {
+                selectedEnemySpawnData = (EnemySpawnData)EditorGUILayout.ObjectField(selectedEnemySpawnData, typeof(EnemySpawnData), false);
+                selectedEnemyEditorGUI.DrawInspectorGUI(selectedEnemySpawnData);
+            }
+            GUILayout.EndArea();
+        }
 
         void LoadData()
         {
             if (data == null) data = (StageEditorData)EditorResources.Load<ScriptableObject>("StageEditor/Data.asset");
             if (setting == null) setting = (StageEditorSetting)EditorResources.Load<ScriptableObject>("StageEditor/Setting.asset");
-            if (data.selectedEnemy != null && data.selectedEnemy.enemyPrefab != selectedEnemy.gameObject)
+
+            if (data.selectedEnemy != null && data.selectedEnemy.enemyPrefab != null)
             {
-                selectedEnemy = data.selectedEnemy.enemyPrefab.GetComponent<Enemy>();
+                selectedEnemyEditorGUI = GetEnemyEditor(selectedEnemySpawnData.GetType());
             }
         }
         void DrawGrid()
@@ -239,90 +336,6 @@ public class StageEditor : EditorWindow
             }
         }
         
-        void ShowEnemyDataOnInspector()
-        {
-            Rect area = new Rect();
-            area.position = new Vector2(data.inspectorLinePosX + setting.inspectorLeftSpace, setting.inspectorTopSpace);
-            area.size = new Vector2(position.width - data.inspectorLinePosX - setting.inspectorLeftSpace - setting.inspectorRightSpace, position.height);
-            
-            GUILayout.BeginArea(area);
-
-            GUILayout.Label("Enemy Inspector", EditorStyles.boldLabel);
-
-            data.selectedEnemy.enemyPrefab = (GameObject)EditorGUILayout.ObjectField("Enemy Prefab", data.selectedEnemy.enemyPrefab, typeof(GameObject), false);
-            data.selectedEnemy.spawnTime = EditorGUILayout.FloatField("Spawn Time", data.selectedEnemy.spawnTime);
-
-            float selectedEnemyGUIHeight = selectedEnemy.GetStageEditorGUIHeight(area);
-            Rect selectedEnemyGUIRect = new Rect();
-            selectedEnemyGUIRect.position = area.position + new Vector2(0, EditorGUIUtility.singleLineHeight * 3);
-            selectedEnemyGUIRect.size = new Vector2(area.width, selectedEnemyGUIHeight);
-            selectedEnemy.DrawStageEditorGUI(selectedEnemyGUIRect);
-            GUILayout.Space(selectedEnemyGUIHeight);
-
-            GUILayout.EndArea();
-        }
-        void ShowFilesOnFileViewer()
-        {
-            Rect area = new Rect();
-            area.position = new Vector2(setting.fileLeftSpace, setting.fileTopSpace);
-            area.size = new Vector2(
-                data.filesLinePosX - setting.fileRightSpace - setting.fileLeftSpace, 
-                position.height - setting.fileTopSpace - setting.fileBottomSpace
-            );
-
-            GUILayout.BeginArea(area);
-
-            Rect stageFolderPathFieldRect = new Rect();
-            stageFolderPathFieldRect.position = area.position;
-            stageFolderPathFieldRect.size = new Vector2(area.width - setting.buttonWidth, EditorGUIUtility.singleLineHeight);
-            EditorGUIUtility.labelWidth = 100;
-            openStageFolderPath = EditorGUI.TextField(stageFolderPathFieldRect, "Stage Name", openStageFolderPath);
-            
-            Rect refreshButtonRect = new Rect();
-            refreshButtonRect.position = stageFolderPathFieldRect.position + new Vector2(stageFolderPathFieldRect.width, 0);
-            refreshButtonRect.size = new Vector2(setting.buttonWidth, EditorGUIUtility.singleLineHeight);
-
-            if (GUI.Button(refreshButtonRect, "Refresh"))
-            {
-                string folderResourcePath = $"Stage/{openStageFolderPath}";
-                if (openStageFolderPath != "" && Directory.Exists($"Assets/Resources/{folderResourcePath}"))
-                {
-                    data.editorEnemyDataList = Resources.LoadAll<EnemySpawnData>(folderResourcePath + "/Enemies").ToList();
-                }
-            }
-
-            if (data.editorEnemyDataList != null)
-            {
-                for (int i = 0; i < data.editorEnemyDataList.Count; i++)
-                {
-                    EnemySpawnData spawnData = data.editorEnemyDataList[i];
-                    Rect dataObjectRect = new Rect();
-                    dataObjectRect.position = area.position + new Vector2(0, i * EditorGUIUtility.singleLineHeight + 2 * EditorGUIUtility.singleLineHeight);
-                    dataObjectRect.size = new Vector2(area.width - setting.buttonWidth, EditorGUIUtility.singleLineHeight);
-                    EditorGUI.ObjectField(dataObjectRect, spawnData, typeof(EnemyData), false);
-
-                    Rect dataSelectButtonRect = new Rect();
-                    dataSelectButtonRect.position = dataObjectRect.position + new Vector2(dataObjectRect.width, 0);
-                    dataSelectButtonRect.size = new Vector2(setting.buttonWidth, EditorGUIUtility.singleLineHeight);
-                    if (GUI.Button(dataSelectButtonRect, "Select"))
-                    { 
-                        data.selectedEnemy = spawnData;
-                        data.selectedEnemyIndex = i;
-                    }
-                }
-            }
-            if (data.selectedEnemy == null) data.selectedEnemyIndex = -1;
-            else
-            {
-                Rect selectBoxRect = new Rect();
-                selectBoxRect.position = area.position + new Vector2(0, data.selectedEnemyIndex * EditorGUIUtility.singleLineHeight + 2 * EditorGUIUtility.singleLineHeight);
-                selectBoxRect.size = new Vector2(area.width, EditorGUIUtility.singleLineHeight);
-                Handles.DrawSolidRectangleWithOutline(selectBoxRect, setting.selectBoxFaceColor, setting.selectBoxOutlineColor);
-            }
-            
-            GUILayout.EndArea();
-        }
-
         void DrawTimeLine()
         {
             float timeLineY = position.height - setting.timeBottomSpace;
@@ -362,5 +375,19 @@ public class StageEditor : EditorWindow
     public static Vector2 WorldToScreenPos(Vector2 worldPos)
     {
         return data.previewPos + new Vector2(worldPos.x, -worldPos.y) * data.cellSize;
+    }
+    public static EnemyEditorGUI GetEnemyEditor<EnemyT>() => GetEnemyEditor(typeof(EnemyT));
+    public static EnemyEditorGUI GetEnemyEditor(Type enemyType)
+    {
+        EnemyEditorGUI result;
+     
+        if (enemyEditorGUIDictionary.TryGetValue(enemyType, out result) == false)
+        {
+            Type type = Type.GetType(enemyType.Name + "EditorGUI");
+            result = (EnemyEditorGUI)Activator.CreateInstance(type);
+            enemyEditorGUIDictionary.Add(enemyType, result);
+        }
+     
+        return result;
     }
 }

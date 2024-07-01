@@ -9,17 +9,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: db032849f1a89814b879165768729f8a, type: 3}
-  m_Name: Pusher Data
+  m_Script: {fileID: 11500000, guid: c19460cbbd9821a4b80e2a5542f2f2d0, type: 3}
+  m_Name: InstantEnemy SpawnData 1
   m_EditorClassIdentifier: 
+  enemyPrefab: {fileID: 0}
+  spawnTime: 0
+  weapon: {fileID: 0}
   startPos: {x: 0, y: 0}
   endPos: {x: 0, y: 0}
-  handlePos: {x: 0, y: 0}
-  moveCurve:
-    serializedVersion: 2
-    m_Curve: []
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  startTime: 0
-  endTime: 0

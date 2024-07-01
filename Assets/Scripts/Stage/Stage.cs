@@ -19,8 +19,7 @@ public class Stage : ScriptableObject
 
             yield return new WaitForSeconds(data.spawnTime - prevTime);
 
-            Instantiate(data.enemyPrefab, data.startPos, Quaternion.identity);
-
+            GameObject enemyObj = Instantiate(data.enemyPrefab);
 
             prevTime = data.spawnTime;
         }

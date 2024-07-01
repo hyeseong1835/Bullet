@@ -2,19 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[ExecuteAlways]
 public abstract class Enemy : Entity
 {
     public override EntityData EntityData => EnemyData;
-    public abstract EnemyData EnemyData { get; }
+    public abstract EnemyData EnemyData { get; set; }
+    public abstract EnemySpawnData EnemySpawnData { get; set; }
 
-    protected void Update()
-    {
-        if (GameManager.IsEditor)
-        {
-            gameObject.layer = LayerMask.NameToLayer("Enemy");
-        }
-    }
     private void OnEnable()
     {
         GameManager.instance.enableEnemyList.Add(this);
@@ -45,7 +38,8 @@ public abstract class Enemy : Entity
         Drop();
         Destroy(gameObject);
     }
-
-    public abstract void DrawStageEditorGUI(Rect rect);
-    public abstract float GetStageEditorGUIHeight(Rect rect);
+    void OnValidate()
+    {
+        //gameObject.layer = LayerMask.NameToLayer("Enemy");
+    }
 }

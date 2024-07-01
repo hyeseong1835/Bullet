@@ -9,7 +9,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6cf80ebdf66d16c488b2d655e8b7d9b2, type: 3}
-  m_Name: New Enemy 3
+  m_Script: {fileID: 11500000, guid: cb4a2d180a04b2a49b0b91d15046a43c, type: 3}
+  m_Name: EnemyA Data
   m_EditorClassIdentifier: 
-  enemySpawnID: 0
+  maxHp: 0
+  drops: []
+  ratioMax: 0
+  exp: 0

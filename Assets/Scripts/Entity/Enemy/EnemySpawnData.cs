@@ -1,8 +1,11 @@
 using UnityEngine;
+using System;
 
 [CreateAssetMenu(fileName = "New Enemy Spawn", menuName = "Data/Enemy")]
-public class EnemySpawnData : ScriptableObject
+public abstract class EnemySpawnData : ScriptableObject
 {
+    public abstract Type EditorType { get; }
+
     public GameObject enemyPrefab;
     public float spawnTime;
 }

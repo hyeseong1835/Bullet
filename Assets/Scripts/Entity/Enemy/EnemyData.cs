@@ -9,7 +9,6 @@ public struct DropInfo
     public GameObject prefab;
     public float ratio;
 }
-[ExecuteAlways]
 public abstract class EnemyData : EntityData
 {
     public List<DropInfo> drops = new List<DropInfo>();
