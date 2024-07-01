@@ -23,6 +23,8 @@ public class StageEditor : EditorWindow
 
     string openStageFolderPath = "";
 
+    bool isPrefabDropDownExpanded = false;
+
     [MenuItem("Window/StageEditor")]
     static void CreateWindow()
     {
@@ -126,17 +128,20 @@ public class StageEditor : EditorWindow
 
             GUILayout.Label("Enemy Inspector", EditorStyles.boldLabel);
             //data.selectedEnemy.enemyPrefab
-            EditorGUILayout.ObjectField("Enemy Prefab", , typeof(GameObject), false);
+            Rect prefabDropDownTitleRect = new Rect();
+            prefabDropDownTitleRect.position = Vector2.zero.GetSetY(EditorStyles.boldLabel.lineHeight);
+            prefabDropDownTitleRect.size = area.size.GetSetY(EditorGUIUtility.singleLineHeight);
 
             string previewName;
-
             if (data.selectedEnemy.enemyPrefab != null) previewName = data.selectedEnemy.enemyPrefab.name;
             else previewName = "None";
 
-            if (EditorGUI.DropdownButton(GUIContent.none, FocusType.Passive))
+            if (EditorGUI.DropdownButton(prefabDropDownTitleRect, new GUIContent(previewName), FocusType.Passive))
             {
-                Debug.Log("DropdownButton");
+                isPrefabDropDownExpanded = !isPrefabDropDownExpanded;
             }
+            GUILayout.Space(prefabDropDownTitleRect.size.y);
+
             data.selectedEnemy.spawnTime = EditorGUILayout.FloatField("Spawn Time", data.selectedEnemy.spawnTime);
 
 
