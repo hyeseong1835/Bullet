@@ -12,10 +12,7 @@ public class StageEditor : EditorWindow
     public static StageEditorSetting setting;
 
     static Dictionary<Type, EnemyEditorGUI> enemyEditorGUIDictionary = new Dictionary<Type, EnemyEditorGUI>();
-    EnemyEditorGUI selectedEnemyEditorGUI;
-
-    EnemySpawnData selectedEnemySpawnData;
-
+    
     bool holdInspectorLine = false;
     bool holdFilesLine = false;
 
@@ -24,6 +21,8 @@ public class StageEditor : EditorWindow
     string openStageFolderPath = "";
 
     bool isPrefabDropDownExpanded = false;
+    int selectedPrefabIndex = 0;
+    string[] prefabPopupNameArray = new string[0];
 
     [MenuItem("Window/StageEditor")]
     static void CreateWindow()
@@ -47,13 +46,12 @@ public class StageEditor : EditorWindow
         
         OnFileViewerGUI();
 
-        if (data.selectedEnemy != null)
+        if (data.selectedEnemySpawnData != null)
         {
             TimeLineMove();
             DrawTimeLine();
 
             OnInspectorGUI();
-            
         }
 
         void OnFileViewerGUI()
@@ -82,7 +80,7 @@ public class StageEditor : EditorWindow
                 string folderResourcePath = $"Stage/{openStageFolderPath}";
                 if (openStageFolderPath != "" && Directory.Exists($"Assets/Resources/{folderResourcePath}"))
                 {
-                    data.editorEnemyDataList = Resources.LoadAll<EnemySpawnData>(folderResourcePath + "/Enemies").ToList();
+                    data.editorEnemyDataList = Resources.LoadAll<EnemySpawnData>(folderResourcePath + "/EnemySpawnData").ToList();
                 }
             }
 
@@ -101,12 +99,12 @@ public class StageEditor : EditorWindow
                     dataSelectButtonRect.size = new Vector2(setting.buttonWidth, EditorGUIUtility.singleLineHeight);
                     if (GUI.Button(dataSelectButtonRect, "Select"))
                     {
-                        data.selectedEnemy = spawnData;
+                        data.selectedEnemySpawnData = spawnData;
                         data.selectedEnemyIndex = i;
                     }
                 }
             }
-            if (data.selectedEnemy == null) data.selectedEnemyIndex = -1;
+            if (data.selectedEnemySpawnData == null) data.selectedEnemyIndex = -1;
             else
             {
                 Rect selectBoxRect = new Rect();
@@ -127,29 +125,60 @@ public class StageEditor : EditorWindow
             GUILayout.BeginArea(area);
 
             GUILayout.Label("Enemy Inspector", EditorStyles.boldLabel);
-            //data.selectedEnemy.enemyPrefab
             Rect prefabDropDownTitleRect = new Rect();
             prefabDropDownTitleRect.position = Vector2.zero.GetSetY(EditorStyles.boldLabel.lineHeight);
             prefabDropDownTitleRect.size = area.size.GetSetY(EditorGUIUtility.singleLineHeight);
 
             string previewName;
-            if (data.selectedEnemy.enemyPrefab != null) previewName = data.selectedEnemy.enemyPrefab.name;
+            if (data.selectedEnemySpawnData.enemyPrefab != null) previewName = data.selectedEnemySpawnData.enemyPrefab.name;
             else previewName = "None";
 
             if (EditorGUI.DropdownButton(prefabDropDownTitleRect, new GUIContent(previewName), FocusType.Passive))
             {
-                isPrefabDropDownExpanded = !isPrefabDropDownExpanded;
+                if (isPrefabDropDownExpanded)
+                {
+                    isPrefabDropDownExpanded = false;
+                }
+                else
+                {
+                    isPrefabDropDownExpanded = true;
+                    data.prefabs = Resources.LoadAll<GameObject>($"Stage/{openStageFolderPath}/EnemyPrefabs");
+                    
+                    prefabPopupNameArray = new string[data.prefabs.Length];
+
+                    for (int i = 0; i < data.prefabs.Length; i++)
+                    {
+                        prefabPopupNameArray[i] = data.prefabs[i].name;
+                    }
+                }
             }
             GUILayout.Space(prefabDropDownTitleRect.size.y);
 
-            data.selectedEnemy.spawnTime = EditorGUILayout.FloatField("Spawn Time", data.selectedEnemy.spawnTime);
+            data.selectedEnemySpawnData.spawnTime = EditorGUILayout.FloatField("Spawn Time", data.selectedEnemySpawnData.spawnTime);
 
 
-            if (selectedEnemyEditorGUI != null)
+            if (data.selectedEnemyEditorGUI != null)
             {
-                selectedEnemySpawnData = (EnemySpawnData)EditorGUILayout.ObjectField(selectedEnemySpawnData, typeof(EnemySpawnData), false);
-                selectedEnemyEditorGUI.DrawInspectorGUI(selectedEnemySpawnData);
+                data.selectedEnemySpawnData = (EnemySpawnData)EditorGUILayout.ObjectField(data.selectedEnemySpawnData, typeof(EnemySpawnData), false);
+                data.selectedEnemyEditorGUI.DrawInspectorGUI(data.selectedEnemySpawnData);
             }
+
+            if (true)
+            {
+                Rect dropDownRect = prefabDropDownTitleRect;
+                dropDownRect.size = dropDownRect.size.GetSetY((data.prefabs.Length + 1) * prefabDropDownTitleRect.size.y);
+
+                int inputIndex = EditorGUI.Popup(dropDownRect, selectedPrefabIndex, prefabPopupNameArray);
+                if (inputIndex != selectedPrefabIndex)
+                {
+                    selectedPrefabIndex = inputIndex;
+                    data.selectedEnemySpawnData.enemyPrefab = data.prefabs[inputIndex];
+                    //isPrefabDropDownExpanded = false;
+                }
+
+                //if (dropDownRect.Contains(e.mousePosition) == false) isPrefabDropDownExpanded = false;
+            }
+
             GUILayout.EndArea();
         }
 
@@ -158,9 +187,9 @@ public class StageEditor : EditorWindow
             if (data == null) data = (StageEditorData)EditorResources.Load<ScriptableObject>("StageEditor/Data.asset");
             if (setting == null) setting = (StageEditorSetting)EditorResources.Load<ScriptableObject>("StageEditor/Setting.asset");
 
-            if (data.selectedEnemy != null && data.selectedEnemy.enemyPrefab != null)
+            if (data.selectedEnemySpawnData != null && data.selectedEnemySpawnData.enemyPrefab != null && data.selectedEnemySpawnData != null)
             {
-                selectedEnemyEditorGUI = GetEnemyEditor(selectedEnemySpawnData.GetType());
+                data.selectedEnemyEditorGUI = GetEnemyEditor();
             }
         }
         void DrawGrid()
@@ -356,7 +385,7 @@ public class StageEditor : EditorWindow
                 {
                     Handles.DrawSolidRectangleWithOutline(
                     new Rect(
-                        data.filesLinePosX + setting.timeHorizontalSpace + (data.selectedEnemy.spawnTime / timeLength) * (data.inspectorLinePosX - 2 * setting.timeHorizontalSpace) - 0.5f * setting.timeCubeSize,
+                        data.filesLinePosX + setting.timeHorizontalSpace + (data.selectedEnemySpawnData.spawnTime / timeLength) * (data.inspectorLinePosX - 2 * setting.timeHorizontalSpace) - 0.5f * setting.timeCubeSize,
                         timeLineY - 0.5f * setting.timeCubeSize,
                         setting.timeCubeSize,
                         setting.timeCubeSize
@@ -381,18 +410,17 @@ public class StageEditor : EditorWindow
     {
         return data.previewPos + new Vector2(worldPos.x, -worldPos.y) * data.cellSize;
     }
-    public static EnemyEditorGUI GetEnemyEditor<EnemyT>() => GetEnemyEditor(typeof(EnemyT));
-    public static EnemyEditorGUI GetEnemyEditor(Type enemyType)
+    public static EnemyEditorGUI GetEnemyEditor()
     {
-        EnemyEditorGUI result;
-     
-        if (enemyEditorGUIDictionary.TryGetValue(enemyType, out result) == false)
+        EnemyEditorGUI editorInstance;
+
+        Type editorType = data.selectedEnemySpawnData.EditorType;
+
+        if (enemyEditorGUIDictionary.TryGetValue(editorType, out editorInstance) == false)
         {
-            Type type = Type.GetType(enemyType.Name + "EditorGUI");
-            result = (EnemyEditorGUI)Activator.CreateInstance(type);
-            enemyEditorGUIDictionary.Add(enemyType, result);
+            editorInstance = (EnemyEditorGUI)Activator.CreateInstance(editorType);
+            enemyEditorGUIDictionary.Add(editorType, editorInstance);
         }
-     
-        return result;
+        return editorInstance;
     }
 }

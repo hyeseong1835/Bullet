@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
@@ -21,12 +22,16 @@ public class StageEditorData : ScriptableObject
             this.spawnTime = spawnTime;
         }
     }
+
+    public List<EnemySpawnData> editorEnemyDataList = new List<EnemySpawnData>();
+    public EnemyEditorGUI selectedEnemyEditorGUI;
+
+    public GameObject[] prefabs = new GameObject[0];
+    public EnemySpawnData selectedEnemySpawnData;
+
     public Box preview;
     public Vector2 previewPos;
 
-    public List<EnemySpawnData> editorEnemyDataList = new List<EnemySpawnData>();
-
-    public EnemySpawnData selectedEnemy;
     public int selectedEnemyIndex;
 
     public float cellSize = 50;
