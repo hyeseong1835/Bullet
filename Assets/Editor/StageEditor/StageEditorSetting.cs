@@ -20,7 +20,8 @@ public class StageEditorSetting : ScriptableObject
     public float timeCubeSize = 10;
     public float timeHorizontalSpace = 100;
     public float timeBottomSpace = 50;
-
+    public Color selectEnemySpawnTimeFaceColor = new Color(1, 0.3f, 0.3f, 1);
+    public Color selectEnemySpawnTimeOutlineColor = Color.white;
 
     public float screenMoveSpeed = 50;
 
@@ -28,4 +29,7 @@ public class StageEditorSetting : ScriptableObject
 
     public float buttonHeight = 20;
     public float buttonWidth = 100;
+    public Color selectBoxFaceColor = new Color(1, 1, 1, 0.1f);
+    public Color selectBoxOutlineColor = Color.white;
+
 }

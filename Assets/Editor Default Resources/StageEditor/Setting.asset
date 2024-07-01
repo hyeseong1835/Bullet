@@ -25,7 +25,11 @@ MonoBehaviour:
   timeCubeSize: 10
   timeHorizontalSpace: 100
   timeBottomSpace: 50
+  selectEnemySpawnTimeFaceColor: {r: 1, g: 0.3, b: 0.3, a: 1}
+  selectEnemySpawnTimeOutlineColor: {r: 1, g: 1, b: 1, a: 1}
   screenMoveSpeed: 1
   definitionGizmoSize: 10
   buttonHeight: 20
   buttonWidth: 100
+  selectBoxFaceColor: {r: 1, g: 1, b: 1, a: 0.101960786}
+  selectBoxOutlineColor: {r: 1, g: 1, b: 1, a: 1}

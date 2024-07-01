@@ -27,6 +27,7 @@ public class StageEditorData : ScriptableObject
     public List<EnemySpawnData> editorEnemyDataList = new List<EnemySpawnData>();
 
     public EnemySpawnData selectedEnemy;
+    public int selectedEnemyIndex;
 
     public float cellSize = 50;
 

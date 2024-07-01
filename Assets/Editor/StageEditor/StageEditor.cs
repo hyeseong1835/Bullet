@@ -41,6 +41,8 @@ public class StageEditor : EditorWindow
         if (data.selectedEnemy != null)
         {
             DrawEnemyDataGizmos();
+
+            TimeLineMove();
             DrawTimeLine();
 
             ShowEnemyDataOnInspector();
@@ -140,6 +142,10 @@ public class StageEditor : EditorWindow
             {
                 data.previewPos = previewContact;
             }
+        }
+        void TimeLineMove()
+        {
+
         }
 
         void InspectorLineHold()
@@ -248,26 +254,6 @@ public class StageEditor : EditorWindow
             data.selectedEnemy.spawnTime = EditorGUILayout.FloatField("Spawn Time", data.selectedEnemy.spawnTime);
 
             GUILayout.EndArea();
-
-            Rect applyButtonRect = new Rect();
-            applyButtonRect.x = position.width - (setting.buttonWidth + setting.inspectorRightSpace);
-            applyButtonRect.y = position.height - 10 - 0.5f * setting.buttonHeight - setting.inspectorBottomSpace;
-            applyButtonRect.width = setting.buttonWidth;
-            applyButtonRect.height = setting.buttonHeight;
-
-            Rect loadButtonRect = new Rect();
-            loadButtonRect.x = data.inspectorLinePosX + (setting.inspectorLeftSpace);
-            loadButtonRect.y = position.height - 10 - 0.5f * setting.buttonHeight - setting.inspectorBottomSpace;
-            loadButtonRect.width = setting.buttonWidth;
-            loadButtonRect.height = setting.buttonHeight;
-            if (GUI.Button(applyButtonRect, "Apply"))
-            {
-
-            }
-            if (GUI.Button(loadButtonRect, "Load"))
-            {
-
-            }
         }
         void ShowFilesOnFileViewer()
         {
@@ -301,24 +287,33 @@ public class StageEditor : EditorWindow
 
             if (data.editorEnemyDataList != null)
             {
-                int i = 2;
-                foreach (EnemySpawnData data in data.editorEnemyDataList)
+                for (int i = 0; i < data.editorEnemyDataList.Count; i++)
                 {
-                    Rect dataRect = new Rect();
-                    dataRect.position = area.position + new Vector2(0, i * EditorGUIUtility.singleLineHeight);
-                    dataRect.size = new Vector2(area.width, EditorGUIUtility.singleLineHeight);
-                    Rect worldRect = new Rect(position.position + dataRect.position, dataRect.size);
-                    if (e.keyCode == KeyCode.Mouse0 && worldRect.Contains(e.mousePosition))
-                    {
-                        Debug.Log("Select" + data);
-                        StageEditor.data.selectedEnemy = data;
-                        e.Use();
+                    EnemySpawnData spawnData = data.editorEnemyDataList[i];
+                    Rect dataObjectRect = new Rect();
+                    dataObjectRect.position = area.position + new Vector2(0, i * EditorGUIUtility.singleLineHeight + 2 * EditorGUIUtility.singleLineHeight);
+                    dataObjectRect.size = new Vector2(area.width - setting.buttonWidth, EditorGUIUtility.singleLineHeight);
+                    EditorGUI.ObjectField(dataObjectRect, spawnData, typeof(EnemyData), false);
+
+                    Rect dataSelectButtonRect = new Rect();
+                    dataSelectButtonRect.position = dataObjectRect.position + new Vector2(dataObjectRect.width, 0);
+                    dataSelectButtonRect.size = new Vector2(setting.buttonWidth, EditorGUIUtility.singleLineHeight);
+                    if (GUI.Button(dataSelectButtonRect, "Select"))
+                    { 
+                        data.selectedEnemy = spawnData;
+                        data.selectedEnemyIndex = i;
                     }
-                    EditorGUI.ObjectField(dataRect, data, typeof(EnemyData), false);
-                    i++;
                 }
             }
-
+            if (data.selectedEnemy == null) data.selectedEnemyIndex = -1;
+            else
+            {
+                Rect selectBoxRect = new Rect();
+                selectBoxRect.position = area.position + new Vector2(0, data.selectedEnemyIndex * EditorGUIUtility.singleLineHeight + 2 * EditorGUIUtility.singleLineHeight);
+                selectBoxRect.size = new Vector2(area.width, EditorGUIUtility.singleLineHeight);
+                Handles.DrawSolidRectangleWithOutline(selectBoxRect, setting.selectBoxFaceColor, setting.selectBoxOutlineColor);
+            }
+            
             GUILayout.EndArea();
         }
 
@@ -347,10 +342,31 @@ public class StageEditor : EditorWindow
                     new Vector3(data.filesLinePosX + setting.timeHorizontalSpace, timeLineY),
                     new Vector3(data.inspectorLinePosX - setting.timeHorizontalSpace, timeLineY)
                 );
-            Handles.DrawWireCube(
-                new Vector3(data.filesLinePosX + setting.timeHorizontalSpace + (data.selectedEnemy.spawnTime / timeLength) * (data.inspectorLinePosX - 2 * setting.timeHorizontalSpace), timeLineY),
-                Vector3.one * setting.timeCubeSize
-            );
+            for (int i = 0; i < data.editorEnemyDataList.Count; i++)
+            {
+                if (i == data.selectedEnemyIndex)
+                {
+                    Handles.DrawSolidRectangleWithOutline(
+                    new Rect(
+                        data.filesLinePosX + setting.timeHorizontalSpace + (data.selectedEnemy.spawnTime / timeLength) * (data.inspectorLinePosX - 2 * setting.timeHorizontalSpace) - 0.5f * setting.timeCubeSize,
+                        timeLineY - 0.5f * setting.timeCubeSize,
+                        setting.timeCubeSize,
+                        setting.timeCubeSize
+                    ),
+                    setting.selectEnemySpawnTimeFaceColor,
+                    setting.selectEnemySpawnTimeOutlineColor
+                    );
+                }
+                else
+                {
+                    EnemySpawnData spawnData = data.editorEnemyDataList[i];
+                    Handles.DrawWireCube(
+                        new Vector3(data.filesLinePosX + setting.timeHorizontalSpace + (spawnData.spawnTime / timeLength) * (data.inspectorLinePosX - 2 * setting.timeHorizontalSpace), timeLineY),
+                        Vector3.one * setting.timeCubeSize
+                    );
+                }
+            }
+
         }
     }
     public static Vector2 WorldToScreenPos(Vector2 worldPos)
