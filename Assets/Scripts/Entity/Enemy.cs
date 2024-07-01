@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
 
 [ExecuteAlways]
@@ -46,4 +45,7 @@ public abstract class Enemy : Entity
         Drop();
         Destroy(gameObject);
     }
+
+    public abstract void DrawStageEditorGUI(Rect rect);
+    public abstract float GetStageEditorGUIHeight(Rect rect);
 }

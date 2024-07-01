@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 6782256742691146509}
   - component: {fileID: 4583601094931701326}
   m_Layer: 12
-  m_Name: HorizontalMoveEnemy A
+  m_Name: MoveEnemy A
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

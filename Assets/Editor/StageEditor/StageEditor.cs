@@ -11,6 +11,8 @@ public class StageEditor : EditorWindow
     static StageEditorData data;
     static StageEditorSetting setting;
 
+    Enemy selectedEnemy;
+
     bool holdInspectorLine = false;
     bool holdFilesLine = false;
 
@@ -50,13 +52,14 @@ public class StageEditor : EditorWindow
 
         ShowFilesOnFileViewer();
 
-
-
-
         void LoadData()
         {
             if (data == null) data = (StageEditorData)EditorResources.Load<ScriptableObject>("StageEditor/Data.asset");
             if (setting == null) setting = (StageEditorSetting)EditorResources.Load<ScriptableObject>("StageEditor/Setting.asset");
+            if (data.selectedEnemy != null && data.selectedEnemy.enemyPrefab != selectedEnemy.gameObject)
+            {
+                selectedEnemy = data.selectedEnemy.enemyPrefab.GetComponent<Enemy>();
+            }
         }
         void DrawGrid()
         {
@@ -238,20 +241,23 @@ public class StageEditor : EditorWindow
         
         void ShowEnemyDataOnInspector()
         {
-            GUILayout.BeginArea(new Rect(
-                data.inspectorLinePosX + setting.inspectorLeftSpace, setting.inspectorTopSpace,
-                position.width - data.inspectorLinePosX - setting.inspectorLeftSpace - setting.inspectorRightSpace, position.height));
+            Rect area = new Rect();
+            area.position = new Vector2(data.inspectorLinePosX + setting.inspectorLeftSpace, setting.inspectorTopSpace);
+            area.size = new Vector2(position.width - data.inspectorLinePosX - setting.inspectorLeftSpace - setting.inspectorRightSpace, position.height);
+            
+            GUILayout.BeginArea(area);
 
             GUILayout.Label("Enemy Inspector", EditorStyles.boldLabel);
 
-            Vector2 editedselectedEnemyDataWorldPos = EditorGUILayout.Vector2Field("World Pos", data.selectedEnemy.worldPos);
-            if (editedselectedEnemyDataWorldPos != data.selectedEnemy.worldPos)
-            {
-                data.selectedEnemy.worldPos = editedselectedEnemyDataWorldPos;
-            }
-            data.selectedEnemy.definition = EditorGUILayout.Vector2Field("Definition", data.selectedEnemy.definition);
-
+            data.selectedEnemy.enemyPrefab = (GameObject)EditorGUILayout.ObjectField("Enemy Prefab", data.selectedEnemy.enemyPrefab, typeof(GameObject), false);
             data.selectedEnemy.spawnTime = EditorGUILayout.FloatField("Spawn Time", data.selectedEnemy.spawnTime);
+
+            float selectedEnemyGUIHeight = selectedEnemy.GetStageEditorGUIHeight(area);
+            Rect selectedEnemyGUIRect = new Rect();
+            selectedEnemyGUIRect.position = area.position + new Vector2(0, EditorGUIUtility.singleLineHeight * 3);
+            selectedEnemyGUIRect.size = new Vector2(area.width, selectedEnemyGUIHeight);
+            selectedEnemy.DrawStageEditorGUI(selectedEnemyGUIRect);
+            GUILayout.Space(selectedEnemyGUIHeight);
 
             GUILayout.EndArea();
         }
@@ -317,22 +323,6 @@ public class StageEditor : EditorWindow
             GUILayout.EndArea();
         }
 
-        void DrawEnemyDataGizmos()
-        {
-            Vector2 screenPos = WorldToScreenPos(data.selectedEnemy.worldPos);
-
-            Handles.color = Color.cyan;
-
-            Handles.DrawWireDisc(screenPos, Vector3.forward, 10);
-
-            Vector2 definitionScreenPos = WorldToScreenPos(data.selectedEnemy.definition);
-
-            Handles.DrawLine(screenPos, definitionScreenPos);
-            Vector2 X = new Vector2(setting.definitionGizmoSize, -setting.definitionGizmoSize);
-            Handles.DrawLine(definitionScreenPos + X, definitionScreenPos - X);
-            Handles.DrawLine(definitionScreenPos + Vector2.one * setting.definitionGizmoSize, definitionScreenPos - Vector2.one * setting.definitionGizmoSize);
-
-        }
         void DrawTimeLine()
         {
             float timeLineY = position.height - setting.timeBottomSpace;

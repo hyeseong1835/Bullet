@@ -4,11 +4,11 @@ using UnityEngine;
 
 public enum EntityState
 {
-    Disable, Push, Enable
+    Disable, Enable
 }
 public abstract class Entity : MonoBehaviour
 {
-    public EntityState state = EntityState.Disable;
+    public EntityState entityState = EntityState.Disable;
     public abstract EntityData EntityData { get; }
     public float hp;
 

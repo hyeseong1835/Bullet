@@ -6,14 +6,23 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "Stage", menuName = "Data/Stage")]
 public class Stage : ScriptableObject
 {
-    public Pool[] enemyPool;
-    public int waveIndex = 0;
+    public string stageName;
+    public EnemySpawnData[] enemySpawnData;
+    //public Pool[] enemyPool;
 
-    public void Start()
+    public IEnumerator Start()
     {
-        foreach (Pool pool in enemyPool)
+        float prevTime = 0;
+        for (int i = 0; i < enemySpawnData.Length; i++)
         {
-            if (pool.holder == null) pool.Init();
+            EnemySpawnData data = enemySpawnData[i];
+
+            yield return new WaitForSeconds(data.spawnTime - prevTime);
+
+            Instantiate(data.enemyPrefab, data.startPos, Quaternion.identity);
+
+
+            prevTime = data.spawnTime;
         }
     }
 }
