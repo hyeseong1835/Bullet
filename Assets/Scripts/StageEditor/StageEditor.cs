@@ -29,8 +29,12 @@ public class StageEditor : EditorWindow
 
     bool isPrefabDropDownExpanded = false;
     Vector2 offset;
+    
+    Action drawDropDown;
+    
+    int dropDownIndex = 0;
+    Rect dropDownRect;
 
-    Action lateOnInspectorGUI;
 
     [MenuItem("Window/StageEditor")]
     static void CreateWindow()
@@ -343,60 +347,61 @@ public class StageEditor : EditorWindow
 
             if (data.selectedEnemySpawnData != null)
             {
-                CustmGUILayout.InteractionObjectField(data.selectedEnemySpawnData.enemyPrefab, PrefabDropDown);
-                
-                void PrefabDropDown(Rect rect)
+                CustmGUILayout.InteractionObjectField(data.selectedEnemySpawnData.enemyPrefab, Header);
+
+                void Header(Rect rect)
                 {
+                    dropDownRect = new Rect(rect.position.GetSetY(5 + EditorStyles.boldLabel.lineHeight + rect.height), new Vector2(area.width, 23));
+
                     if (e.isMouse)
                     {
                         if (EventUtility.MouseDown(0) && rect.Contains(e.mousePosition))
                         {
-                            isPrefabDropDownExpanded = true;
-                            Debug.Log($"클릭: {e.mousePosition}");
-                        }
-                        if (isPrefabDropDownExpanded && EventUtility.MouseDrag(0) && rect.GetAddHeight(23 * data.prefabs.Length).Contains(e.mousePosition) == false)
-                        {
-                            isPrefabDropDownExpanded = false;
-                            Debug.Log($"벗어남: {e.mousePosition} // {rect.GetAddHeight(23 * data.prefabs.Length)}");
+                            isPrefabDropDownExpanded = !isPrefabDropDownExpanded;
+                            e.Use();
                         }
                     }
-                    if (true)
+                    if (isPrefabDropDownExpanded && ((dropDownRect.GetAddPositionY(-rect.height).GetAddHeight(23 * (data.prefabs.Length - 1))).Contains(e.mousePosition) == false))
                     {
-                        int i = 0;
-                        for (; i < data.prefabs.Length; i++)
+                        isPrefabDropDownExpanded = false;
+                        Debug.Log($"벗어남: {e.mousePosition} // {dropDownRect.GetAddPositionY(-rect.height).GetAddHeight(23 * data.prefabs.Length)}");
+                    }
+                    
+                    if (isPrefabDropDownExpanded)
+                    {
+                        dropDownIndex = 0;
+                        for (int i = 0; i < data.prefabs.Length; i++)
                         {
-                            GameObject prefab = data.prefabs[i];
-                            rect.size = rect.size.GetSetY(23);
-                            rect.position = rect.position.GetAddY(rect.height - rect.size.y);
-
-                            if (rect.Contains(e.mousePosition))
+                            if (dropDownRect.GetAddPositionY(i * 23).Contains(e.mousePosition))
                             {
                                 if (EventUtility.MouseDown(0))
                                 {
-                                    Debug.Log(prefab);
-                                    data.selectedEnemySpawnData.enemyPrefab = prefab;
+                                    data.selectedEnemySpawnData.enemyPrefab = data.prefabs[dropDownIndex];
                                     isPrefabDropDownExpanded = false;
                                 }
                                 if (e.isMouse) e.Use();
                             }
 
-                            lateOnInspectorGUI += () =>
+                            drawDropDown += () =>
                             {
-                                GameObject prefab = data.prefabs[i];
-                                rect.position = rect.position.GetAddY(rect.size.y);
-                                CustomGUI.DrawSquare(rect, setting.dropDownColor);
-                                EditorGUI.LabelField(rect, prefab.name);
-                                if (rect.Contains(e.mousePosition)) CustomGUI.DrawSquare(rect, setting.selectBoxColor);
-                                i++;
+                                Rect elementRect = dropDownRect.GetAddPositionY(dropDownIndex * 23);
+                                CustomGUI.DrawSquare(elementRect, setting.dropDownColor);
+                                EditorGUI.LabelField(elementRect, data.prefabs[dropDownIndex].name);
+                                if (elementRect.Contains(e.mousePosition)) CustomGUI.DrawSquare(elementRect, setting.selectBoxColor);
+                                dropDownIndex++;
                             };
                         }
-                        i = 0;
                     }
                 }
                 data.selectedEnemySpawnData.spawnTime = EditorGUILayout.FloatField("Spawn Time", data.selectedEnemySpawnData.spawnTime);
 
                 data.selectedEnemyEditorGUI.DrawInspectorGUI(data.selectedEnemySpawnData);
-                LateOnInspectorGUI();
+
+                if (drawDropDown != null)
+                {
+                    drawDropDown.Invoke();
+                    drawDropDown = null;
+                }
             }
 
 
@@ -405,44 +410,6 @@ public class StageEditor : EditorWindow
 
         #endregion
 
-    }
-    void LateOnInspectorGUI()
-    {
-        if (lateOnInspectorGUI != null)
-        {
-            lateOnInspectorGUI.Invoke();
-            lateOnInspectorGUI = null;
-        }
-    }
-    bool DropDown<ObjectT>(ObjectT[] obj, Rect headerRect, out ObjectT select, Func<ObjectT, string> nameGetter,
-        SquareColor dropDownColor, SquareColor selectColor, float height = 23) where ObjectT : UnityEngine.Object
-    {
-        select = null;
-
-        for (int i = 0; i < obj.Length; i++)
-        {
-            ObjectT prefab = obj[i];
-            Rect rect = headerRect;
-            rect.size = rect.size.GetSetY(height);
-            rect.position = rect.position.GetAddY(i * rect.size.y + headerRect.height);
-
-            lateOnInspectorGUI += () => CustomGUI.DrawSquare(rect, dropDownColor);
-            lateOnInspectorGUI += () => EditorGUI.LabelField(rect, nameGetter(prefab));
-
-            if (rect.Contains(e.mousePosition))
-            {
-                lateOnInspectorGUI += () => CustomGUI.DrawSquare(rect, selectColor);
-
-                select = prefab;
-
-                if (EventUtility.MouseDown(0))
-                {
-                    e.Use();
-                    return true;
-                }
-            }
-        }
-        return false;
     }
     public static Vector2 WorldToScreenPos(Vector2 worldPos)
     {
