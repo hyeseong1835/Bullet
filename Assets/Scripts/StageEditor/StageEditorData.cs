@@ -23,16 +23,22 @@ public class StageEditorData : ScriptableObject
         }
     }
 
-    public List<EnemySpawnData> editorEnemyDataList = new List<EnemySpawnData>();
+    public Stage selectedStage;
+    public int selectedStageIndex;
+    public string[] stageNameArray;
+
+
+    public EnemySpawnData selectedEnemySpawnData;
     public EnemyEditorGUI selectedEnemyEditorGUI;
+    public int selectedEnemyIndex;
+    public List<EnemySpawnData> editorEnemyDataList = new List<EnemySpawnData>();
 
     public GameObject[] prefabs = new GameObject[0];
-    public EnemySpawnData selectedEnemySpawnData;
 
+    
+    
     public Box preview;
     public Vector2 previewPos;
-
-    public int selectedEnemyIndex;
 
     public float cellSize = 50;
 

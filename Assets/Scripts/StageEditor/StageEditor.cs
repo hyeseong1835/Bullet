@@ -20,21 +20,16 @@ public class StageEditor : EditorWindow
     Rect inspectorRect = new Rect();
     Rect previewRect = new Rect();
 
+    bool holdPreview = false;
     bool holdInspectorLine = false;
     bool holdFilesLine = false;
 
     float timeLength = 100;
 
-    string openStageFolderPath = "";
-
-    bool isPrefabDropDownExpanded = false;
     Vector2 offset;
-    
-    Action drawDropDown;
-    
-    int dropDownIndex = 0;
-    Rect dropDownRect;
 
+    float windowPrevWidth = 0;
+    float windowPrevHeight = 0;
 
     [MenuItem("Window/StageEditor")]
     static void CreateWindow()
@@ -45,19 +40,26 @@ public class StageEditor : EditorWindow
     }
     void OnGUI()
     {
-
         Init();
 
-        
-        //PreviewMove();
+        if (windowPrevWidth != position.width || windowPrevHeight != position.height)
+        {
+            RefreshInspectorRect();
+            RefreshFileViewerRect();
+            RefreshPreviewRect();
+
+            windowPrevWidth = position.width;
+            windowPrevHeight = position.height;
+        }
 
         DrawPreview();
 
-
-        LineMove();
-        
+        Hold();
         DrawFileViewerGUI();
         DrawInspectorGUI();
+
+        PreviewMove();
+
 
         
         if (data.selectedEnemySpawnData != null)
@@ -75,100 +77,15 @@ public class StageEditor : EditorWindow
             {
                 if (data == null) data = (StageEditorData)EditorResources.Load<ScriptableObject>("StageEditor/Data.asset");
                 if (setting == null) setting = (StageEditorSetting)EditorResources.Load<ScriptableObject>("StageEditor/Setting.asset");
-
-                if (data.selectedEnemySpawnData != null && data.selectedEnemySpawnData.enemyPrefab != null && data.selectedEnemySpawnData != null)
-                {
-                    data.selectedEnemyEditorGUI = GetEnemyEditor();
-                }
             }
         }
         
 
-        void PreviewMove()
+
+        void Hold()
         {
-            if (e.button == 0)
-            {
-                switch (e.type)
-                {
-                    case EventType.MouseDown:
-                        if (previewRect.GetAddWidth(setting.lineHoldWidth).GetAddPositionX(0.5f * setting.lineHoldWidth).Contains(e.mousePosition))
-                        {
-                            offset = data.previewPos - e.mousePosition;
-                            e.Use();
-                        }
-                        break;
+            if (holdPreview) return;
 
-                    case EventType.MouseDrag:
-                        data.previewPos = e.mousePosition + offset;
-                        if (previewRect.GetAddWidth(setting.lineHoldWidth).GetAddPositionX(0.5f * setting.lineHoldWidth).Contains(e.mousePosition))
-                        {
-                            e.Use();
-                            if (data.preview.IsContact(data.previewPos, position.height, 0, data.inspectorLinePosX, data.filesLinePosX, out Vector2 previewContact))
-                            {
-                                data.previewPos = previewContact;
-                            }
-                            Repaint();
-                        }
-                        break;
-                    }
-            }
-        }
-
-        void DrawPreview()
-        {
-            DrawGrid();
-
-            if (data.selectedEnemySpawnData != null && data.selectedEnemyEditorGUI != null)
-            {
-                data.selectedEnemyEditorGUI.DrawEnemyDataGizmos(data.selectedEnemySpawnData);
-            }
-
-            void DrawGrid()
-            {
-                CustomGUI.DrawSquare(previewRect, setting.previewBackGroundColor);
-                CustomGUI.DrawOpenGrid(previewRect, new Vector2(data.previewPos.x % data.cellSize, data.previewPos.y % data.cellSize), data.cellSize, setting.previewOutGridColor);
-                CustomGUI.DrawCloseGrid(data.previewPos + data.cellSize * new Vector2(-0.5f * Window.GameWidth, -Window.GameHeight), new Vector2Int(Window.GameWidth, Window.GameHeight), data.cellSize, setting.previewGameGridColor);
-            }
-        }
-
-        void DrawTimeLine()
-        {
-            float timeLineX = data.filesLinePosX + setting.timeHorizontalSpace;
-            float timeLineY = position.height - setting.timeBottomSpace;
-            float timeLineWidth = data.inspectorLinePosX - 2 * setting.timeHorizontalSpace;
-
-            Handles.color = Color.white;
-            Handles.DrawLine(
-                    new Vector3(data.filesLinePosX + setting.timeHorizontalSpace, timeLineY),
-                    new Vector3(data.inspectorLinePosX - setting.timeHorizontalSpace, timeLineY)
-                );
-
-            for (int i = 0; i < data.editorEnemyDataList.Count; i++)
-            {
-                if (i == data.selectedEnemyIndex)
-                {
-                    float timeRatio = data.selectedEnemySpawnData.spawnTime / timeLength;
-                    Rect timeLineMarkerRect = new Rect();
-                    timeLineMarkerRect.position = new Vector2(timeLineX + timeRatio * timeLineWidth, timeLineY);
-                    timeLineMarkerRect.size = Vector2.one * setting.timeCubeSize;
-
-                    CustomGUI.DrawSquare(timeLineMarkerRect, setting.selectBoxColor);
-                }
-                else
-                {
-                    EnemySpawnData spawnData = data.editorEnemyDataList[i];
-                    Handles.DrawWireCube(
-                        new Vector3(data.filesLinePosX + setting.timeHorizontalSpace + (spawnData.spawnTime / timeLength) * (data.inspectorLinePosX - 2 * setting.timeHorizontalSpace), timeLineY),
-                        Vector3.one * setting.timeCubeSize
-                    );
-                }
-            }
-
-        }
-        
-
-        void LineMove()
-        {
             FileViewerLineMove();
             InspectorLineMove();
 
@@ -251,24 +168,24 @@ public class StageEditor : EditorWindow
                     Repaint();
                 }
             }
-
-
-            void RefreshFileViewerRect()
+            
+            if (data.preview.IsContact(data.previewPos, position.height, 0, data.inspectorLinePosX, data.filesLinePosX, out Vector2 previewContact))
             {
-                fileViewerRect.position = new Vector2(0, 0);
-                fileViewerRect.size = new Vector2(data.filesLinePosX, position.height);
-            }
-            void RefreshInspectorRect()
-            {
-                inspectorRect.position = new Vector2(data.inspectorLinePosX, 0);
-                inspectorRect.size = new Vector2(position.width - data.inspectorLinePosX, position.height);
-            }
-            void RefreshPreviewRect()
-            {
-                previewRect.position = new Vector2(data.filesLinePosX, 0);
-                previewRect.size = new Vector2(data.inspectorLinePosX - data.filesLinePosX, position.height);
+                data.previewPos = previewContact;
+                Repaint();
             }
         }
+        void RefreshFileViewerRect()
+        {
+            fileViewerRect.position = new Vector2(0, 0);
+            fileViewerRect.size = new Vector2(data.filesLinePosX, position.height);
+        }
+        void RefreshInspectorRect()
+        {
+            inspectorRect.position = new Vector2(data.inspectorLinePosX, 0);
+            inspectorRect.size = new Vector2(position.width - data.inspectorLinePosX, position.height);
+        }
+        
 
         void DrawFileViewerGUI()
         {
@@ -283,55 +200,58 @@ public class StageEditor : EditorWindow
 
             GUILayout.BeginArea(area);
 
-            Rect stageFolderPathFieldRect = new Rect();
-            stageFolderPathFieldRect.position = area.position;
-            stageFolderPathFieldRect.size = new Vector2(area.width - setting.buttonWidth, EditorGUIUtility.singleLineHeight);
-            EditorGUIUtility.labelWidth = 100;
-            openStageFolderPath = EditorGUI.TextField(stageFolderPathFieldRect, "Stage Name", openStageFolderPath);
+            GUILayout.Label("File Viewer", EditorStyles.boldLabel);
 
-            Rect refreshButtonRect = new Rect();
-            refreshButtonRect.position = stageFolderPathFieldRect.position + new Vector2(stageFolderPathFieldRect.width, 0);
-            refreshButtonRect.size = new Vector2(setting.buttonWidth, EditorGUIUtility.singleLineHeight);
+            StagePopup();
 
-            if (GUI.Button(refreshButtonRect, "Refresh"))
-            {
-                string folderResourcePath = $"Stage/{openStageFolderPath}";
-                if (openStageFolderPath != "" && Directory.Exists($"Assets/Resources/{folderResourcePath}"))
-                {
-                    data.editorEnemyDataList = Resources.LoadAll<EnemySpawnData>(folderResourcePath + "/EnemySpawnData").ToList();
-                }
-            }
-
-            if (data.editorEnemyDataList != null)
-            {
-                for (int i = 0; i < data.editorEnemyDataList.Count; i++)
-                {
-                    EnemySpawnData spawnData = data.editorEnemyDataList[i];
-                    Rect dataObjectRect = new Rect();
-                    dataObjectRect.position = area.position + new Vector2(0, i * EditorGUIUtility.singleLineHeight + 2 * EditorGUIUtility.singleLineHeight);
-                    dataObjectRect.size = new Vector2(area.width - setting.buttonWidth, EditorGUIUtility.singleLineHeight);
-                    EditorGUI.ObjectField(dataObjectRect, spawnData, typeof(EnemyData), false);
-
-                    Rect dataSelectButtonRect = new Rect();
-                    dataSelectButtonRect.position = dataObjectRect.position + new Vector2(dataObjectRect.width, 0);
-                    dataSelectButtonRect.size = new Vector2(setting.buttonWidth, EditorGUIUtility.singleLineHeight);
-                    if (GUI.Button(dataSelectButtonRect, "Select"))
-                    {
-                        data.selectedEnemySpawnData = spawnData;
-                        data.selectedEnemyIndex = i;
-                    }
-                }
-            }
-            if (data.selectedEnemySpawnData == null) data.selectedEnemyIndex = -1;
-            else
-            {
-                Rect selectBoxRect = new Rect();
-                selectBoxRect.position = area.position + new Vector2(0, data.selectedEnemyIndex * EditorGUIUtility.singleLineHeight + 2 * EditorGUIUtility.singleLineHeight);
-                selectBoxRect.size = new Vector2(area.width, EditorGUIUtility.singleLineHeight);
-                CustomGUI.DrawSquare(selectBoxRect, setting.selectBoxColor);
-            }
+            EnemyPopup();
 
             GUILayout.EndArea();
+
+            
+            void StagePopup()
+            {
+                GUILayout.BeginHorizontal();
+                int stageSelectInput = EditorGUILayout.Popup(data.selectedStageIndex, data.stageNameArray, GUILayout.Height(setting.buttonHeight));
+                if (stageSelectInput != data.selectedStageIndex)
+                {
+                    data.selectedStageIndex = stageSelectInput;
+                    string stageFolderPath = $"Stage/{data.stageNameArray[data.selectedStageIndex]}";
+                    data.selectedStage = (Stage)Resources.Load<ScriptableObject>($"{stageFolderPath}/Stage");
+                    data.editorEnemyDataList = ((EnemySpawnData[])Resources.LoadAll<ScriptableObject>($"Stage/{data.stageNameArray[data.selectedStageIndex]}/EnemySpawnData")).ToList();
+                }
+
+                if (GUI.Button(GUILayoutUtility.GetRect(setting.buttonWidth, setting.buttonHeight).GetAddPositionY(2), "Refresh"))
+                {
+                    data.stageNameArray = Directory.GetDirectories("Assets/Resources/Stage").Select(path => { string splitPath = path.Split('/')[^1]; return splitPath.Substring(6, splitPath.Length - 6); }).ToArray();
+                }
+                GUILayout.EndHorizontal();
+            }
+            void EnemyPopup()
+            {
+                Rect selectBoxRect = new Rect();
+
+                if (data.editorEnemyDataList != null)
+                {
+                    for (int i = 0; i < data.editorEnemyDataList.Count; i++)
+                    {
+                        GUILayout.BeginHorizontal();
+                        EnemySpawnData spawnData = data.editorEnemyDataList[i];
+                        EditorGUILayout.ObjectField(spawnData, typeof(EnemyData), false, GUILayout.Height(setting.buttonHeight));
+                        
+                        if (data.selectedEnemyIndex == i) selectBoxRect = GUILayoutUtility.GetLastRect();
+
+                        if (GUI.Button(GUILayoutUtility.GetRect(setting.buttonWidth, setting.buttonHeight).GetAddPositionY(2), "Select"))
+                        {
+                            data.selectedEnemySpawnData = spawnData;
+                            data.selectedEnemyIndex = i;
+                        }
+                        GUILayout.EndHorizontal();
+                    }
+                }
+                if (data.selectedEnemySpawnData == null) data.selectedEnemyIndex = -1;
+                else CustomGUI.DrawSquare(selectBoxRect, setting.selectBoxColor);
+            }
         }
         void DrawInspectorGUI()
         {
@@ -347,65 +267,97 @@ public class StageEditor : EditorWindow
 
             if (data.selectedEnemySpawnData != null)
             {
-                CustmGUILayout.InteractionObjectField(data.selectedEnemySpawnData.enemyPrefab, Header);
-
-                void Header(Rect rect)
+                int enemySpawnDataInput = EditorGUILayout.Popup(data.selectedEnemySpawnData.prefabIndex, data.prefabs.Select(prefab => prefab.name).ToArray());
+                if(data.selectedEnemySpawnData.prefabIndex != enemySpawnDataInput)
                 {
-                    dropDownRect = new Rect(rect.position.GetSetY(5 + EditorStyles.boldLabel.lineHeight + rect.height), new Vector2(area.width, 23));
-
-                    if (e.isMouse)
-                    {
-                        if (EventUtility.MouseDown(0) && rect.Contains(e.mousePosition))
-                        {
-                            isPrefabDropDownExpanded = !isPrefabDropDownExpanded;
-                            e.Use();
-                        }
-                    }
-                    if (isPrefabDropDownExpanded && ((dropDownRect.GetAddPositionY(-rect.height).GetAddHeight(23 * (data.prefabs.Length - 1))).Contains(e.mousePosition) == false))
-                    {
-                        isPrefabDropDownExpanded = false;
-                        Debug.Log($"벗어남: {e.mousePosition} // {dropDownRect.GetAddPositionY(-rect.height).GetAddHeight(23 * data.prefabs.Length)}");
-                    }
-                    
-                    if (isPrefabDropDownExpanded)
-                    {
-                        dropDownIndex = 0;
-                        for (int i = 0; i < data.prefabs.Length; i++)
-                        {
-                            if (dropDownRect.GetAddPositionY(i * 23).Contains(e.mousePosition))
-                            {
-                                if (EventUtility.MouseDown(0))
-                                {
-                                    data.selectedEnemySpawnData.enemyPrefab = data.prefabs[dropDownIndex];
-                                    isPrefabDropDownExpanded = false;
-                                }
-                                if (e.isMouse) e.Use();
-                            }
-
-                            drawDropDown += () =>
-                            {
-                                Rect elementRect = dropDownRect.GetAddPositionY(dropDownIndex * 23);
-                                CustomGUI.DrawSquare(elementRect, setting.dropDownColor);
-                                EditorGUI.LabelField(elementRect, data.prefabs[dropDownIndex].name);
-                                if (elementRect.Contains(e.mousePosition)) CustomGUI.DrawSquare(elementRect, setting.selectBoxColor);
-                                dropDownIndex++;
-                            };
-                        }
-                    }
+                    data.selectedEnemySpawnData.prefabIndex = enemySpawnDataInput;
+                    data.selectedEnemyEditorGUI = GetEnemyEditor(data.selectedEnemySpawnData.EditorType);
                 }
-                data.selectedEnemySpawnData.spawnTime = EditorGUILayout.FloatField("Spawn Time", data.selectedEnemySpawnData.spawnTime);
-
-                data.selectedEnemyEditorGUI.DrawInspectorGUI(data.selectedEnemySpawnData);
-
-                if (drawDropDown != null)
-                {
-                    drawDropDown.Invoke();
-                    drawDropDown = null;
-                }
+                if (data.selectedEnemyEditorGUI != null) data.selectedEnemyEditorGUI.DrawInspectorGUI(data.selectedEnemySpawnData);
             }
 
-
             GUILayout.EndArea();
+        }
+
+
+        void PreviewMove()
+        {
+            if (holdFilesLine || holdInspectorLine) return;
+
+            if (EventUtility.MouseDown(0) && previewRect.Contains(e.mousePosition))
+            {
+                holdPreview = true;
+                offset = data.previewPos - e.mousePosition;
+                e.Use();
+            }
+            if (holdPreview && EventUtility.MouseDrag(0))
+            {
+                data.previewPos = e.mousePosition + offset;
+                e.Use();
+                if (data.preview.IsContact(data.previewPos, position.height, 0, data.inspectorLinePosX, data.filesLinePosX, out Vector2 previewContact))
+                {
+                    data.previewPos = previewContact;
+                }
+                Repaint();
+            }
+            if (EventUtility.MouseUp(0))
+            {
+                holdPreview = false;
+            }
+        }
+
+        void RefreshPreviewRect()
+        {
+            previewRect.position = new Vector2(data.filesLinePosX, 0);
+            previewRect.size = new Vector2(data.inspectorLinePosX - data.filesLinePosX, position.height);
+        }
+        
+        void DrawPreview()
+        {
+            DrawGrid();
+
+            if (data.selectedEnemyEditorGUI != null) data.selectedEnemyEditorGUI.DrawEnemyDataGizmos(data.selectedEnemySpawnData);
+            
+            void DrawGrid()
+            {
+                RefreshPreviewRect();
+                CustomGUI.DrawSquare(previewRect, setting.previewBackGroundColor);
+                Vector2Int floor = new Vector2Int(
+                    Mathf.FloorToInt(previewRect.width / data.cellSize), 
+                    Mathf.FloorToInt(previewRect.height / data.cellSize)
+                );
+                Vector2 offset = previewRect.size - floor;
+                CustomGUI.DrawCloseGrid(-offset, floor, data.cellSize, setting.previewOutGridColor);
+                CustomGUI.DrawCloseGrid(data.previewPos + data.cellSize * new Vector2(-0.5f * Window.GameWidth, -Window.GameHeight), new Vector2Int(Window.GameWidth, Window.GameHeight), data.cellSize, setting.previewGameGridColor);
+            }
+        }
+
+        void DrawTimeLine()
+        {
+            float timeLineX = data.filesLinePosX + setting.timeHorizontalSpace;
+            float timeLineY = position.height - setting.timeBottomSpace;
+            float timeLineWidth = data.inspectorLinePosX - 2 * setting.timeHorizontalSpace;
+
+            Handles.color = Color.white;
+            Handles.DrawLine(
+                    new Vector3(data.filesLinePosX + setting.timeHorizontalSpace, timeLineY),
+                    new Vector3(data.inspectorLinePosX - setting.timeHorizontalSpace, timeLineY)
+                );
+
+            for (int i = 0; i < data.editorEnemyDataList.Count; i++)
+            {
+                float timeRatio = data.editorEnemyDataList[i].spawnTime / timeLength;
+
+                Rect timeLineMarkerRect = new Rect();
+                timeLineMarkerRect.position = new Vector2(timeLineX + timeRatio * timeLineWidth - 0.5f * setting.timeCubeSize, timeLineY - 0.5f * setting.timeCubeSize);
+                timeLineMarkerRect.size = Vector2.one * setting.timeCubeSize;
+
+                if (i == data.selectedEnemyIndex)
+                {
+                    CustomGUI.DrawSquare(timeLineMarkerRect, setting.selectEnemySpawnTimeColor);
+                }
+                else CustomGUI.DrawSquare(timeLineMarkerRect, setting.enemySpawnTimeColor);
+            }
         }
 
         #endregion
@@ -415,11 +367,9 @@ public class StageEditor : EditorWindow
     {
         return data.previewPos + new Vector2(worldPos.x, -worldPos.y) * data.cellSize;
     }
-    public static EnemyEditorGUI GetEnemyEditor()
+    public static EnemyEditorGUI GetEnemyEditor(Type editorType)
     {
         EnemyEditorGUI editorInstance;
-
-        Type editorType = data.selectedEnemySpawnData.EditorType;
 
         if (enemyEditorGUIDictionary.TryGetValue(editorType, out editorInstance) == false)
         {

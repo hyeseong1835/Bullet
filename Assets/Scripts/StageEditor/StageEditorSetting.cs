@@ -29,6 +29,7 @@ public class StageEditorSetting : ScriptableObject
     public float timeHorizontalSpace = 100;
     public float timeBottomSpace = 50;
     public SquareColor selectEnemySpawnTimeColor;
+    public SquareColor enemySpawnTimeColor;
 
     public float screenMoveSpeed = 50;
 

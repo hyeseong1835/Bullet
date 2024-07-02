@@ -7,7 +7,7 @@ using UnityEngine;
 public class Stage : ScriptableObject
 {
     public EnemySpawnData[] enemySpawnData;
-    //public Pool[] enemyPool;
+    public Pool[] enemyPool;
 
     public IEnumerator Start()
     {
@@ -18,7 +18,7 @@ public class Stage : ScriptableObject
 
             yield return new WaitForSeconds(data.spawnTime - prevTime);
 
-            GameObject enemyObj = Instantiate(data.enemyPrefab);
+            GameObject enemyObj = enemyPool[data.prefabIndex].Use();
 
             prevTime = data.spawnTime;
         }

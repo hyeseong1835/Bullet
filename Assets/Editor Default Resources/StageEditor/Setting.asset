@@ -29,21 +29,24 @@ MonoBehaviour:
   fileRightSpace: 5
   fileLeftSpace: 5
   fileColor:
-    face: {r: 0.09803922, g: 0.09803922, b: 0.09803922, a: 1}
+    face: {r: 0.098039225, g: 0.098039225, b: 0.098039225, a: 1}
     outline: {r: 0, g: 0, b: 0, a: 1}
   previewBackGroundColor: {r: 0.15686275, g: 0.15686275, b: 0.15686275, a: 1}
   previewGameGridColor: {r: 1, g: 1, b: 1, a: 1}
-  previewOutGridColor: {r: 0.18867922, g: 0.18867922, b: 0.18867922, a: 1}
+  previewOutGridColor: {r: 0, g: 0, b: 0, a: 1}
   timeCubeSize: 10
   timeHorizontalSpace: 100
   timeBottomSpace: 50
   selectEnemySpawnTimeColor:
-    face: {r: 0, g: 0, b: 0, a: 0}
-    outline: {r: 0, g: 0, b: 0, a: 0}
+    face: {r: 0.4660377, g: 1, b: 0.6477056, a: 1}
+    outline: {r: 1, g: 1, b: 1, a: 1}
+  enemySpawnTimeColor:
+    face: {r: 1, g: 1, b: 1, a: 1}
+    outline: {r: 0.26415092, g: 0.26415092, b: 0.26415092, a: 1}
   screenMoveSpeed: 1
   definitionGizmoSize: 10
   buttonHeight: 20
-  buttonWidth: 100
+  buttonWidth: 50
   selectBoxColor:
-    face: {r: 0, g: 0, b: 0, a: 1}
+    face: {r: 1, g: 1, b: 1, a: 0.19607843}
     outline: {r: 1, g: 1, b: 1, a: 1}

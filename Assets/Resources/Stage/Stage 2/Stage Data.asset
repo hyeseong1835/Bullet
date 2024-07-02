@@ -12,13 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 716bf7d622075f147aeeea90e2564d49, type: 3}
   m_Name: Stage Data
   m_EditorClassIdentifier: 
-  enemyPool:
-  - prefab: {fileID: 0}
-    holder: {fileID: 0}
-    destroyDelay: 0
-    startCount: 0
-    stayCount: 0
-    pool: []
-    waitDestroy: []
-  waveData: []
-  waveIndex: 0
+  enemySpawnData: []
+  enemyPool: []

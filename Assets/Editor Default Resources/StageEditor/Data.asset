@@ -12,6 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 72707a419bef5a144a8467c4489e64dc, type: 3}
   m_Name: Data
   m_EditorClassIdentifier: 
+  selectedStage: {fileID: 0}
+  selectedStageIndex: 1
+  stageNameArray:
+  - Stage 1
+  - Stage 2
+  selectedEnemySpawnData: {fileID: 11400000, guid: 53a10d6c3dffbf14ca2c30a12e4a95f5, type: 2}
+  selectedEnemyIndex: 2
   editorEnemyDataList:
   - {fileID: 11400000, guid: d709293ac2c586243a99156b8b1aa1ac, type: 2}
   - {fileID: 11400000, guid: 7ae937991a4226e4dbd71cf8203a8c19, type: 2}
@@ -21,12 +28,10 @@ MonoBehaviour:
   - {fileID: 5235914642448064442, guid: 3ed429bc1e8a29444962959c6d58af02, type: 3}
   - {fileID: 5235914642448064442, guid: 0cd9a6f2d671aef4cbfec9a2ce47cfb9, type: 3}
   - {fileID: 5235914642448064442, guid: ef964c7e90e8e224586ae27098f895c2, type: 3}
-  selectedEnemySpawnData: {fileID: 11400000, guid: d709293ac2c586243a99156b8b1aa1ac, type: 2}
   preview:
-    size: {x: 100, y: 250}
-    center: {x: 0, y: -125}
-  previewPos: {x: 238.2, y: 589}
-  selectedEnemyIndex: 0
-  cellSize: 50
-  inspectorLinePosX: 434.2
-  filesLinePosX: 167.2
+    size: {x: 200, y: 500}
+    center: {x: 0, y: -250}
+  previewPos: {x: 338.2, y: 512.8}
+  cellSize: 100
+  inspectorLinePosX: 438.2
+  filesLinePosX: 201.2
