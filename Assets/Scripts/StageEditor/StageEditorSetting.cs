@@ -7,21 +7,28 @@ public class StageEditorSetting : ScriptableObject
 {
     public float lineHoldWidth = 10;
     public float minDistanceBetweenLines = 10;
+
     public float inspectorTopSpace = 10;
     public float inspectorBottomSpace = 5;
     public float inspectorRightSpace = 5;
     public float inspectorLeftSpace = 5;
+    public SquareColor inspectorColor;
+    public SquareColor dropDownColor;
 
     public float fileTopSpace = 10;
     public float fileBottomSpace = 5;
     public float fileRightSpace = 5;
     public float fileLeftSpace = 5;
+    public SquareColor fileColor;
+
+    public Color previewBackGroundColor;
+    public Color previewGameGridColor;
+    public Color previewOutGridColor;
 
     public float timeCubeSize = 10;
     public float timeHorizontalSpace = 100;
     public float timeBottomSpace = 50;
-    public Color selectEnemySpawnTimeFaceColor = new Color(1, 0.3f, 0.3f, 1);
-    public Color selectEnemySpawnTimeOutlineColor = Color.white;
+    public SquareColor selectEnemySpawnTimeColor;
 
     public float screenMoveSpeed = 50;
 
@@ -29,7 +36,5 @@ public class StageEditorSetting : ScriptableObject
 
     public float buttonHeight = 20;
     public float buttonWidth = 100;
-    public Color selectBoxFaceColor = new Color(1, 1, 1, 0.1f);
-    public Color selectBoxOutlineColor = Color.white;
-
+    public SquareColor selectBoxColor;
 }

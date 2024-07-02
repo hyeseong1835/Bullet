@@ -3,29 +3,28 @@ using UnityEngine;
 
 public class InstantEnemyEditorGUI : EnemyEditorGUI
 {
-    public override void DrawInspectorGUI(EnemySpawnData spawnData)
+    public override void DrawInspectorGUI(EnemySpawnData enemySpawnData)
     {
-        InstantEnemySpawnData instantEnemy = (InstantEnemySpawnData)spawnData;
+        InstantEnemySpawnData data = (InstantEnemySpawnData)enemySpawnData;
 
-        instantEnemy.startPos = EditorGUILayout.Vector2Field("World Pos", instantEnemy.startPos);
-        instantEnemy.endPos = EditorGUILayout.Vector2Field("Definition", instantEnemy.endPos);
+        data.startPos = EditorGUILayout.Vector2Field("World Pos", data.startPos);
+        data.endPos = EditorGUILayout.Vector2Field("Definition", data.endPos);
     }
 
-    public override void DrawEnemyDataGizmos(EnemySpawnData spawnData)
+    public override void DrawEnemyDataGizmos(EnemySpawnData enemySpawnData)
     {
-        InstantEnemySpawnData instantEnemy = (InstantEnemySpawnData)spawnData;
+        InstantEnemySpawnData data = (InstantEnemySpawnData)enemySpawnData;
 
-        Vector2 screenPos = StageEditor.WorldToScreenPos(instantEnemy.startPos);
+        Vector2 startScreenPos = StageEditor.WorldToScreenPos(data.startPos);
+        Vector2 endScreenPos = StageEditor.WorldToScreenPos(data.endPos);
+
         Handles.color = Color.cyan;
+        Handles.DrawWireDisc(startScreenPos, Vector3.forward, 10);
 
-        Handles.DrawWireDisc(screenPos, Vector3.forward, 10);
-
-        Vector2 definitionScreenPos = StageEditor.WorldToScreenPos(instantEnemy.endPos);
-
-        Handles.DrawLine(screenPos, definitionScreenPos);
+        Handles.DrawLine(startScreenPos, endScreenPos);
         Vector2 X = new Vector2(StageEditor.setting.definitionGizmoSize, -StageEditor.setting.definitionGizmoSize);
-        Handles.DrawLine(definitionScreenPos + X, definitionScreenPos - X);
-        Handles.DrawLine(definitionScreenPos + Vector2.one * StageEditor.setting.definitionGizmoSize, definitionScreenPos - Vector2.one * StageEditor.setting.definitionGizmoSize);
+        Handles.DrawLine(endScreenPos + X, endScreenPos - X);
+        Handles.DrawLine(endScreenPos + Vector2.one * StageEditor.setting.definitionGizmoSize, endScreenPos - Vector2.one * StageEditor.setting.definitionGizmoSize);
         Handles.color = Color.white;
     }
 }

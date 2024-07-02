@@ -14,6 +14,22 @@ public static class VectorUtility
     public static Vector2 GetAddX(this Vector2 vector, float value) => vector.AddX(value);
     public static Vector2 GetAddY(this Vector2 vector, float value) => vector.AddY(value);
 
+    public static Vector3 SetX(ref this Vector3 vector, float value) => vector = new Vector3(value, vector.y, vector.z);
+    public static Vector3 SetY(ref this Vector3 vector, float value) => vector = new Vector3(vector.x, value, vector.z);
+    public static Vector3 SetZ(ref this Vector3 vector, float value) => vector = new Vector3(vector.x, vector.y, value);
+
+    public static Vector3 GetSetX(this Vector3 vector, float value) => vector.SetX(value);
+    public static Vector3 GetSetY(this Vector3 vector, float value) => vector.SetY(value);
+    public static Vector3 GetSetZ(this Vector3 vector, float value) => vector.SetZ(value);
+
+    public static Vector3 AddX(ref this Vector3 vector, float value) => vector.SetX(vector.x + value);
+    public static Vector3 AddY(ref this Vector3 vector, float value) => vector.SetY(vector.y + value);
+    public static Vector3 AddZ(ref this Vector3 vector, float value) => vector.SetZ(vector.z + value);
+
+    public static Vector3 GetAddX(this Vector3 vector, float value) => vector.AddX(value);
+    public static Vector3 GetAddY(this Vector3 vector, float value) => vector.AddY(value);
+    public static Vector3 GetAddZ(this Vector3 vector, float value) => vector.AddZ(value);
+
     public static Vector2 Bezier(Vector2 startPos, Vector2 endPos, Vector2 handlePos, float t)
     {
         Vector2 a = Vector2.Lerp(startPos, handlePos, t);

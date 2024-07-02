@@ -18,18 +18,32 @@ MonoBehaviour:
   inspectorBottomSpace: 5
   inspectorRightSpace: 5
   inspectorLeftSpace: 5
+  inspectorColor:
+    face: {r: 0.09803922, g: 0.09803922, b: 0.09803922, a: 1}
+    outline: {r: 0, g: 0, b: 0, a: 1}
+  dropDownColor:
+    face: {r: 0, g: 0, b: 0, a: 1}
+    outline: {r: 0, g: 0, b: 0, a: 1}
   fileTopSpace: 10
   fileBottomSpace: 5
   fileRightSpace: 5
   fileLeftSpace: 5
+  fileColor:
+    face: {r: 0.09803922, g: 0.09803922, b: 0.09803922, a: 1}
+    outline: {r: 0, g: 0, b: 0, a: 1}
+  previewBackGroundColor: {r: 0.15686275, g: 0.15686275, b: 0.15686275, a: 1}
+  previewGameGridColor: {r: 1, g: 1, b: 1, a: 1}
+  previewOutGridColor: {r: 0.18867922, g: 0.18867922, b: 0.18867922, a: 1}
   timeCubeSize: 10
   timeHorizontalSpace: 100
   timeBottomSpace: 50
-  selectEnemySpawnTimeFaceColor: {r: 1, g: 0.3, b: 0.3, a: 1}
-  selectEnemySpawnTimeOutlineColor: {r: 1, g: 1, b: 1, a: 1}
+  selectEnemySpawnTimeColor:
+    face: {r: 0, g: 0, b: 0, a: 0}
+    outline: {r: 0, g: 0, b: 0, a: 0}
   screenMoveSpeed: 1
   definitionGizmoSize: 10
   buttonHeight: 20
   buttonWidth: 100
-  selectBoxFaceColor: {r: 1, g: 1, b: 1, a: 0.101960786}
-  selectBoxOutlineColor: {r: 1, g: 1, b: 1, a: 1}
+  selectBoxColor:
+    face: {r: 0, g: 0, b: 0, a: 1}
+    outline: {r: 1, g: 1, b: 1, a: 1}
