@@ -33,11 +33,6 @@ public struct Box
         center = coll.offset;
     }
 
-    public Vector2 GetCenterPos(Vector2 pos)
-    {
-        return pos + center;
-    }
-
     #region Contact
 
     /// <param name="y">box의 Y 좌표 </param>
@@ -283,7 +278,6 @@ public struct Box
 
     #endregion
 
-    /*
     #region Exit + Out
 
     /// <returns>Box가 line보다 위일 때 true를 반환합니다.</returns>
@@ -346,7 +340,6 @@ public struct Box
     }
 
     #endregion
-    */
 
     #region ExitGame
 

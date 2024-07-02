@@ -20,16 +20,18 @@ public class StageEditor : EditorWindow
     Rect inspectorRect = new Rect();
     Rect previewRect = new Rect();
 
-    bool holdPreview = false;
-    bool holdInspectorLine = false;
-    bool holdFilesLine = false;
+    enum HoldType
+    {
+        None,
+        Preview,
+        FileViewerLine,
+        InspectorLine
+    }
+    HoldType hold = HoldType.None;
 
     float timeLength = 100;
 
     Vector2 offset;
-
-    float windowPrevWidth = 0;
-    float windowPrevHeight = 0;
 
     [MenuItem("Window/StageEditor")]
     static void CreateWindow()
@@ -40,28 +42,115 @@ public class StageEditor : EditorWindow
     }
     void OnGUI()
     {
-        Init();
+        #region Init
 
-        if (windowPrevWidth != position.width || windowPrevHeight != position.height)
+        if (data == null) data = (StageEditorData)EditorResources.Load<ScriptableObject>("StageEditor/Data.asset");
+        if (setting == null) setting = (StageEditorSetting)EditorResources.Load<ScriptableObject>("StageEditor/Setting.asset");
+
+        #endregion
+
+        if (e.isScrollWheel)
         {
-            RefreshInspectorRect();
-            RefreshFileViewerRect();
-            RefreshPreviewRect();
-
-            windowPrevWidth = position.width;
-            windowPrevHeight = position.height;
+            data.cellSize += e.delta.y;
+            Repaint();
         }
-
+        RefreshPreviewRect();
         DrawPreview();
 
-        Hold();
+        #region FileViewer Move
+
+        if (hold == HoldType.None && EventUtility.MouseDown(0))
+        {
+            float distance = e.mousePosition.x - data.filesLinePosX;
+            if (Mathf.Abs(distance) < setting.lineHoldWidth)
+            {
+                hold = HoldType.FileViewerLine;
+                e.Use();
+            }
+        }
+        if (hold == HoldType.FileViewerLine && EventUtility.MouseDrag(0))
+        {
+            data.filesLinePosX = e.mousePosition.x;
+
+            float inspectorLineMin = data.filesLinePosX + setting.minDistanceBetweenLines;
+            if (data.inspectorLinePosX < inspectorLineMin)
+            {
+                data.inspectorLinePosX = inspectorLineMin;
+                RefreshInspectorRect();
+            }
+            Repaint();
+            e.Use();
+        }
+
+        if (data.filesLinePosX < 0)
+        {
+            data.filesLinePosX = 0;
+
+            Repaint();
+        }
+
+        #endregion
+
+        #region Inspector Move
+
+        if (hold == HoldType.None && EventUtility.MouseDown(0))
+        {
+            float distance = e.mousePosition.x - data.inspectorLinePosX;
+            if (Mathf.Abs(distance) < setting.lineHoldWidth)
+            {
+                hold = HoldType.InspectorLine;
+                e.Use();
+            }
+        }
+        if (hold == HoldType.InspectorLine && EventUtility.MouseDrag(0))
+        {
+            data.inspectorLinePosX = e.mousePosition.x;
+            float fileLineMax = data.inspectorLinePosX - setting.minDistanceBetweenLines;
+            if (data.filesLinePosX > fileLineMax)
+            {
+                data.filesLinePosX = fileLineMax;
+                RefreshFileViewerRect();
+            }
+            Repaint();
+            e.Use();
+        }
+        if (data.inspectorLinePosX > position.width)
+        {
+            data.inspectorLinePosX = position.width;
+            Repaint();
+        }
+
+        #endregion
+        
+        RefreshFileViewerRect();
+        RefreshInspectorRect();
+
         DrawFileViewerGUI();
         DrawInspectorGUI();
 
-        PreviewMove();
+        if (hold == HoldType.None && EventUtility.MouseDown(0) && previewRect.Contains(e.mousePosition))
+        {
+            hold = HoldType.Preview;
+            offset = data.previewPos - e.mousePosition;
+            e.Use();
+        }
+        if (hold == HoldType.Preview && EventUtility.MouseDrag(0))
+        {
+            data.previewPos = e.mousePosition + offset;
+            e.Use();
 
+            Repaint();
+        }
+        if (EventUtility.MouseUp(0))
+        {
+            hold = HoldType.None;
+        }
 
-        
+        if (data.preview.IsExit(data.previewPos, position.height, 0, data.inspectorLinePosX, data.filesLinePosX, out Vector2 previewContact))
+        {
+            data.previewPos = previewContact;
+        }
+
         if (data.selectedEnemySpawnData != null)
         {
             DrawTimeLine();
@@ -69,112 +158,6 @@ public class StageEditor : EditorWindow
 
         #region Function
 
-        void Init()
-        {
-            LoadData();
-
-            void LoadData()
-            {
-                if (data == null) data = (StageEditorData)EditorResources.Load<ScriptableObject>("StageEditor/Data.asset");
-                if (setting == null) setting = (StageEditorSetting)EditorResources.Load<ScriptableObject>("StageEditor/Setting.asset");
-            }
-        }
-        
-
-
-        void Hold()
-        {
-            if (holdPreview) return;
-
-            FileViewerLineMove();
-            InspectorLineMove();
-
-            if (EventUtility.MouseUp(0))
-            {
-                holdFilesLine = false;
-                holdInspectorLine = false;
-            }
-
-            void FileViewerLineMove()
-            {
-                if (holdInspectorLine) return;
-
-                if (EventUtility.MouseDown(0))
-                {
-                    float distance = e.mousePosition.x - data.filesLinePosX;
-                    if (Mathf.Abs(distance) < setting.lineHoldWidth)
-                    {
-                        holdFilesLine = true;
-                        e.Use();
-                    }
-                }
-                if (holdFilesLine && EventUtility.MouseDrag(0))
-                {
-                    data.filesLinePosX = e.mousePosition.x;
-
-                    float inspectorLineMin = data.filesLinePosX + setting.minDistanceBetweenLines;
-                    if (data.inspectorLinePosX < inspectorLineMin)
-                    {
-                        data.inspectorLinePosX = inspectorLineMin;
-                        RefreshInspectorRect();
-                    }
-                    RefreshFileViewerRect();
-                    RefreshPreviewRect();
-                    Repaint();
-                    e.Use();
-                }
-
-                if (data.filesLinePosX < 0)
-                {
-                    data.filesLinePosX = 0;
-                    RefreshFileViewerRect();
-                    RefreshPreviewRect();
-                    Repaint();
-                }
-            }
-
-            void InspectorLineMove()
-            {
-                if (holdFilesLine) return;
-
-                if (EventUtility.MouseDown(0))
-                {
-                    float distance = e.mousePosition.x - data.inspectorLinePosX;
-                    if (Mathf.Abs(distance) < setting.lineHoldWidth)
-                    {
-                        holdInspectorLine = true;
-                        e.Use();
-                    }
-                }
-                if (holdInspectorLine && EventUtility.MouseDrag(0))
-                {
-                    data.inspectorLinePosX = e.mousePosition.x;
-                    float fileLineMax = data.inspectorLinePosX - setting.minDistanceBetweenLines;
-                    if (data.filesLinePosX > fileLineMax)
-                    {
-                        data.filesLinePosX = fileLineMax;
-                        RefreshFileViewerRect();
-                    }
-                    RefreshInspectorRect();
-                    RefreshPreviewRect();
-                    Repaint();
-                    e.Use();
-                }
-                if (data.inspectorLinePosX > position.width)
-                {
-                    data.inspectorLinePosX = position.width;
-                    RefreshInspectorRect();
-                    RefreshPreviewRect();
-                    Repaint();
-                }
-            }
-            
-            if (data.preview.IsContact(data.previewPos, position.height, 0, data.inspectorLinePosX, data.filesLinePosX, out Vector2 previewContact))
-            {
-                data.previewPos = previewContact;
-                Repaint();
-            }
-        }
         void RefreshFileViewerRect()
         {
             fileViewerRect.position = new Vector2(0, 0);
@@ -185,7 +168,11 @@ public class StageEditor : EditorWindow
             inspectorRect.position = new Vector2(data.inspectorLinePosX, 0);
             inspectorRect.size = new Vector2(position.width - data.inspectorLinePosX, position.height);
         }
-        
+        void RefreshPreviewRect()
+        {
+            previewRect.position = new Vector2(data.filesLinePosX, 0);
+            previewRect.size = new Vector2(data.inspectorLinePosX - data.filesLinePosX, position.height);
+        }
 
         void DrawFileViewerGUI()
         {
@@ -207,7 +194,6 @@ public class StageEditor : EditorWindow
             EnemyPopup();
 
             GUILayout.EndArea();
-
             
             void StagePopup()
             {
@@ -277,39 +263,6 @@ public class StageEditor : EditorWindow
             }
 
             GUILayout.EndArea();
-        }
-
-
-        void PreviewMove()
-        {
-            if (holdFilesLine || holdInspectorLine) return;
-
-            if (EventUtility.MouseDown(0) && previewRect.Contains(e.mousePosition))
-            {
-                holdPreview = true;
-                offset = data.previewPos - e.mousePosition;
-                e.Use();
-            }
-            if (holdPreview && EventUtility.MouseDrag(0))
-            {
-                data.previewPos = e.mousePosition + offset;
-                e.Use();
-                if (data.preview.IsContact(data.previewPos, position.height, 0, data.inspectorLinePosX, data.filesLinePosX, out Vector2 previewContact))
-                {
-                    data.previewPos = previewContact;
-                }
-                Repaint();
-            }
-            if (EventUtility.MouseUp(0))
-            {
-                holdPreview = false;
-            }
-        }
-
-        void RefreshPreviewRect()
-        {
-            previewRect.position = new Vector2(data.filesLinePosX, 0);
-            previewRect.size = new Vector2(data.inspectorLinePosX - data.filesLinePosX, position.height);
         }
         
         void DrawPreview()
