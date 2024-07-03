@@ -31,6 +31,10 @@ MonoBehaviour:
   fileColor:
     face: {r: 0.098039225, g: 0.098039225, b: 0.098039225, a: 1}
     outline: {r: 0, g: 0, b: 0, a: 1}
+  timeWidth: 50
+  timeLengthFieldSize: {x: 50, y: 20}
+  timeLengthFieldOffsetY: 5
+  timeLineColor: {r: 1, g: 1, b: 1, a: 1}
   previewBackGroundColor: {r: 0.15686275, g: 0.15686275, b: 0.15686275, a: 1}
   previewGameGridColor: {r: 1, g: 1, b: 1, a: 1}
   previewOutGridColor: {r: 0, g: 0, b: 0, a: 1}
@@ -38,15 +42,18 @@ MonoBehaviour:
   timeHorizontalSpace: 100
   timeBottomSpace: 50
   selectEnemySpawnTimeColor:
-    face: {r: 0.4660377, g: 1, b: 0.6477056, a: 1}
+    face: {r: 1, g: 1, b: 1, a: 1}
     outline: {r: 1, g: 1, b: 1, a: 1}
   enemySpawnTimeColor:
-    face: {r: 1, g: 1, b: 1, a: 1}
-    outline: {r: 0.26415092, g: 0.26415092, b: 0.26415092, a: 1}
+    face: {r: 1, g: 1, b: 1, a: 0}
+    outline: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
   screenMoveSpeed: 1
+  zoomSpeed: 10
+  cellSizeMin: 5
   definitionGizmoSize: 10
   buttonHeight: 20
-  buttonWidth: 50
+  buttonWidth: 60
   selectBoxColor:
     face: {r: 1, g: 1, b: 1, a: 0.19607843}
     outline: {r: 1, g: 1, b: 1, a: 1}
+  selectHideInHeaderColor: {r: 0, g: 0, b: 0, a: 0}

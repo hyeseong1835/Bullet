@@ -20,7 +20,10 @@ public class StageEditorSetting : ScriptableObject
     public float fileRightSpace = 5;
     public float fileLeftSpace = 5;
     public SquareColor fileColor;
-
+    public float timeWidth = 50;
+    public Vector2 timeLengthFieldSize = new Vector2(50, 20);
+    public float timeLengthFieldOffsetY = 5;
+    public Color timeLineColor;
     public Color previewBackGroundColor;
     public Color previewGameGridColor;
     public Color previewOutGridColor;
@@ -32,10 +35,14 @@ public class StageEditorSetting : ScriptableObject
     public SquareColor enemySpawnTimeColor;
 
     public float screenMoveSpeed = 50;
+    public float zoomSpeed = 10;
+    public float cellSizeMin = 5;
 
     public float definitionGizmoSize = 10;
 
     public float buttonHeight = 20;
     public float buttonWidth = 100;
+
     public SquareColor selectBoxColor;
+    public Color selectHideInHeaderColor;
 }

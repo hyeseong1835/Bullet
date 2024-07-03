@@ -8,25 +8,25 @@ public static class RectUtility
     #region Set
 
     #region Position
-    public static Rect SetPosition(ref this Rect rect, Vector2 position)
+    public static Rect SetPos(ref this Rect rect, Vector2 position)
     {
         rect.position = position;
         return rect;
     }
-    public static Rect SetPostionX(ref this Rect rect, float x)
+    public static Rect SetX(ref this Rect rect, float x)
     {
         rect.x = x;
         return rect;
     }
-    public static Rect SetPostionY(ref this Rect rect, float y)
+    public static Rect SetY(ref this Rect rect, float y)
     {
         rect.y = y;
         return rect;
     }
 
-    public static Rect GetSetPosition(this Rect rect, Vector2 position) => rect.SetPosition(position);
-    public static Rect GetSetPostionX(this Rect rect, float x) => rect.SetPostionX(x);
-    public static Rect GetSetPostionY(this Rect rect, float y) => rect.SetPostionY(y);
+    public static Rect GetSetPos(this Rect rect, Vector2 position) => rect.SetPos(position);
+    public static Rect GetSetX(this Rect rect, float x) => rect.SetX(x);
+    public static Rect GetSetY(this Rect rect, float y) => rect.SetY(y);
 
     #endregion
 
@@ -57,25 +57,25 @@ public static class RectUtility
 
     #region Add
 
-    public static Rect AddPosition(ref this Rect rect, Vector2 position)
+    public static Rect AddPos(ref this Rect rect, Vector2 position)
     {
         rect.position += position;
         return rect;
     }
-    public static Rect AddPositionX(ref this Rect rect, float x)
+    public static Rect AddX(ref this Rect rect, float x)
     {
         rect.x += x;
         return rect;
     }
-    public static Rect AddPositionY(ref this Rect rect, float y)
+    public static Rect AddY(ref this Rect rect, float y)
     {
         rect.y += y;
         return rect;
     }
 
-    public static Rect GetAddPosition(this Rect rect, Vector2 position) => rect.AddPosition(position);
-    public static Rect GetAddPositionX(this Rect rect, float x) => rect.AddPositionX(x);
-    public static Rect GetAddPositionY(this Rect rect, float y) => rect.AddPositionY(y);
+    public static Rect GetAddPos(this Rect rect, Vector2 position) => rect.AddPos(position);
+    public static Rect GetAddX(this Rect rect, float x) => rect.AddX(x);
+    public static Rect GetAddY(this Rect rect, float y) => rect.AddY(y);
 
     public static Rect AddSize(ref this Rect rect, Vector2 size)
     {

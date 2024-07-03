@@ -1,10 +1,13 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
+using Unity.VisualScripting;
 using UnityEditor;
 using UnityEditor.Experimental;
+using UnityEditorInternal.Profiling.Memory.Experimental;
 using UnityEngine;
 
 public class StageEditor : EditorWindow
@@ -29,8 +32,6 @@ public class StageEditor : EditorWindow
     }
     HoldType hold = HoldType.None;
 
-    float timeLength = 100;
-
     Vector2 offset;
 
     [MenuItem("Window/StageEditor")]
@@ -49,9 +50,15 @@ public class StageEditor : EditorWindow
 
         #endregion
 
-        if (e.isScrollWheel)
+        if (e.isScrollWheel && previewRect.Contains(e.mousePosition))
         {
-            data.cellSize += e.delta.y;
+            switch(e.pointerType)
+            {
+                case PointerType.Mouse:
+                    data.cellSize += e.delta.y;
+                    break;
+            }
+            if (data.cellSize < setting.cellSizeMin) data.cellSize = setting.cellSizeMin;
             Repaint();
         }
         RefreshPreviewRect();
@@ -132,6 +139,7 @@ public class StageEditor : EditorWindow
         {
             hold = HoldType.Preview;
             offset = data.previewPos - e.mousePosition;
+            GUI.FocusControl(null);
             e.Use();
         }
         if (hold == HoldType.Preview && EventUtility.MouseDrag(0))
@@ -149,11 +157,6 @@ public class StageEditor : EditorWindow
         if (data.preview.IsExit(data.previewPos, position.height, 0, data.inspectorLinePosX, data.filesLinePosX, out Vector2 previewContact))
         {
             data.previewPos = previewContact;
-        }
-
-        if (data.selectedEnemySpawnData != null)
-        {
-            DrawTimeLine();
         }
 
         #region Function
@@ -186,58 +189,229 @@ public class StageEditor : EditorWindow
             );
 
             GUILayout.BeginArea(area);
-
-            GUILayout.Label("File Viewer", EditorStyles.boldLabel);
-
-            StagePopup();
-
-            EnemyPopup();
-
-            GUILayout.EndArea();
-            
-            void StagePopup()
             {
+                GUILayout.Label("File Viewer", EditorStyles.boldLabel);
+                
+                //Stage Select
                 GUILayout.BeginHorizontal();
-                int stageSelectInput = EditorGUILayout.Popup(data.selectedStageIndex, data.stageNameArray, GUILayout.Height(setting.buttonHeight));
-                if (stageSelectInput != data.selectedStageIndex)
                 {
-                    data.selectedStageIndex = stageSelectInput;
-                    string stageFolderPath = $"Stage/{data.stageNameArray[data.selectedStageIndex]}";
-                    data.selectedStage = (Stage)Resources.Load<ScriptableObject>($"{stageFolderPath}/Stage");
-                    data.editorEnemyDataList = ((EnemySpawnData[])Resources.LoadAll<ScriptableObject>($"Stage/{data.stageNameArray[data.selectedStageIndex]}/EnemySpawnData")).ToList();
-                }
-
-                if (GUI.Button(GUILayoutUtility.GetRect(setting.buttonWidth, setting.buttonHeight).GetAddPositionY(2), "Refresh"))
-                {
-                    data.stageNameArray = Directory.GetDirectories("Assets/Resources/Stage").Select(path => { string splitPath = path.Split('/')[^1]; return splitPath.Substring(6, splitPath.Length - 6); }).ToArray();
-                }
-                GUILayout.EndHorizontal();
-            }
-            void EnemyPopup()
-            {
-                Rect selectBoxRect = new Rect();
-
-                if (data.editorEnemyDataList != null)
-                {
-                    for (int i = 0; i < data.editorEnemyDataList.Count; i++)
+                    int stageSelectInput = EditorGUILayout.Popup(data.selectedStageIndex, data.stageNameArray, GUILayout.Height(setting.buttonHeight));
+                    if (stageSelectInput != data.selectedStageIndex)
                     {
-                        GUILayout.BeginHorizontal();
-                        EnemySpawnData spawnData = data.editorEnemyDataList[i];
-                        EditorGUILayout.ObjectField(spawnData, typeof(EnemyData), false, GUILayout.Height(setting.buttonHeight));
-                        
-                        if (data.selectedEnemyIndex == i) selectBoxRect = GUILayoutUtility.GetLastRect();
+                        string stageFolderPath = $"Stage/{data.stageNameArray[stageSelectInput]}";
 
-                        if (GUI.Button(GUILayoutUtility.GetRect(setting.buttonWidth, setting.buttonHeight).GetAddPositionY(2), "Select"))
+                        data.selectedStage = (Stage)Resources.Load<ScriptableObject>($"{stageFolderPath}/Stage Data");
+                        data.RefreshEnemyDataList();
+
+                        int enemySelectIndex;
+                        if (data.enemySpawnDataList.Count > 0) enemySelectIndex = 0;
+                        else enemySelectIndex = -1;
+                        data.SelectEnemySpawnData(enemySelectIndex);
+
+                        data.selectedStageIndex = stageSelectInput;
+                    }
+
+                    //Refresh
+                    if (GUI.Button(GUILayoutUtility.GetRect(setting.buttonWidth, setting.buttonHeight).GetAddY(2), "Refresh"))
+                    {
+                        data.stageNameArray = Directory.GetDirectories("Assets/Resources/Stage")
+                            .Select(path =>
+                            {
+                                string splitPath = path.Split('/')[^1];
+                                return splitPath.Substring(6, splitPath.Length - 6);
+                            }
+                        ).ToArray();
+
+                        if (data.selectedStage == null) data.enemySpawnDataList.Clear();
+                        else data.RefreshEnemyDataList();
+                        float prevTime = -1;
+                        Dictionary<float, bool> timeFoldout = new Dictionary<float, bool>();
+                        foreach (EnemySpawnData enemyData in data.enemySpawnDataList)
                         {
-                            data.selectedEnemySpawnData = spawnData;
-                            data.selectedEnemyIndex = i;
+                            if (enemyData.spawnTime != prevTime)
+                            {
+                                if (data.timeFoldout.TryGetValue(enemyData.spawnTime, out bool foldout))
+                                {
+                                    timeFoldout.Add(enemyData.spawnTime, foldout);
+                                }
+                                else
+                                {
+                                    timeFoldout.Add(enemyData.spawnTime, false);
+                                }
+                            }
                         }
-                        GUILayout.EndHorizontal();
+                        data.timeFoldout = timeFoldout;
                     }
                 }
-                if (data.selectedEnemySpawnData == null) data.selectedEnemyIndex = -1;
-                else CustomGUI.DrawSquare(selectBoxRect, setting.selectBoxColor);
+                GUILayout.EndHorizontal();
+                
+                EditorGUILayout.Space(5);
+
+                if (data.enemySpawnDataList == null || data.enemySpawnDataList.Count < 1)
+                {
+                    GUILayout.Label("EnemySpawnData is Empty");
+                }
+                else
+                {
+                    // Enemy List
+                    data.enemyScroll = EditorGUILayout.BeginScrollView(new Vector2(0, data.enemyScroll)).y;
+                    {
+                        Rect selectRect = Rect.zero;
+                        Rect headerRect = Rect.zero;
+                        bool isSelectHideByHeader = false;
+                        int elementCount = 0;
+                        float prevTime = -1;
+                        bool foldout = false;
+                        for (int i = 0; i < data.enemySpawnDataList.Count; i++)
+                        {
+                            EnemySpawnData spawnData = data.enemySpawnDataList[i];
+                            if (spawnData.spawnTime != prevTime)
+                            {
+                                if(foldout == false) LateCloseHeader();
+                                
+                                if (data.timeFoldout.TryGetValue(spawnData.spawnTime, out foldout) == false)
+                                {
+                                    data.timeFoldout.Add(spawnData.spawnTime, true);
+                                    foldout = true;
+                                }
+                                
+                                if (foldout)
+                                {
+                                    OpenHeader(spawnData, i);
+                                }
+                                else
+                                {
+                                    CloseHeader(spawnData, i);
+                                }
+                                elementCount = 0;
+                            }
+                            else
+                            {
+                                elementCount++;
+
+                                if (foldout)
+                                {
+                                    OpenElement(spawnData, i);
+                                }
+                                else
+                                {
+                                    CloseElement(spawnData, i);
+                                }
+                            }
+
+                            prevTime = spawnData.spawnTime;
+                        }
+                        if (selectRect != Rect.zero)
+                        {
+                            if (isSelectHideByHeader)
+                            {
+                                HidedSelect();
+                            }
+                            else Select();
+                        }
+                        if (foldout == false) LateCloseHeader();
+
+                        #region Function
+
+                        void HidedSelect()
+                        {
+                            Vector2 p1 = headerRect.position.GetAddY(headerRect.height);
+                            Vector2 p2 = p1.GetAddX(headerRect.width);
+                            Handles.color = setting.selectHideInHeaderColor;
+                            Handles.DrawLine(p1, p2);
+                        }
+                        void Select()
+                        {
+                            CustomGUI.DrawSquare(selectRect, setting.selectBoxColor);
+                        }
+                        void LateCloseHeader()
+                        {
+                            if (elementCount > 0)
+                            {
+                                Vector2 p1 = headerRect.position.GetAddY(headerRect.height);
+                                Vector2 p2 = p1.GetAddX(headerRect.width);
+                                Handles.color = Color.white;
+                                Handles.DrawLine(p1, p2);
+
+                                EditorGUILayout.Space(5);
+                            }
+                        }
+                        void OpenHeader(EnemySpawnData spawnData, int i)
+                        {
+                            EditorGUILayout.Space(5);
+
+                            GUILayout.BeginHorizontal();
+                            {
+                                //Time Label
+                                Rect timeRect = GUILayoutUtility.GetRect(setting.timeWidth, EditorGUIUtility.singleLineHeight);
+                                EditorGUI.LabelField(timeRect, spawnData.spawnTime.ToString("F1"));
+
+                                if (EventUtility.MouseDown(0) && timeRect.Contains(e.mousePosition))
+                                {
+                                    data.timeFoldout[spawnData.spawnTime] = !foldout;
+                                    Repaint();
+                                }
+
+                                //Object Field
+                                EditorGUILayout.ObjectField(spawnData, typeof(EnemyData), false, GUILayout.Height(setting.buttonHeight));
+
+                                headerRect = GUILayoutUtility.GetLastRect().GetSetWidth(area.width - timeRect.width);
+                                if (spawnData == data.selectedEnemySpawnData)
+                                {
+                                    selectRect = headerRect;
+                                }
+
+                                //Select Button
+                                if (GUI.Button(GUILayoutUtility.GetRect(setting.buttonWidth, setting.buttonHeight).GetAddY(2), "Select"))
+                                {
+                                    GUI.FocusControl(null);
+                                    data.SelectEnemySpawnData(i);
+                                }
+                            }
+                            GUILayout.EndHorizontal();
+                        }
+                        void CloseHeader(EnemySpawnData spawnData, int i)
+                        {
+                            OpenHeader(spawnData, i);
+
+                            
+                        }
+
+                        void OpenElement(EnemySpawnData spawnData, int i)
+                        {
+                            GUILayout.BeginHorizontal();
+                            {
+                                Rect timeRect = GUILayoutUtility.GetRect(setting.timeWidth, EditorGUIUtility.singleLineHeight);
+
+                                EditorGUILayout.ObjectField(spawnData, typeof(EnemyData), false, GUILayout.Height(EditorGUIUtility.singleLineHeight));
+                                if (spawnData == data.selectedEnemySpawnData)
+                                {
+                                    selectRect = GUILayoutUtility.GetLastRect().GetSetWidth(area.width - timeRect.width);
+                                }
+
+                                if (GUI.Button(GUILayoutUtility.GetRect(setting.buttonWidth, setting.buttonHeight).GetAddY(2), "Select"))
+                                {
+                                    GUI.FocusControl(null);
+                                    data.SelectEnemySpawnData(i);
+                                }
+                            }
+                            GUILayout.EndHorizontal();
+                        }
+                        void CloseElement(EnemySpawnData spawnData, int i)
+                        {
+                            if (spawnData == data.selectedEnemySpawnData)
+                            {
+                                selectRect = headerRect;
+                                isSelectHideByHeader = true;
+                            }
+                        }
+
+                        #endregion
+                    }
+                    EditorGUILayout.EndScrollView();
+                }
             }
+            GUILayout.EndArea();
         }
         void DrawInspectorGUI()
         {
@@ -248,41 +422,54 @@ public class StageEditor : EditorWindow
             CustomGUI.DrawSquare(inspectorRect, setting.inspectorColor);
 
             GUILayout.BeginArea(area);
-
-            GUILayout.Label("Enemy Inspector", EditorStyles.boldLabel);
-
-            if (data.selectedEnemySpawnData != null)
             {
-                int enemySpawnDataInput = EditorGUILayout.Popup(data.selectedEnemySpawnData.prefabIndex, data.prefabs.Select(prefab => prefab.name).ToArray());
-                if(data.selectedEnemySpawnData.prefabIndex != enemySpawnDataInput)
-                {
-                    data.selectedEnemySpawnData.prefabIndex = enemySpawnDataInput;
-                    data.selectedEnemyEditorGUI = GetEnemyEditor(data.selectedEnemySpawnData.EditorType);
-                }
-                if (data.selectedEnemyEditorGUI != null) data.selectedEnemyEditorGUI.DrawInspectorGUI(data.selectedEnemySpawnData);
-            }
+                GUILayout.Label("Enemy Inspector", EditorStyles.boldLabel);
 
+                if (data.selectedEnemySpawnData != null)
+                {
+                    #region SpawnPrefab
+                    data.selectedEnemySpawnData.prefabIndex = EditorGUILayout.Popup(data.selectedEnemySpawnData.prefabIndex, data.prefabs.Select(prefab => prefab.name).ToArray());
+                    #endregion
+
+                    #region SpawnTime
+                    float spawnTimeInput = EditorGUILayout.FloatField("Spawn Time", data.selectedEnemySpawnData.spawnTime);
+                    if (spawnTimeInput != data.selectedEnemySpawnData.spawnTime)
+                    {
+                        if (spawnTimeInput >= 0) data.selectedEnemySpawnData.spawnTime = spawnTimeInput;
+                        else data.selectedEnemySpawnData.spawnTime = 0;
+
+                        data.SelectEnemySpawnData(data.RemoveAndSortInEnemySpawnDataList(data.selectedEnemySpawnData, data.selectedEnemyIndex));
+                    }
+                    #endregion
+
+                    if (data.selectedEnemyEditorGUI == null) data.RefreshEnemyEditorGUI();
+                    
+                    if (data.selectedEnemyEditorGUI != null) data.selectedEnemyEditorGUI.DrawInspectorGUI(data.selectedEnemySpawnData);
+                    else GUILayout.Label("EditorGUI Missing");
+                }
+                else
+                {
+                    GUILayout.Label("Select Enemy Spawn Data");
+                }
+            }
             GUILayout.EndArea();
         }
-        
         void DrawPreview()
         {
-            DrawGrid();
+            RefreshPreviewRect();
+            CustomGUI.DrawSquare(previewRect, setting.previewBackGroundColor);
+            Vector2Int cellCount = 3 * Vector2Int.one + new Vector2Int(
+                Mathf.FloorToInt(previewRect.width / data.cellSize),
+                Mathf.FloorToInt(previewRect.height / data.cellSize)
+            );
+            Vector2 offset = new Vector2((data.previewPos.x) % data.cellSize, (data.previewPos.y) % data.cellSize);
+            Vector2 start = new Vector2(Mathf.Floor(previewRect.x / data.cellSize) * data.cellSize , Mathf.Floor(previewRect.y / data.cellSize) * data.cellSize);
+            CustomGUI.DrawOpenGrid(start + offset - data.cellSize * Vector2.one, cellCount, data.cellSize, setting.previewOutGridColor);
+            CustomGUI.DrawCloseGrid(data.previewPos + data.cellSize * new Vector2(-0.5f * Window.GameWidth, -Window.GameHeight), new Vector2Int(Window.GameWidth, Window.GameHeight), data.cellSize, setting.previewGameGridColor);
 
             if (data.selectedEnemyEditorGUI != null) data.selectedEnemyEditorGUI.DrawEnemyDataGizmos(data.selectedEnemySpawnData);
             
-            void DrawGrid()
-            {
-                RefreshPreviewRect();
-                CustomGUI.DrawSquare(previewRect, setting.previewBackGroundColor);
-                Vector2Int floor = new Vector2Int(
-                    Mathf.FloorToInt(previewRect.width / data.cellSize), 
-                    Mathf.FloorToInt(previewRect.height / data.cellSize)
-                );
-                Vector2 offset = previewRect.size - floor;
-                CustomGUI.DrawCloseGrid(-offset, floor, data.cellSize, setting.previewOutGridColor);
-                CustomGUI.DrawCloseGrid(data.previewPos + data.cellSize * new Vector2(-0.5f * Window.GameWidth, -Window.GameHeight), new Vector2Int(Window.GameWidth, Window.GameHeight), data.cellSize, setting.previewGameGridColor);
-            }
+            if (data.selectedEnemySpawnData != null) DrawTimeLine();
         }
 
         void DrawTimeLine()
@@ -291,25 +478,59 @@ public class StageEditor : EditorWindow
             float timeLineY = position.height - setting.timeBottomSpace;
             float timeLineWidth = data.inspectorLinePosX - 2 * setting.timeHorizontalSpace;
 
-            Handles.color = Color.white;
-            Handles.DrawLine(
-                    new Vector3(data.filesLinePosX + setting.timeHorizontalSpace, timeLineY),
-                    new Vector3(data.inspectorLinePosX - setting.timeHorizontalSpace, timeLineY)
-                );
+            float timeLineStart = data.filesLinePosX + setting.timeHorizontalSpace;
+            float timeLineEnd = data.inspectorLinePosX - setting.timeHorizontalSpace;
 
-            for (int i = 0; i < data.editorEnemyDataList.Count; i++)
+            Handles.color = setting.timeLineColor;
+            Handles.DrawLine(
+                new Vector3(timeLineStart, timeLineY),
+                new Vector3(timeLineEnd, timeLineY)
+            );
+            Handles.DrawLine(
+                new Vector2(timeLineStart, timeLineY + setting.timeLengthFieldOffsetY),
+                new Vector2(timeLineStart, timeLineY - setting.timeLengthFieldOffsetY)
+            );
+            Handles.DrawLine(
+                new Vector2(timeLineEnd, timeLineY + setting.timeLengthFieldOffsetY),
+                new Vector2(timeLineEnd, timeLineY - setting.timeLengthFieldOffsetY)
+            );
+            for (int i = 0; i < data.enemySpawnDataList.Count; i++)
             {
-                float timeRatio = data.editorEnemyDataList[i].spawnTime / timeLength;
+                DrawTimeLineMarker(
+                    data.enemySpawnDataList[i].spawnTime, 
+                    setting.enemySpawnTimeColor
+                );
+            }
+            if (data.selectedEnemyIndex != -1)
+            {
+                DrawTimeLineMarker(
+                    data.enemySpawnDataList[data.selectedEnemyIndex].spawnTime,
+                    setting.selectEnemySpawnTimeColor
+                );
+            }
+            
+            void DrawTimeLineMarker(float time, SquareColor color)
+            {
+                float timeRatio = time / data.timeLength;
 
                 Rect timeLineMarkerRect = new Rect();
-                timeLineMarkerRect.position = new Vector2(timeLineX + timeRatio * timeLineWidth - 0.5f * setting.timeCubeSize, timeLineY - 0.5f * setting.timeCubeSize);
+                timeLineMarkerRect.position = new Vector2(
+                    Mathf.Lerp(timeLineStart, timeLineEnd, timeRatio) - 0.5f * setting.timeCubeSize,
+                    timeLineY
+                ) - Vector2.one * 0.5f * setting.timeCubeSize;
                 timeLineMarkerRect.size = Vector2.one * setting.timeCubeSize;
 
-                if (i == data.selectedEnemyIndex)
-                {
-                    CustomGUI.DrawSquare(timeLineMarkerRect, setting.selectEnemySpawnTimeColor);
-                }
-                else CustomGUI.DrawSquare(timeLineMarkerRect, setting.enemySpawnTimeColor);
+                CustomGUI.DrawSquare(timeLineMarkerRect, color);
+            }
+            Rect timeLengthFieldRect = new Rect();
+            timeLengthFieldRect.position = new Vector2(timeLineEnd, timeLineY - (setting.timeLengthFieldSize.y + setting.timeLengthFieldOffsetY));
+            timeLengthFieldRect.size = setting.timeLengthFieldSize;
+            
+            data.timeLength = EditorGUI.DelayedFloatField(timeLengthFieldRect, data.timeLength);
+            if (data.enemySpawnDataList.Count >= 1)
+            {
+                float lastTime = data.enemySpawnDataList[^1].spawnTime;
+                if (lastTime > data.timeLength) data.timeLength = lastTime;
             }
         }
 
