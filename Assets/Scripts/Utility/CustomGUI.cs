@@ -5,6 +5,7 @@ using UnityEngine;
 using System;
 using UnityEngine.UIElements;
 using JetBrains.Annotations;
+using System.Reflection.Emit;
 
 public static class CustomGUI
 {
@@ -65,29 +66,5 @@ public static class CustomGUI
         interaction.Invoke();
 
         return (ObjectT)EditorGUI.ObjectField(rect, obj, typeof(ObjectT), allowSceneObject);
-    }
-}
-public static class CustmGUILayout
-{
-    static Event e => Event.current;
-    public static ObjectT InteractionObjectField<ObjectT>(ObjectT obj, Action<Rect> interaction, float width = -1, float height = -1) where ObjectT : UnityEngine.Object
-    {
-        if (width == -1) width = GUILayoutUtility.GetLastRect().width;
-        if (height == -1) height = EditorStyles.objectField.lineHeight;
-        Rect rect = GUILayoutUtility.GetRect(width, height);
-
-        interaction.Invoke(rect);
-
-        return (ObjectT)EditorGUI.ObjectField(rect, obj, typeof(ObjectT), false);
-    }
-    public static void PreventMouseObjectField<ObjectT>(ObjectT obj, float width = -1, float height = -1) where ObjectT : UnityEngine.Object
-    {
-        if (width == -1) width = GUILayoutUtility.GetLastRect().width;
-        if (height == -1) height = EditorStyles.objectField.lineHeight;
-        Rect rect = GUILayoutUtility.GetRect(width, height);
-
-        if (e.isMouse && rect.Contains(e.mousePosition)) e.Use();
-
-        EditorGUI.ObjectField(rect, obj, typeof(ObjectT), false);
     }
 }

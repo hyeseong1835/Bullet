@@ -4,10 +4,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
-using Unity.VisualScripting;
 using UnityEditor;
 using UnityEditor.Experimental;
-using UnityEditorInternal.Profiling.Memory.Experimental;
 using UnityEngine;
 
 public class StageEditor : EditorWindow
@@ -190,6 +188,61 @@ public class StageEditor : EditorWindow
 
             GUILayout.BeginArea(area);
             {
+                if (EditorGUILayout.DropdownButton(new GUIContent("Debug"), FocusType.Passive))
+                {
+                    data.debug = !data.debug;
+                    Repaint();
+                }
+                if(data.debug)
+                {
+                    TitleHeaderLabel("Stage");
+                    EditorGUILayout.ObjectField(data.selectedStage, typeof(Stage), false);
+                    {
+                        EditorGUILayout.TextField("Path", data.selectedStageFolderResourcePath);
+                        foreach (string name in data.stageNameArray)
+                        {
+                            EditorGUILayout.LabelField(name);
+                        }
+                    }
+
+                    BeginNewTab("Select");
+                    EditorGUILayout.Space(5);
+                    CustomGUILayout.UnderBarTitleText("Select");
+                    EditorGUILayout.BeginHorizontal();
+                    EditorGUILayout.Space(10);
+                    EditorGUILayout.BeginVertical(GUILayout.Width(area.width - 10));
+                    {
+                        CustomGUILayout.UnderBarTitleText("Prefab");
+                        EditorGUILayout.ObjectField(data.selectedPrefab, typeof(GameObject), false);
+                        if (data.prefabLists == null || data.prefabLists.Count == 0)
+                        {
+                            WarningLabel("Empty PrefabList");
+                        }
+                        else
+                        {
+                            for (int listIndex = data.prefabLists.Count; listIndex > 0; --listIndex)
+                            {
+                                List<GameObject> curList = data.prefabLists[listIndex];
+
+                                if (curList.Count < 1)
+                                {
+                                    WarningLabel("Empty List");
+                                    continue;
+                                }
+                                Type listType = curList[0].GetType();
+                                CustomGUILayout.UnderBarTitleText(listType.Name);
+
+                                for (int elementIndex = 0; elementIndex < curList.Count; elementIndex++)
+                                {
+                                    EditorGUILayout.ObjectField(curList[elementIndex], typeof(GameObject), false);
+                                }
+                            }
+                        }
+                    }
+                    EditorGUILayout.EndVertical();
+                    EditorGUILayout.EndHorizontal();
+                }
+
                 GUILayout.Label("File Viewer", EditorStyles.boldLabel);
                 
                 //Stage Select
@@ -201,7 +254,8 @@ public class StageEditor : EditorWindow
                         string stageFolderPath = $"Stage/{data.stageNameArray[stageSelectInput]}";
 
                         data.selectedStage = (Stage)Resources.Load<ScriptableObject>($"{stageFolderPath}/Stage Data");
-                        data.RefreshEnemyDataList();
+                        data.RefreshStagePath();
+                        data.RefreshEnemySpawnDataList();
 
                         int enemySelectIndex;
                         if (data.enemySpawnDataList.Count > 0) enemySelectIndex = 0;
@@ -221,35 +275,28 @@ public class StageEditor : EditorWindow
                                 return splitPath.Substring(6, splitPath.Length - 6);
                             }
                         ).ToArray();
-
+                        if (data.stageNameArray.Length > 0) data.selectedStageIndex = 0;
+                        else data.selectedStageIndex = -1;
                         if (data.selectedStage == null) data.enemySpawnDataList.Clear();
-                        else data.RefreshEnemyDataList();
-                        float prevTime = -1;
-                        Dictionary<float, bool> timeFoldout = new Dictionary<float, bool>();
-                        foreach (EnemySpawnData enemyData in data.enemySpawnDataList)
+                        else
                         {
-                            if (enemyData.spawnTime != prevTime)
-                            {
-                                if (data.timeFoldout.TryGetValue(enemyData.spawnTime, out bool foldout))
-                                {
-                                    timeFoldout.Add(enemyData.spawnTime, foldout);
-                                }
-                                else
-                                {
-                                    timeFoldout.Add(enemyData.spawnTime, false);
-                                }
-                            }
+                            data.RefreshStagePath();
+                            data.RefreshEnemySpawnDataList();
                         }
-                        data.timeFoldout = timeFoldout;
+                        data.RefreshPrefab();
+
+                        //data.RefreshTimeFoldout();
+                        data.ResetTimeFoldout();
                     }
                 }
                 GUILayout.EndHorizontal();
                 
                 EditorGUILayout.Space(5);
 
+                EditorGUILayout.LabelField("Spawn Data", EditorStyles.boldLabel);
                 if (data.enemySpawnDataList == null || data.enemySpawnDataList.Count < 1)
                 {
-                    GUILayout.Label("EnemySpawnData is Empty");
+                    WarningLabel("EnemySpawnData is Empty");
                 }
                 else
                 {
@@ -412,6 +459,16 @@ public class StageEditor : EditorWindow
                 }
             }
             GUILayout.EndArea();
+
+            Rect rect = new Rect();
+            rect.size = new Vector2(setting.buttonWidth, setting.buttonHeight);
+            rect.position = area.position + area.size - rect.size;
+
+            if (GUI.Button(rect, "Apply"))
+            {
+                data.ApplyToStage();
+            }
+            
         }
         void DrawInspectorGUI()
         {
@@ -428,7 +485,17 @@ public class StageEditor : EditorWindow
                 if (data.selectedEnemySpawnData != null)
                 {
                     #region SpawnPrefab
-                    data.selectedEnemySpawnData.prefabIndex = EditorGUILayout.Popup(data.selectedEnemySpawnData.prefabIndex, data.prefabs.Select(prefab => prefab.name).ToArray());
+                    if (data.selectedPrefab == null)
+                    {
+                        WarningLabel("Selected Prefab is null");
+                    }
+                    else
+                    {
+                        data.selectedEnemySpawnData.prefabIndex = EditorGUILayout.Popup(
+                            data.selectedEnemySpawnData.prefabIndex,
+                            data.GetPrefabList(data.selectedPrefab).Select(prefab => prefab.name).ToArray()
+                        );
+                    }
                     #endregion
 
                     #region SpawnTime
@@ -443,13 +510,13 @@ public class StageEditor : EditorWindow
                     #endregion
 
                     if (data.selectedEnemyEditorGUI == null) data.RefreshEnemyEditorGUI();
-                    
+
                     if (data.selectedEnemyEditorGUI != null) data.selectedEnemyEditorGUI.DrawInspectorGUI(data.selectedEnemySpawnData);
-                    else GUILayout.Label("EditorGUI Missing");
+                    else WarningLabel("EditorGUI Missing");
                 }
                 else
                 {
-                    GUILayout.Label("Select Enemy Spawn Data");
+                    WarningLabel("Select Enemy Spawn Data");
                 }
             }
             GUILayout.EndArea();
@@ -474,12 +541,14 @@ public class StageEditor : EditorWindow
 
         void DrawTimeLine()
         {
+            float timeLineStart = data.filesLinePosX + setting.timeHorizontalSpace;
+            float timeLineEnd = data.inspectorLinePosX - setting.timeHorizontalSpace;
+
+            if (timeLineStart > timeLineEnd) return;
+
             float timeLineX = data.filesLinePosX + setting.timeHorizontalSpace;
             float timeLineY = position.height - setting.timeBottomSpace;
             float timeLineWidth = data.inspectorLinePosX - 2 * setting.timeHorizontalSpace;
-
-            float timeLineStart = data.filesLinePosX + setting.timeHorizontalSpace;
-            float timeLineEnd = data.inspectorLinePosX - setting.timeHorizontalSpace;
 
             Handles.color = setting.timeLineColor;
             Handles.DrawLine(
@@ -535,7 +604,31 @@ public class StageEditor : EditorWindow
         }
 
         #endregion
-
+        void WarningLabel(string message)
+        {
+            EditorGUILayout.Space(10);
+            EditorGUILayout.LabelField(message, EditorStyles.centeredGreyMiniLabel);
+            EditorGUILayout.Space(10);
+        }
+        void TitleHeaderLabel(string title)
+        {
+            EditorGUILayout.Space(5);
+            CustomGUILayout.UnderBarTitleText(title);
+        }
+        void BeginNewTab(string title)
+        {
+            EditorGUILayout.Space(5);
+            float areaWidth = GUILayoutUtility.GetLastRect().width;
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.Space(10);
+            EditorGUILayout.BeginVertical(GUILayout.Width(areaWidth - 10));
+            TitleHeaderLabel(title);
+        }
+        void EndNewTab()
+        {
+            EditorGUILayout.EndVertical();
+            EditorGUILayout.EndHorizontal();
+        }
     }
     public static Vector2 WorldToScreenPos(Vector2 worldPos)
     {

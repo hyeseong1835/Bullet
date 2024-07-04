@@ -7,6 +7,7 @@ using UnityEngine;
 public class Stage : ScriptableObject
 {
     public EnemySpawnData[] enemySpawnData;
+    public GameObject[] enemyPrefabs;
     public Pool[] enemyPool;
 
     public IEnumerator Start()
