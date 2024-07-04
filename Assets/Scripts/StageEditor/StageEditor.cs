@@ -20,7 +20,9 @@ public class StageEditor : EditorWindow
     Rect fileViewerRect = new Rect();
     Rect inspectorRect = new Rect();
     Rect previewRect = new Rect();
-
+    
+    public bool debug = false;
+    
     enum HoldType
     {
         None,
@@ -190,29 +192,36 @@ public class StageEditor : EditorWindow
             {
                 if (EditorGUILayout.DropdownButton(new GUIContent("Debug"), FocusType.Passive))
                 {
-                    data.debug = !data.debug;
+                    debug = !debug;
                     Repaint();
                 }
-                if(data.debug)
+                if(debug)
                 {
+                    EditorGUILayout.ObjectField(data, typeof(StageEditorData), false);
+                    EditorGUILayout.ObjectField(setting, typeof(StageEditorSetting), false);
+
                     TitleHeaderLabel("Stage");
                     EditorGUILayout.ObjectField(data.selectedStage, typeof(Stage), false);
                     {
-                        EditorGUILayout.TextField("Path", data.selectedStageFolderResourcePath);
-                        foreach (string name in data.stageNameArray)
+                        BeginNewTab();
                         {
-                            EditorGUILayout.LabelField(name);
+                            TitleHeaderLabel("Stage List");
+                            if (data.stageArray == null) WarningLabel("Stage Array is null");
+                            else if (data.stageArray.Length < 1) WarningLabel("Stage Array is Empty");
+                            else
+                            {
+                                foreach (Stage stage in data.stageArray)
+                                {
+                                    EditorGUILayout.ObjectField(stage, typeof(Stage), false);
+                                }
+                            }
                         }
+                        EndNewTab();
                     }
-
-                    BeginNewTab("Select");
-                    EditorGUILayout.Space(5);
-                    CustomGUILayout.UnderBarTitleText("Select");
-                    EditorGUILayout.BeginHorizontal();
-                    EditorGUILayout.Space(10);
-                    EditorGUILayout.BeginVertical(GUILayout.Width(area.width - 10));
+                    TitleHeaderLabel("Select");
+                    BeginNewTab();
                     {
-                        CustomGUILayout.UnderBarTitleText("Prefab");
+                        TitleHeaderLabel("Prefab");
                         EditorGUILayout.ObjectField(data.selectedPrefab, typeof(GameObject), false);
                         if (data.prefabLists == null || data.prefabLists.Count == 0)
                         {
@@ -239,8 +248,7 @@ public class StageEditor : EditorWindow
                             }
                         }
                     }
-                    EditorGUILayout.EndVertical();
-                    EditorGUILayout.EndHorizontal();
+                    EndNewTab();
                 }
 
                 GUILayout.Label("File Viewer", EditorStyles.boldLabel);
@@ -248,45 +256,32 @@ public class StageEditor : EditorWindow
                 //Stage Select
                 GUILayout.BeginHorizontal();
                 {
-                    int stageSelectInput = EditorGUILayout.Popup(data.selectedStageIndex, data.stageNameArray, GUILayout.Height(setting.buttonHeight));
+                    string[] stageNameArray = new string[data.stageArray.Length + 1];
+                    stageNameArray[0] = "None";
+                    for(int i = 0; i < data.stageArray.Length; i++)
+                    {
+                        Stage stage = data.stageArray[i];
+                        if (stage == null) stageNameArray[i] = "NULL";
+                        else stageNameArray[i + 1] = stage.name;
+                    }
+
+                    int stageSelectInput = EditorGUILayout.Popup(
+                        data.selectedStageIndex + 1, 
+                        stageNameArray, 
+                        GUILayout.Height(setting.buttonHeight)
+                    ) - 1;
+                    
                     if (stageSelectInput != data.selectedStageIndex)
                     {
-                        string stageFolderPath = $"Stage/{data.stageNameArray[stageSelectInput]}";
-
-                        data.selectedStage = (Stage)Resources.Load<ScriptableObject>($"{stageFolderPath}/Stage Data");
-                        data.RefreshStagePath();
-                        data.RefreshEnemySpawnDataList();
-
-                        int enemySelectIndex;
-                        if (data.enemySpawnDataList.Count > 0) enemySelectIndex = 0;
-                        else enemySelectIndex = -1;
-                        data.SelectEnemySpawnData(enemySelectIndex);
-
-                        data.selectedStageIndex = stageSelectInput;
+                        data.SelectStage(stageSelectInput);
                     }
 
                     //Refresh
                     if (GUI.Button(GUILayoutUtility.GetRect(setting.buttonWidth, setting.buttonHeight).GetAddY(2), "Refresh"))
                     {
-                        data.stageNameArray = Directory.GetDirectories("Assets/Resources/Stage")
-                            .Select(path =>
-                            {
-                                string splitPath = path.Split('/')[^1];
-                                return splitPath.Substring(6, splitPath.Length - 6);
-                            }
-                        ).ToArray();
-                        if (data.stageNameArray.Length > 0) data.selectedStageIndex = 0;
-                        else data.selectedStageIndex = -1;
-                        if (data.selectedStage == null) data.enemySpawnDataList.Clear();
-                        else
-                        {
-                            data.RefreshStagePath();
-                            data.RefreshEnemySpawnDataList();
-                        }
-                        data.RefreshPrefab();
+                        data.RefreshStageArray();
 
-                        //data.RefreshTimeFoldout();
-                        data.ResetTimeFoldout();
+                        data.RefreshTimeFoldout();
                     }
                 }
                 GUILayout.EndHorizontal();
@@ -615,14 +610,11 @@ public class StageEditor : EditorWindow
             EditorGUILayout.Space(5);
             CustomGUILayout.UnderBarTitleText(title);
         }
-        void BeginNewTab(string title)
+        void BeginNewTab()
         {
-            EditorGUILayout.Space(5);
-            float areaWidth = GUILayoutUtility.GetLastRect().width;
-            EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.Space(10);
-            EditorGUILayout.BeginVertical(GUILayout.Width(areaWidth - 10));
-            TitleHeaderLabel(title);
+            float areaWidth = EditorGUILayout.BeginHorizontal().width;
+            EditorGUILayout.Space(0);
+            EditorGUILayout.BeginVertical(GUILayout.Width(areaWidth));
         }
         void EndNewTab()
         {

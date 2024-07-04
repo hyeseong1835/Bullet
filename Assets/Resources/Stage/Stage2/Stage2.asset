@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 716bf7d622075f147aeeea90e2564d49, type: 3}
-  m_Name: Stage Data
+  m_Name: Stage2
   m_EditorClassIdentifier: 
-  stageName: 
   enemySpawnData: []
+  enemyPool: []
