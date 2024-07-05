@@ -46,7 +46,6 @@ public class StageEditorData : ScriptableObject
     
     public int prefabLength { get; private set; }
 
-
     public Box preview { get; private set; }
     public Vector2 previewPos;
 
@@ -118,6 +117,7 @@ public class StageEditorData : ScriptableObject
     {
         ApplyPrefabList();
         ApplyEnemySpawnData();
+        EditorUtility.SetDirty(selectedStage);
     }
 
     #endregion
@@ -321,6 +321,7 @@ public class StageEditorData : ScriptableObject
     public void ApplyEnemySpawnData()
     {
         RefreshEnemySpawnDataList();
+        
         selectedStage.enemySpawnData = enemySpawnDataList.ToArray();
     }
 

@@ -452,8 +452,6 @@ public class StageEditor : EditorWindow
                     void CloseHeader(EnemySpawnData spawnData, int i)
                     {
                         OpenHeader(spawnData, i);
-
-
                     }
 
                     void OpenElement(EnemySpawnData spawnData, int i)
@@ -500,8 +498,10 @@ public class StageEditor : EditorWindow
             if (GUI.Button(rect, "Apply"))
             {
                 data.ApplyToStage();
+                EditorUtility.SetDirty(data);
+                EditorUtility.SetDirty(setting);
             }
-            
+
         }
         void DrawInspectorGUI()
         {
