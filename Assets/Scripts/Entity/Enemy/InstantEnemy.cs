@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class InstantEnemy : Enemy
@@ -9,6 +10,7 @@ public class InstantEnemy : Enemy
     }
 
     InstantEnemySpawnData spawnData;
+    public override Type EnemySpawnDataType => typeof(InstantEnemySpawnData);
     public override EnemySpawnData EnemySpawnData { 
         get => spawnData; 
         set { spawnData = (InstantEnemySpawnData) value; } 

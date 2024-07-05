@@ -1,5 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
+using System;
 using UnityEngine;
 
 public abstract class Enemy : Entity
@@ -7,6 +6,7 @@ public abstract class Enemy : Entity
     public override EntityData EntityData => EnemyData;
     public abstract EnemyData EnemyData { get; set; }
     public abstract EnemySpawnData EnemySpawnData { get; set; }
+    public abstract Type EnemySpawnDataType { get; }
 
     private void OnEnable()
     {
@@ -18,7 +18,7 @@ public abstract class Enemy : Entity
     }
     protected void Drop()
     {
-        float random = Random.Range(0, EnemyData.ratioMax);
+        float random = UnityEngine.Random.Range(0, EnemyData.ratioMax);
         foreach (DropInfo drop in EnemyData.drops)
         {
             if (random <= drop.ratio)
