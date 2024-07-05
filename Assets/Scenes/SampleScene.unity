@@ -2761,7 +2761,7 @@ MonoBehaviour:
   state: 0
   enableEnemyList: []
   mainPanel: {fileID: 1563279745}
-  stage1: {fileID: 0}
+  stage1: {fileID: 11400000, guid: 25a176242b046004aac1bd45a693c16e, type: 2}
 --- !u!1 &1458694609
 GameObject:
   m_ObjectHideFlags: 0

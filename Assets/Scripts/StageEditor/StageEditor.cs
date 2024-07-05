@@ -159,6 +159,28 @@ public class StageEditor : EditorWindow
             data.previewPos = previewContact;
         }
 
+        if (e.type == EventType.KeyDown)
+        {
+            switch (e.keyCode)
+            {
+                case KeyCode.LeftArrow:
+                    if (0 < data.selectedEnemySpawnDataIndex)
+                    {
+                        data.SelectEnemySpawnData(data.selectedEnemySpawnDataIndex - 1);
+                        Repaint();
+                    }
+                    break;
+
+                case KeyCode.RightArrow:
+                    if (data.selectedEnemySpawnDataIndex != -1 && data.selectedEnemySpawnDataIndex < data.enemySpawnDataList.Count - 1)
+                    {
+                        data.SelectEnemySpawnData(data.selectedEnemySpawnDataIndex + 1);
+                        Repaint();
+                    }
+                    break;
+            }
+        }
+
         #region Function
 
         void RefreshFileViewerRect()

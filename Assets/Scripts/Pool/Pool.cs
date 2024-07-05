@@ -39,7 +39,7 @@ public class Pool
 
     public GameObject prefab;
 
-    public Transform holder;
+    public Transform holder { get; private set; }
     public float destroyDelay;
     
     public int startCount;
@@ -49,6 +49,14 @@ public class Pool
     [HideInInspector] public List<WaitDestroyElement> waitDestroy = new List<WaitDestroyElement>();//-|
 
     [SerializeField] Action<GameObject> addEvent;
+
+    public Pool(GameObject prefab, float destroyDelay, int startCount, int stayCount)
+    {
+        this.prefab = prefab;
+        this.destroyDelay = destroyDelay;
+        this.startCount = startCount;
+        this.stayCount = stayCount;
+    }
 
     public void Init(Action<GameObject> addEvent = null)
     {

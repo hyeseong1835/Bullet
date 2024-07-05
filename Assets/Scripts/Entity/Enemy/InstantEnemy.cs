@@ -19,10 +19,17 @@ public class InstantEnemy : Enemy
     public float speed;
 
     Vector3 dir;
-    
+    new void OnEnable()
+    {
+        base.OnEnable();
+
+        hp = data.maxHp;
+        transform.position = spawnData.startPos;
+        dir = spawnData.endPos - spawnData.startPos;
+    }
     void Start()
     {
-        dir = spawnData.endPos - spawnData.startPos;
+
     }
     void Update()
     {

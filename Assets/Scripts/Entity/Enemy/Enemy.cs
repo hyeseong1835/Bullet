@@ -8,11 +8,11 @@ public abstract class Enemy : Entity
     public abstract EnemySpawnData EnemySpawnData { get; set; }
     public abstract Type EnemySpawnDataType { get; }
 
-    private void OnEnable()
+    protected void OnEnable()
     {
         GameManager.instance.enableEnemyList.Add(this);
     }
-    private void OnDisable()
+    protected void OnDisable()
     {
         GameManager.instance.enableEnemyList.Remove(this);
     }
@@ -38,7 +38,7 @@ public abstract class Enemy : Entity
         Drop();
         Destroy(gameObject);
     }
-    void OnValidate()
+    protected void OnValidate()
     {
         //gameObject.layer = LayerMask.NameToLayer("Enemy");
     }

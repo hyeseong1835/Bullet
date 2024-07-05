@@ -35,7 +35,7 @@ public class GameManager : MonoBehaviour
     }
     void Start()
     {
-
+        stage1.Init();
     }
 
     void Update()

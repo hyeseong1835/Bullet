@@ -12,5 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 716bf7d622075f147aeeea90e2564d49, type: 3}
   m_Name: Stage1
   m_EditorClassIdentifier: 
-  stageName: 
-  enemySpawnData: []
+  enemySpawnData:
+  - {fileID: 11400000, guid: c049cec819d03c041963f163983f7449, type: 2}
+  - {fileID: 11400000, guid: d709293ac2c586243a99156b8b1aa1ac, type: 2}
+  enemyPrefabs:
+  - {fileID: 5235914642448064442, guid: 3ed429bc1e8a29444962959c6d58af02, type: 3}
+  - {fileID: 5235914642448064442, guid: 37af630dcfdcfde45b2d347b2e9bebb0, type: 3}
+  enemyPool: []

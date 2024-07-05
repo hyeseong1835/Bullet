@@ -10,6 +10,18 @@ public class Stage : ScriptableObject
     public GameObject[] enemyPrefabs;
     public Pool[] enemyPool;
 
+    public void Init()
+    {
+        enemyPool = new Pool[enemyPrefabs.Length];
+        
+        for (int i = 0; i < enemyPrefabs.Length; i++)
+        {
+            GameObject prefab = enemyPrefabs[i];
+            Pool pool = new Pool(prefab, 1, 0, 0);
+            pool.Init();
+            enemyPool[i] = pool;
+        }
+    }
     public IEnumerator Start()
     {
         float prevTime = 0;
@@ -20,7 +32,9 @@ public class Stage : ScriptableObject
             yield return new WaitForSeconds(data.spawnTime - prevTime);
 
             GameObject enemyObj = enemyPool[data.prefabIndex].Use();
-
+            Enemy enemy = enemyObj.GetComponent<Enemy>();
+            enemy.EnemySpawnData = data;
+            
             prevTime = data.spawnTime;
         }
     }

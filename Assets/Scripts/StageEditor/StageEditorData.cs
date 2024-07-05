@@ -116,12 +116,8 @@ public class StageEditorData : ScriptableObject
     }
     public void ApplyToStage()
     {
-        RefreshPrefabList();
-        selectedStage.enemyPrefabs = new GameObject[prefabLength];
         ApplyPrefabList();
-
-        RefreshEnemySpawnDataList();
-        selectedStage.enemySpawnData = enemySpawnDataList.ToArray();
+        ApplyEnemySpawnData();
     }
 
     #endregion
@@ -175,6 +171,7 @@ public class StageEditorData : ScriptableObject
     public int GetPrefabListIndex(Type type) => prefabTypeList.IndexOf(type);
     public void ApplyPrefabList()
     {
+        RefreshPrefabList();
         selectedStage.enemyPrefabs = GetAllPrefabList().ToArray();
     }
     public void RefreshPrefabList()
@@ -320,6 +317,11 @@ public class StageEditorData : ScriptableObject
             enemySpawnDataList.Add(AssetDatabase.LoadAssetAtPath<EnemySpawnData>(enemySpawnDataPath));
         }
         enemySpawnDataList.Sort((a, b) => a.spawnTime.CompareTo(b.spawnTime));
+    }
+    public void ApplyEnemySpawnData()
+    {
+        RefreshEnemySpawnDataList();
+        selectedStage.enemySpawnData = enemySpawnDataList.ToArray();
     }
 
     #endregion
