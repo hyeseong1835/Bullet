@@ -81,9 +81,10 @@ public class Pool
         {
             Add().SetActive(false);
         }
-    }
 
-    public GameObject Use()
+        PoolHolder.instance.pools.Add(this);
+    }
+    public GameObject Get()
     {
         //비활성화 오브젝트 찾기
         foreach (GameObject gameObject in pool)
@@ -96,7 +97,6 @@ public class Pool
             }
             if (gameObject.activeInHierarchy == false)
             {
-                gameObject.SetActive(true);
                 return gameObject;
             }
         }
@@ -112,11 +112,16 @@ public class Pool
                 return Use();
             }
             element.CancelDestroy(this);
-            obj.SetActive(true);
             return obj;
         }
         //모두 사용 중일 때
         return Add();
+    }
+    public GameObject Use()
+    {
+        GameObject obj = Get();
+        obj.SetActive(true);
+        return obj;
     }
     public GameObject DeUse(GameObject obj)
     {
@@ -140,8 +145,11 @@ public class Pool
     public GameObject Add()
     {
         GameObject obj = UnityEngine.Object.Instantiate(prefab, holder);
+        obj.name = holder.name;
+        obj.SetActive(false);
+
         pool.Add(obj);
-        if(addEvent != null) addEvent(obj);
+        if (addEvent != null) addEvent(obj);
         return obj;
     }
 }

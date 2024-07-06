@@ -36,7 +36,7 @@ public abstract class Enemy : Entity
     protected override void OnDead()
     {
         Drop();
-        Destroy(gameObject);
+        PoolHolder.instance.pools.Find((pool) => (pool.prefab.name == gameObject.name)).DeUse(gameObject);
     }
     protected void OnValidate()
     {

@@ -117,6 +117,11 @@ public class StageEditorData : ScriptableObject
     {
         ApplyPrefabList();
         ApplyEnemySpawnData();
+
+        foreach(EnemySpawnData data in selectedStage.enemySpawnData)
+        {
+            EditorUtility.SetDirty(data);
+        }
         EditorUtility.SetDirty(selectedStage);
     }
 

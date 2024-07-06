@@ -16,11 +16,15 @@ public class InstantEnemy : Enemy
         set { spawnData = (InstantEnemySpawnData) value; } 
     }
 
+    public Weapon weapon;
+
     public float speed;
 
     Vector3 dir;
     new void OnEnable()
     {
+        if (spawnData == null) return;
+
         base.OnEnable();
 
         hp = data.maxHp;
@@ -34,6 +38,7 @@ public class InstantEnemy : Enemy
     void Update()
     {
         transform.position += dir * speed * Time.deltaTime;
+        /*
         if (dir.x != 0) CheckOver(dir.x, transform.position.x, spawnData.endPos.x);
         else CheckOver(dir.y, transform.position.y, spawnData.endPos.y);
 
@@ -41,5 +46,6 @@ public class InstantEnemy : Enemy
         {
             if ((dir > 0) ? cur > end : cur < end) Destroy(gameObject);
         }
+        */
     }
 }

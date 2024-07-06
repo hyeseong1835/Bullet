@@ -12,42 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 72707a419bef5a144a8467c4489e64dc, type: 3}
   m_Name: Data
   m_EditorClassIdentifier: 
-  selectedStage: {fileID: 11400000, guid: 25a176242b046004aac1bd45a693c16e, type: 2}
-  stageFolderResourcePath: Stage/Stage 1
-  selectedStageIndex: 0
-  stageNameArray:
-  - Stage 1
-  - Stage 2
-  selectedEnemyIndex: -1
-  enemySpawnDataList:
-  - {fileID: 11400000, guid: d709293ac2c586243a99156b8b1aa1ac, type: 2}
-  prefabs:
-  - {fileID: 5235914642448064442, guid: 37af630dcfdcfde45b2d347b2e9bebb0, type: 3}
-  - {fileID: 5235914642448064442, guid: 3ed429bc1e8a29444962959c6d58af02, type: 3}
-  - {fileID: 5235914642448064442, guid: e7cbee20d16810842b30583185843328, type: 3}
-  - {fileID: 5235914642448064442, guid: b166a7a0d498f324ea40495ad806e149, type: 3}
-  - {fileID: 5235914642448064442, guid: 64345327dde194445952b69d947f6c75, type: 3}
-  - {fileID: 5235914642448064442, guid: 8e5a722fa42c9ab458dadeab63ca4808, type: 3}
-  - {fileID: 5235914642448064442, guid: ff3f15d41e383c544a66228770928845, type: 3}
-  - {fileID: 5235914642448064442, guid: 6d9a40a75a841f343b4aeb78a4a651aa, type: 3}
-  - {fileID: 5235914642448064442, guid: 18e7f897bbd3e5546890a00cb13270f4, type: 3}
-  - {fileID: 5235914642448064442, guid: 9045c8d47b73db346949c4d6f8bcb0af, type: 3}
-  - {fileID: 5235914642448064442, guid: 0e76caa6745d2084bbb4b98ebfcb7a6b, type: 3}
-  - {fileID: 5235914642448064442, guid: 886fb9c4cfd00fa4a9ba79f2a18e6082, type: 3}
-  - {fileID: 5235914642448064442, guid: 0cd9a6f2d671aef4cbfec9a2ce47cfb9, type: 3}
-  - {fileID: 5235914642448064442, guid: ef964c7e90e8e224586ae27098f895c2, type: 3}
-  - {fileID: 5235914642448064442, guid: 70cddb32c3e098a46bb7dd7f2428e33a, type: 3}
-  - {fileID: 5235914642448064442, guid: ea28e3c18c6ec524594fc4397b307fa5, type: 3}
-  - {fileID: 5235914642448064442, guid: 239d19a5f2fa1ba4fb9519f13ed77a04, type: 3}
-  - {fileID: 5235914642448064442, guid: 6ccde085993b8a64f921d494a7b633ea, type: 3}
-  - {fileID: 5235914642448064442, guid: 30073dea26704714380ca49e8f5460b8, type: 3}
-  - {fileID: 5235914642448064442, guid: e632365618bd4ea4496d42d1e6008a61, type: 3}
-  preview:
-    size: {x: 184, y: 460}
-    center: {x: 0, y: -230}
-  previewPos: {x: 249.2, y: 566.80005}
-  cellSize: 92
-  inspectorLinePosX: 354
-  filesLinePosX: 299.2
+  previewPos: {x: 314, y: 667.80005}
+  cellSize: 71
+  inspectorLinePosX: 222
+  filesLinePosX: 277.2
   enemyScroll: 0
   timeLength: 60

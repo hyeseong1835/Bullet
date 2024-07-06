@@ -28,14 +28,15 @@ public class Stage : ScriptableObject
         for (int i = 0; i < enemySpawnData.Length; i++)
         {
             EnemySpawnData data = enemySpawnData[i];
-
             yield return new WaitForSeconds(data.spawnTime - prevTime);
+            GameObject enemyObj = enemyPool[data.prefabIndex].Get();
 
-            GameObject enemyObj = enemyPool[data.prefabIndex].Use();
             Enemy enemy = enemyObj.GetComponent<Enemy>();
             enemy.EnemySpawnData = data;
-            
+            enemyObj.SetActive(true);
             prevTime = data.spawnTime;
+            
+            Debug.Log($"Spawn: {enemyObj.name} [{data.spawnTime}]");
         }
     }
 }

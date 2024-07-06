@@ -12,7 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cb4a2d180a04b2a49b0b91d15046a43c, type: 3}
   m_Name: EnemyA Data
   m_EditorClassIdentifier: 
-  maxHp: 999
-  drops: []
-  ratioMax: 0
-  exp: 0
+  maxHp: 5
+  drops:
+  - prefab: {fileID: 242570612577920784, guid: 3841c09468d6ca44082a2e6022067ec5, type: 3}
+    ratio: 1
+  ratioMax: 1
+  exp: 5
