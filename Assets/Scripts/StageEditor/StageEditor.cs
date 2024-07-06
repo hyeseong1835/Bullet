@@ -33,11 +33,12 @@ public class StageEditor : EditorWindow
     HoldType hold = HoldType.None;
 
     Vector2 offset;
+    float prevScreenWidth;
 
     [MenuItem("Window/StageEditor")]
     static void CreateWindow()
     {
-        StageEditor window = (StageEditor)EditorWindow.GetWindow(typeof(StageEditor));
+        StageEditor window = (StageEditor)GetWindow(typeof(StageEditor));
 
         window.Show();
     }
@@ -45,89 +46,17 @@ public class StageEditor : EditorWindow
     {
         #region Init
 
+        wantsMouseEnterLeaveWindow = true;
+        
         if (data == null) data = (StageEditorData)EditorResources.Load<ScriptableObject>("StageEditor/Data.asset");
         if (setting == null) setting = (StageEditorSetting)EditorResources.Load<ScriptableObject>("StageEditor/Setting.asset");
 
         #endregion
 
-        if (e.isScrollWheel && previewRect.Contains(e.mousePosition))
-        {
-            switch(e.pointerType)
-            {
-                case PointerType.Mouse:
-                    data.cellSize += e.delta.y;
-                    break;
-            }
-            if (data.cellSize < setting.cellSizeMin) data.cellSize = setting.cellSizeMin;
-            Repaint();
-        }
         RefreshPreviewRect();
         DrawPreview();
 
-        #region FileViewer Move
-
-        if (hold == HoldType.None && EventUtility.MouseDown(0))
-        {
-            float distance = e.mousePosition.x - data.filesLinePosX;
-            if (Mathf.Abs(distance) < setting.lineHoldWidth)
-            {
-                hold = HoldType.FileViewerLine;
-                e.Use();
-            }
-        }
-        if (hold == HoldType.FileViewerLine && EventUtility.MouseDrag(0))
-        {
-            data.filesLinePosX = e.mousePosition.x;
-
-            float inspectorLineMin = data.filesLinePosX + setting.minDistanceBetweenLines;
-            if (data.inspectorLinePosX < inspectorLineMin)
-            {
-                data.inspectorLinePosX = inspectorLineMin;
-                RefreshInspectorRect();
-            }
-            Repaint();
-            e.Use();
-        }
-
-        if (data.filesLinePosX < 0)
-        {
-            data.filesLinePosX = 0;
-
-            Repaint();
-        }
-
-        #endregion
-
-        #region Inspector Move
-
-        if (hold == HoldType.None && EventUtility.MouseDown(0))
-        {
-            float distance = e.mousePosition.x - data.inspectorLinePosX;
-            if (Mathf.Abs(distance) < setting.lineHoldWidth)
-            {
-                hold = HoldType.InspectorLine;
-                e.Use();
-            }
-        }
-        if (hold == HoldType.InspectorLine && EventUtility.MouseDrag(0))
-        {
-            data.inspectorLinePosX = e.mousePosition.x;
-            float fileLineMax = data.inspectorLinePosX - setting.minDistanceBetweenLines;
-            if (data.filesLinePosX > fileLineMax)
-            {
-                data.filesLinePosX = fileLineMax;
-                RefreshFileViewerRect();
-            }
-            Repaint();
-            e.Use();
-        }
-        if (data.inspectorLinePosX > position.width)
-        {
-            data.inspectorLinePosX = position.width;
-            Repaint();
-        }
-
-        #endregion
+        Input();
         
         RefreshFileViewerRect();
         RefreshInspectorRect();
@@ -135,78 +64,256 @@ public class StageEditor : EditorWindow
         DrawFileViewerGUI();
         DrawInspectorGUI();
 
-        if (hold == HoldType.None && EventUtility.MouseDown(0) && previewRect.Contains(e.mousePosition))
+        if (position.width != prevScreenWidth)
         {
-            hold = HoldType.Preview;
-            offset = data.previewPos - e.mousePosition;
-            GUI.FocusControl(null);
-            e.Use();
-        }
-        if (hold == HoldType.Preview && EventUtility.MouseDrag(0))
-        {
-            data.previewPos = e.mousePosition + offset;
-            e.Use();
-
-            Repaint();
-        }
-        if (EventUtility.MouseUp(0))
-        {
-            hold = HoldType.None;
+            OnScreanWidthResized();
+            prevScreenWidth = position.width;
         }
 
-        if (data.preview.IsExit(data.previewPos, position.height, 0, data.inspectorLinePosX, data.filesLinePosX, out Vector2 previewContact))
+        void OnScreanWidthResized()
         {
-            data.previewPos = previewContact;
-        }
-
-        if (e.type == EventType.KeyDown)
-        {
-            switch (e.keyCode)
+            if (data.fileViewerLinePosX < 0)
             {
-                case KeyCode.LeftArrow:
-                    if (0 < data.selectedEnemySpawnDataIndex)
+                data.fileViewerLinePosX = 0;
+
+                Repaint();
+            }
+
+            if (data.inspectorLinePosX < 0)
+            {
+                data.inspectorLinePosX = 0;
+                Repaint();
+            }
+            bool fileViewerLineCorrect = FileViewerWindowCheck(out float fileViewerLineMax);
+            bool inspectorLineCorrect = InspectorWindowCheck(out float inspectorLineMax);
+            
+            if (fileViewerLineCorrect == false && inspectorLineCorrect == false)
+            {
+                float center = 0.5f * (data.fileViewerLinePosX + (position.width - data.inspectorLinePosX));
+                data.fileViewerLinePosX = center - 0.5f * setting.minDistanceBetweenLines;
+                data.inspectorLinePosX = center + 0.5f * setting.minDistanceBetweenLines;
+            }
+            else if (fileViewerLineCorrect == false)
+            {
+                data.fileViewerLinePosX = fileViewerLineMax;
+            }
+            else if (inspectorLineCorrect == false)
+            {
+                data.inspectorLinePosX = inspectorLineMax;
+            }
+            PreviewCheck();
+        }
+        
+        #region Function
+
+        void Input()
+        {
+            if (e.isScrollWheel)
+            {
+                if(previewRect.Contains(e.mousePosition))
+                {
+                    switch (e.pointerType)
                     {
-                        data.SelectEnemySpawnData(data.selectedEnemySpawnDataIndex - 1);
-                        Repaint();
+                        case PointerType.Mouse:
+                            data.cellSize += e.delta.y;
+                            break;
+                    }
+                    if (data.cellSize < setting.cellSizeMin) data.cellSize = setting.cellSizeMin;
+                    Repaint();
+                }
+            }
+            switch (e.type)
+            {
+                case EventType.MouseLeaveWindow:
+                    switch (hold)
+                    {
+                        case HoldType.FileViewerLine:
+                            if (e.mousePosition.x <= 0)
+                            {
+                                if (data.fileViewerLinePosX != 0)
+                                {
+                                    data.fileViewerLinePosX = 0;
+                                    Repaint();
+                                }
+                            }
+                            hold = HoldType.None;
+                            break;
+                        
+                        case HoldType.InspectorLine:
+                            if (e.mousePosition.x >= position.width)
+                            {
+                                if (data.inspectorLinePosX != 0)
+                                {
+                                    data.inspectorLinePosX = 0;
+                                    Repaint();
+                                }
+                            }
+                            hold = HoldType.None;
+                            break;
+
+                        case HoldType.Preview:
+                            hold = HoldType.None;
+                            break;
+                    }
+                    break;
+                case EventType.MouseDown:
+                    switch (e.button)
+                    {
+                        case 0: Mouse0Down(); break;
                     }
                     break;
 
-                case KeyCode.RightArrow:
-                    if (data.selectedEnemySpawnDataIndex != -1 && data.selectedEnemySpawnDataIndex < data.enemySpawnDataList.Count - 1)
+                case EventType.MouseDrag:
+                    switch (e.button)
                     {
-                        data.SelectEnemySpawnData(data.selectedEnemySpawnDataIndex + 1);
-                        Repaint();
+                        case 0: Mouse0Drag(); break;
+                    }
+                    break;
+                
+                case EventType.MouseUp:
+                    switch (e.button)
+                    {
+                        case 0: Mouse0Up(); break;
+                    }
+                    break;
+
+                case EventType.KeyDown:
+                    switch (e.keyCode)
+                    {
+                        case KeyCode.LeftArrow:
+                            if (0 < data.selectedEnemySpawnDataIndex)
+                            {
+                                data.SelectEnemySpawnData(data.selectedEnemySpawnDataIndex - 1);
+                                Repaint();
+                            }
+                            break;
+
+                        case KeyCode.RightArrow:
+                            if (data.selectedEnemySpawnDataIndex != -1 && data.selectedEnemySpawnDataIndex < data.enemySpawnDataList.Count - 1)
+                            {
+                                data.SelectEnemySpawnData(data.selectedEnemySpawnDataIndex + 1);
+                                Repaint();
+                            }
+                            break;
                     }
                     break;
             }
+            void Mouse0Down()
+            {
+                if (hold == HoldType.None)
+                {
+                    float filesLineDistance = e.mousePosition.x - data.fileViewerLinePosX;
+                    if (Mathf.Abs(filesLineDistance) < setting.lineHoldWidth)
+                    {
+                        hold = HoldType.FileViewerLine;
+                        
+                        GUI.FocusControl(null);
+                        e.Use();
+                        return;
+                    }
+
+                    float inspectorLineDistance = e.mousePosition.x - (position.width - data.inspectorLinePosX);
+                    if (Mathf.Abs(inspectorLineDistance) < setting.lineHoldWidth)
+                    {
+                        hold = HoldType.InspectorLine;
+                        
+                        GUI.FocusControl(null);
+                        e.Use();
+                        return;
+                    }
+
+                    if (previewRect.Contains(e.mousePosition))
+                    {
+                        hold = HoldType.Preview;
+                        offset = data.previewPos - e.mousePosition;
+                        
+                        GUI.FocusControl(null);
+                        e.Use();
+                        return;
+                    }
+                }
+            }
+            void Mouse0Drag()
+            {
+                switch (hold)
+                {
+                    case HoldType.None: 
+                        
+                        break;
+
+                    case HoldType.FileViewerLine:
+                        data.fileViewerLinePosX = e.mousePosition.x;
+                        PreviewCheck();
+                        
+                        if (InspectorWindowCheck(out float inspectorLineMax) == false)
+                        {
+                            data.inspectorLinePosX = inspectorLineMax;
+                        }
+                        
+                        Repaint();
+                        break;
+
+                    case HoldType.InspectorLine:
+                        data.inspectorLinePosX = position.width - e.mousePosition.x;
+                        PreviewCheck();
+                        
+                        if (FileViewerWindowCheck(out float fileViewerLineMax) == false)
+                        {
+                            data.fileViewerLinePosX = fileViewerLineMax;
+                        }
+                        
+                        Repaint();
+                        break;
+
+                    case HoldType.Preview:
+                        data.previewPos = e.mousePosition + offset;
+                        
+                        PreviewCheck();
+
+                        Repaint();
+                        break;
+                }
+            }
+            void Mouse0Up()
+            {
+                if (hold != HoldType.None)
+                {
+                    hold = HoldType.None;
+                }
+            }
         }
 
-        #region Function
-
+        void PreviewCheck()
+        {
+            if (data.preview.IsExit(data.previewPos, position.height, 0, (position.width - data.inspectorLinePosX), data.fileViewerLinePosX, out Vector2 previewContact))
+            {
+                data.previewPos = previewContact;
+            }
+        }
         void RefreshFileViewerRect()
         {
             fileViewerRect.position = new Vector2(0, 0);
-            fileViewerRect.size = new Vector2(data.filesLinePosX, position.height);
+            fileViewerRect.size = new Vector2(data.fileViewerLinePosX, position.height);
         }
         void RefreshInspectorRect()
         {
-            inspectorRect.position = new Vector2(data.inspectorLinePosX, 0);
-            inspectorRect.size = new Vector2(position.width - data.inspectorLinePosX, position.height);
+            inspectorRect.position = new Vector2(position.width - data.inspectorLinePosX, 0);
+            inspectorRect.size = new Vector2(data.inspectorLinePosX, position.height);
         }
         void RefreshPreviewRect()
         {
-            previewRect.position = new Vector2(data.filesLinePosX, 0);
-            previewRect.size = new Vector2(data.inspectorLinePosX - data.filesLinePosX, position.height);
+            previewRect.position = new Vector2(data.fileViewerLinePosX, 0);
+            previewRect.size = new Vector2(position.width - (data.inspectorLinePosX + data.fileViewerLinePosX), position.height);
         }
 
         void DrawFileViewerGUI()
         {
-            CustomGUI.DrawSquare(new Rect(0, 0, data.filesLinePosX, position.height), setting.fileColor);
+            CustomGUI.DrawSquare(new Rect(0, 0, data.fileViewerLinePosX, position.height), setting.fileColor);
 
             Rect area = new Rect();
             area.position = new Vector2(setting.fileLeftSpace, setting.fileTopSpace);
             area.size = new Vector2(
-                data.filesLinePosX - setting.fileRightSpace - setting.fileLeftSpace,
+                data.fileViewerLinePosX - setting.fileRightSpace - setting.fileLeftSpace,
                 position.height - setting.fileTopSpace - setting.fileBottomSpace
             );
             GUILayout.BeginArea(area);
@@ -583,14 +690,14 @@ public class StageEditor : EditorWindow
 
         void DrawTimeLine()
         {
-            float timeLineStart = data.filesLinePosX + setting.timeHorizontalSpace;
-            float timeLineEnd = data.inspectorLinePosX - setting.timeHorizontalSpace;
+            float timeLineStart = data.fileViewerLinePosX + setting.timeHorizontalSpace;
+            float timeLineEnd = (position.width - data.inspectorLinePosX) - setting.timeHorizontalSpace;
 
             if (timeLineStart > timeLineEnd) return;
 
-            float timeLineX = data.filesLinePosX + setting.timeHorizontalSpace;
+            float timeLineX = data.fileViewerLinePosX + setting.timeHorizontalSpace;
             float timeLineY = position.height - setting.timeBottomSpace;
-            float timeLineWidth = data.inspectorLinePosX - 2 * setting.timeHorizontalSpace;
+            float timeLineWidth = (position.width - data.inspectorLinePosX) - 2 * setting.timeHorizontalSpace;
 
             Handles.color = setting.timeLineColor;
             Handles.DrawLine(
@@ -669,6 +776,29 @@ public class StageEditor : EditorWindow
             EditorGUILayout.EndVertical();
             EditorGUILayout.EndHorizontal();
         }
+    }
+
+    bool FileViewerWindowCheck()
+    {
+        float fileViewerLineMax = position.width - (data.inspectorLinePosX + setting.minDistanceBetweenLines);
+
+        return data.fileViewerLinePosX <= fileViewerLineMax;
+    }
+    bool FileViewerWindowCheck(out float fileViewerLineMax)
+    {
+        fileViewerLineMax = position.width - (data.inspectorLinePosX + setting.minDistanceBetweenLines);
+
+        return data.fileViewerLinePosX <= fileViewerLineMax;
+    }
+    bool InspectorWindowCheck()
+    {
+        float inspectorLineMax = position.width - (data.fileViewerLinePosX + setting.minDistanceBetweenLines);
+        return data.inspectorLinePosX <= inspectorLineMax;
+    }
+    bool InspectorWindowCheck(out float inspectorLineMax)
+    {
+        inspectorLineMax = position.width - (data.fileViewerLinePosX + setting.minDistanceBetweenLines);
+        return data.inspectorLinePosX <= inspectorLineMax;
     }
     public static Vector2 WorldToScreenPos(Vector2 worldPos)
     {

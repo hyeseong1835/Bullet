@@ -52,7 +52,8 @@ public class StageEditorData : ScriptableObject
     public float cellSize = 50;
 
     public float inspectorLinePosX;
-    public float filesLinePosX;
+    public float fileViewerLinePosX;
+
     public float enemyScroll;
     public float timeLength;
     public Dictionary<float, bool> timeFoldout { get; private set; } = new Dictionary<float, bool>();
