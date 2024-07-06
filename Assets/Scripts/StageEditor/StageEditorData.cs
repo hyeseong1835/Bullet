@@ -58,6 +58,7 @@ public class StageEditorData : ScriptableObject
     public float timeLength;
     public Dictionary<float, bool> timeFoldout { get; private set; } = new Dictionary<float, bool>();
 
+    public float timeMoveSnap = 0.5f;
 
     private void OnValidate()
     {
@@ -268,6 +269,12 @@ public class StageEditorData : ScriptableObject
 
     #region EnemySpawnData
 
+    public int SelectEnemySpawnData(EnemySpawnData data)
+    {
+        int dataIndex = enemySpawnDataList.IndexOf(data);
+        SelectEnemySpawnData(dataIndex);
+        return dataIndex;
+    }    
     public EnemySpawnData SelectEnemySpawnData(int index)
     {
         if (enemySpawnDataList == null || index < 0 || enemySpawnDataList.Count <= index)
@@ -294,9 +301,9 @@ public class StageEditorData : ScriptableObject
         }
         return selectedEnemySpawnData;
     }
-    public int RemoveAndSortInEnemySpawnDataList(EnemySpawnData spawnData, int index)
+    public int SortTargetInEnemySpawnDataList(EnemySpawnData spawnData)
     {
-        enemySpawnDataList.RemoveAt(index);
+        enemySpawnDataList.Remove(spawnData);
 
         return InsertToEnemySpawnDataList(spawnData);
     }

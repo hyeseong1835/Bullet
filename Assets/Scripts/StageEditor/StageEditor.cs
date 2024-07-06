@@ -195,6 +195,30 @@ public class StageEditor : EditorWindow
                                 Repaint();
                             }
                             break;
+                        case KeyCode.Comma:
+                            if (data.selectedEnemySpawnData != null && 0 < data.selectedEnemySpawnData.spawnTime)
+                            {
+                                data.selectedEnemySpawnData.spawnTime -= data.timeMoveSnap;
+                                data.selectedEnemySpawnData.spawnTime = Mathf.Ceil(data.selectedEnemySpawnData.spawnTime / data.timeMoveSnap) * data.timeMoveSnap;
+                                
+                                data.SelectEnemySpawnData(data.SortTargetInEnemySpawnDataList(data.selectedEnemySpawnData));
+                                Repaint();
+                            }
+                            break;
+                        case KeyCode.Period:
+                            if (data.selectedEnemySpawnData != null)
+                            {
+                                data.selectedEnemySpawnData.spawnTime += data.timeMoveSnap;
+                                data.selectedEnemySpawnData.spawnTime = Mathf.Floor(data.selectedEnemySpawnData.spawnTime / data.timeMoveSnap) * data.timeMoveSnap;
+                                if (data.selectedEnemySpawnData.spawnTime > data.timeLength)
+                                {
+                                    data.timeLength = data.selectedEnemySpawnData.spawnTime;
+                                }
+                                
+                                data.SelectEnemySpawnData(data.SortTargetInEnemySpawnDataList(data.selectedEnemySpawnData));
+                                Repaint();
+                            }
+                            break;
                     }
                     break;
             }
@@ -654,7 +678,7 @@ public class StageEditor : EditorWindow
                         if (spawnTimeInput >= 0) data.selectedEnemySpawnData.spawnTime = spawnTimeInput;
                         else data.selectedEnemySpawnData.spawnTime = 0;
 
-                        data.SelectEnemySpawnData(data.RemoveAndSortInEnemySpawnDataList(data.selectedEnemySpawnData, data.selectedEnemySpawnDataIndex));
+                        data.SelectEnemySpawnData(data.SortTargetInEnemySpawnDataList(data.selectedEnemySpawnData));
                     }
                     #endregion
 
