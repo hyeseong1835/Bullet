@@ -9,6 +9,6 @@ public abstract class EnemyEditorGUI
     /// 에디터의 이벤트를 받은 후 호출됩니다.
     /// </summary>
     public virtual void LateEvent() { }
-    public abstract void DrawInspectorGUI(EnemySpawnData enemy);
-    public abstract void DrawEnemyDataGizmos(EnemySpawnData enemy);
+    public abstract void DrawInspectorGUI(EditorEnemyData enemyData);
+    public abstract void DrawEnemyDataGizmos(EditorEnemyData enemyData);
 }

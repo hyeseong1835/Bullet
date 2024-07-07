@@ -24,11 +24,18 @@ public class Stage : ScriptableObject
     }
     public IEnumerator Start()
     {
+#if UNITY_EDITOR
+        GameManager.instance.StartCoroutine(Editor());
+#endif
         float prevTime = 0;
         for (int i = 0; i < enemySpawnData.Length; i++)
         {
             EnemySpawnData data = enemySpawnData[i];
             yield return new WaitForSeconds(data.spawnTime - prevTime);
+#if UNITY_EDITOR
+            StageEditor.instance.playTime = data.spawnTime;
+            StageEditor.data.SelectEnemySpawnData(data);
+#endif
             GameObject enemyObj = enemyPool[data.prefabIndex].Get();
 
             Enemy enemy = enemyObj.GetComponent<Enemy>();
@@ -37,5 +44,23 @@ public class Stage : ScriptableObject
             prevTime = data.spawnTime;
         }
     }
+#if UNITY_EDITOR
+    public IEnumerator Editor()
+    {
+        if (StageEditor.instance == null) StageEditor.CreateWindow();
+
+        StageEditor.data.RefreshStageArray();
+        StageEditor.data.SelectStage(this);
+        StageEditor.instance.playTime = 0;
+
+        while (StageEditor.instance.playTime < StageEditor.data.timeLength)
+        {
+            StageEditor.instance.playTime += Time.deltaTime;
+
+            StageEditor.instance.Repaint();
+            yield return null;
+        }
+    }
+#endif
 }
 

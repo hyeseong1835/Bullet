@@ -31,6 +31,7 @@ MonoBehaviour:
   fileColor:
     face: {r: 0.098039225, g: 0.098039225, b: 0.098039225, a: 1}
     outline: {r: 0, g: 0, b: 0, a: 1}
+  hasEditorBackGroundColor: {r: 0.15686275, g: 0.15686275, b: 0.15686275, a: 1}
   timeWidth: 50
   timeLengthFieldSize: {x: 50, y: 20}
   timeLengthFieldOffsetY: 5

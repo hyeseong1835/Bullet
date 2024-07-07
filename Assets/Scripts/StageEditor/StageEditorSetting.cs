@@ -20,6 +20,8 @@ public class StageEditorSetting : ScriptableObject
     public float fileRightSpace = 5;
     public float fileLeftSpace = 5;
     public SquareColor fileColor;
+    public Color hasEditorBackGroundColor;
+
     public float timeWidth = 50;
     public Vector2 timeLengthFieldSize = new Vector2(50, 20);
     public float timeLengthFieldOffsetY = 5;
