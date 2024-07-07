@@ -75,7 +75,15 @@ public struct Box
     public bool IsContactTop(float y, float line, out float contact)
     {
         contact = line - center.y - 0.5f * size.y;
-        return y > contact;
+        if (y > contact)
+        {
+            return true;
+        }
+        else
+        {
+            contact = y;
+            return false;
+        }
     }
 
     /// <param name="y">box의 Y 좌표</param>
@@ -84,7 +92,15 @@ public struct Box
     public bool IsContactBottom(float y, float line, out float contact)
     {
         contact = line - center.y + 0.5f * size.y;
-        return y < contact;
+        if (y < contact)
+        {
+            return true;
+        }
+        else
+        {
+            contact = y;
+            return false;
+        }
     }
 
     /// <param name="x">box의 X 좌표</param>
@@ -93,7 +109,15 @@ public struct Box
     public bool IsContactRight(float x, float line, out float contact)
     {
         contact = line - center.x - 0.5f * size.x;
-        return x > contact;
+        if (x > contact)
+        {
+            return true;
+        }
+        else
+        {
+            contact = x;
+            return false;
+        }
     }
 
     /// <param name="x">box의 X 좌표</param>
@@ -102,7 +126,15 @@ public struct Box
     public bool IsContactLeft(float x, float line, out float contact)
     {
         contact = line - center.x + 0.5f * size.x;
-        return x < contact;
+        if (x < contact)
+        {
+            return true;
+        }
+        else
+        {
+            contact = x;
+            return false;
+        }
     }
 
     /// <param name="pos">box의 WorldPosition</param>
@@ -284,26 +316,58 @@ public struct Box
     public bool IsExitUp(float y, float line, out float contact)
     {
         contact = line - center.y + 0.5f * size.y;
-        return y >= contact;
+        if (y >= contact)
+        {
+            return true;
+        }
+        else
+        {
+            contact = y;
+            return false;
+        }
     }
     /// <returns>Box가 line보다 아래일 때 true를 반환합니다.</returns>
     public bool IsExitDown(float y, float line, out float contact)
     {
         contact = line - center.y - 0.5f * size.y;
-        return y <= contact;
+        if (y <= contact)
+        {
+            return true;
+        }
+        else
+        {
+            contact = y;
+            return false;
+        }
     }
     /// <returns>Box가 line보다 오른쪽일 때 true를 반환합니다.</returns>
     public bool IsExitRight(float x, float line, out float contact)
     {
         contact = line - center.x + 0.5f * size.x;
-        return x >= contact;
+        if (x >= contact)
+        {
+            return true;
+        }
+        else
+        {
+            contact = x;
+            return false;
+        }
     }
 
     /// <returns>Box가 line보다 왼쪽일 때 true를 반환합니다.</returns>
     public bool IsExitLeft(float x, float line, out float contact)
     {
         contact = line - center.x - 0.5f * size.x;
-        return x <= contact;
+        if (x <= contact)
+        {
+            return true;
+        }
+        else
+        {
+            contact = x;
+            return false;
+        }
     }
 
     /// <param name="pos">box의 WorldPosition</param>

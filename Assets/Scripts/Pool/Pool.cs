@@ -67,18 +67,25 @@ public class Pool
             holder = new GameObject(prefab.name).transform;
             holder.SetParent(PoolHolder.instance.transform);
         }
-        
+        if (pool != null)
+        {
+            foreach (GameObject obj in pool)
+            {
+                if (obj != null) UnityEngine.Object.Destroy(obj);
+            }
+        }
         pool = new List<GameObject>();
+
+        if (waitDestroy != null)
+        {
+            foreach (WaitDestroyElement element in waitDestroy)
+            {
+                if (element.obj != null) UnityEngine.Object.Destroy(element.obj);
+            }
+        }
         waitDestroy = new List<WaitDestroyElement>();
         
-        foreach (GameObject obj in pool)
-        {
-            if (obj != null) UnityEngine.Object.Destroy(obj);
-        }
-        foreach (WaitDestroyElement element in waitDestroy)
-        {
-            if (element.obj != null) UnityEngine.Object.Destroy(element.obj);
-        }
+        
         
         for (int i = 0; i < startCount; i++)
         {
