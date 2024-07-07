@@ -180,7 +180,7 @@ public class StageEditor : EditorWindow
                 case EventType.KeyDown:
                     switch (e.keyCode)
                     {
-                        case KeyCode.LeftArrow:
+                        case KeyCode.UpArrow:
                             if (0 < data.selectedEnemySpawnDataIndex)
                             {
                                 data.SelectEnemySpawnData(data.selectedEnemySpawnDataIndex - 1);
@@ -188,7 +188,7 @@ public class StageEditor : EditorWindow
                             }
                             break;
 
-                        case KeyCode.RightArrow:
+                        case KeyCode.DownArrow:
                             if (data.selectedEnemySpawnDataIndex != -1 && data.selectedEnemySpawnDataIndex < data.enemySpawnDataList.Count - 1)
                             {
                                 data.SelectEnemySpawnData(data.selectedEnemySpawnDataIndex + 1);
@@ -341,7 +341,10 @@ public class StageEditor : EditorWindow
                 position.height - setting.fileTopSpace - setting.fileBottomSpace
             );
             GUILayout.BeginArea(area);
-            data.enemyScroll = EditorGUILayout.BeginScrollView(new Vector2(0, data.enemyScroll)).y;
+            data.enemyScroll = EditorGUILayout.BeginScrollView(new Vector2(0, data.enemyScroll), false, true, GUIStyle.none, GUI.skin.verticalScrollbar, GUIStyle.none).y;
+            area.width -= 15;
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.BeginVertical();
             {
                 if (EditorGUILayout.DropdownButton(new GUIContent("Debug"), FocusType.Passive))
                 {
@@ -373,12 +376,6 @@ public class StageEditor : EditorWindow
                     }
                     TitleHeaderLabel("Select");
                     EditorGUILayout.ObjectField(data.selectedEnemySpawnData, typeof(EnemySpawnData), false);
-                    /*
-                    string selectedEnemyEditorGUIText;
-                    if (data.selectedEnemyEditorGUI == null) selectedEnemyEditorGUIText = "NULL";
-                    else selectedEnemyEditorGUIText = data.selectedEnemyEditorGUI.GetType().Name;
-                    EditorGUILayout.TextField(selectedEnemyEditorGUIText);
-                    */
                     BeginNewTab();
                     {
                         TitleHeaderLabel("Prefab");
@@ -448,7 +445,7 @@ public class StageEditor : EditorWindow
                     }
                     
                     //Refresh
-                    if (GUI.Button(GUILayoutUtility.GetRect(setting.buttonWidth, setting.buttonHeight).GetAddY(2), "Refresh"))
+                    if (GUI.Button(GUILayoutUtility.GetRect(setting.buttonWidth, setting.buttonHeight, GUILayout.ExpandWidth(false)).GetAddY(2), "Refresh"))
                     {
                         data.RefreshStageArray();
                         data.RefreshTimeFoldout();
@@ -553,7 +550,7 @@ public class StageEditor : EditorWindow
                         GUILayout.BeginHorizontal();
                         {
                             //Time Label
-                            Rect timeRect = GUILayoutUtility.GetRect(setting.timeWidth, EditorGUIUtility.singleLineHeight);
+                            Rect timeRect = GUILayoutUtility.GetRect(setting.timeWidth, EditorGUIUtility.singleLineHeight, GUILayout.ExpandWidth(false));
                             EditorGUI.LabelField(timeRect, spawnData.spawnTime.ToString("F1"));
 
                             if (EventUtility.MouseDown(0) && timeRect.Contains(e.mousePosition))
@@ -572,7 +569,7 @@ public class StageEditor : EditorWindow
                             }
 
                             //Select Button
-                            if (GUI.Button(GUILayoutUtility.GetRect(setting.buttonWidth, setting.buttonHeight).GetAddY(2), "Select"))
+                            if (GUI.Button(GUILayoutUtility.GetRect(setting.buttonWidth, setting.buttonHeight, GUILayout.ExpandWidth(false)).GetAddY(2), "Select"))
                             {
                                 GUI.FocusControl(null);
                                 data.SelectEnemySpawnData(i);
@@ -589,7 +586,7 @@ public class StageEditor : EditorWindow
                     {
                         GUILayout.BeginHorizontal();
                         {
-                            Rect timeRect = GUILayoutUtility.GetRect(setting.timeWidth, EditorGUIUtility.singleLineHeight);
+                            Rect timeRect = GUILayoutUtility.GetRect(setting.timeWidth, EditorGUIUtility.singleLineHeight, GUILayout.ExpandWidth(false));
 
                             EditorGUILayout.ObjectField(spawnData, typeof(EnemyData), false, GUILayout.Height(EditorGUIUtility.singleLineHeight));
                             if (spawnData == data.selectedEnemySpawnData)
@@ -597,7 +594,7 @@ public class StageEditor : EditorWindow
                                 selectRect = GUILayoutUtility.GetLastRect().GetSetWidth(area.width - timeRect.width);
                             }
 
-                            if (GUI.Button(GUILayoutUtility.GetRect(setting.buttonWidth, setting.buttonHeight).GetAddY(2), "Select"))
+                            if (GUI.Button(GUILayoutUtility.GetRect(setting.buttonWidth, setting.buttonHeight, GUILayout.ExpandWidth(false)).GetAddY(2), "Select"))
                             {
                                 GUI.FocusControl(null);
                                 data.SelectEnemySpawnData(i);
@@ -617,6 +614,9 @@ public class StageEditor : EditorWindow
                     #endregion
                 }
             }
+            EditorGUILayout.EndVertical();
+            EditorGUILayout.Space(15, false);
+            EditorGUILayout.EndHorizontal();
             EditorGUILayout.Space(100);
             EditorGUILayout.EndScrollView();
             GUILayout.EndArea();
@@ -792,7 +792,7 @@ public class StageEditor : EditorWindow
         void BeginNewTab()
         {
             float areaWidth = EditorGUILayout.BeginHorizontal().width;
-            EditorGUILayout.Space(5);
+            EditorGUILayout.Space(10, false);
             EditorGUILayout.BeginVertical(GUILayout.Width(areaWidth));
         }
         void EndNewTab()

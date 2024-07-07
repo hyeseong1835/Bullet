@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: InstantEnemy SpawnData 5
   m_EditorClassIdentifier: 
   prefabIndex: 0
-  spawnTime: 2
+  spawnTime: 2.5
   weapon: {fileID: 0}
   startPos: {x: 1, y: 3}
   endPos: {x: 0, y: 0}
