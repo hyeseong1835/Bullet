@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Setting
   m_EditorClassIdentifier: 
   lineHoldWidth: 10
-  minDistanceBetweenLines: 10
+  minDistanceBetweenLines: 0
   inspectorTopSpace: 10
   inspectorBottomSpace: 5
   inspectorRightSpace: 5

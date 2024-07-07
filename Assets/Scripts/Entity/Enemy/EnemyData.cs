@@ -6,7 +6,9 @@ using UnityEngine;
 [Serializable]
 public struct DropInfo
 {
-    public GameObject prefab;
+    public GameObject[] prefabs;
+    public ItemData[] items;
+
     public float ratio;
 }
 public abstract class EnemyData : EntityData

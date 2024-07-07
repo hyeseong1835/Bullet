@@ -108,6 +108,8 @@ public class StageEditor : EditorWindow
 
         void Input()
         {
+            if (data.selectedEnemyEditorGUI != null) data.selectedEnemyEditorGUI.Event();
+            
             if (e.isScrollWheel)
             {
                 if(previewRect.Contains(e.mousePosition))
@@ -122,6 +124,7 @@ public class StageEditor : EditorWindow
                     Repaint();
                 }
             }
+
             switch (e.type)
             {
                 case EventType.MouseLeaveWindow:
@@ -222,6 +225,9 @@ public class StageEditor : EditorWindow
                     }
                     break;
             }
+
+            if (data.selectedEnemyEditorGUI != null) data.selectedEnemyEditorGUI.LateEvent();
+
             void Mouse0Down()
             {
                 if (hold == HoldType.None)
@@ -826,7 +832,11 @@ public class StageEditor : EditorWindow
     }
     public static Vector2 WorldToScreenPos(Vector2 worldPos)
     {
-        return data.previewPos + new Vector2(worldPos.x, -worldPos.y) * data.cellSize;
+        return data.previewPos + worldPos.GetMultiplyY(-1) * data.cellSize;
+    }
+    public static Vector2 ScreenToWorldPoint(Vector2 screenPos)
+    {
+        return ((screenPos - data.previewPos) / data.cellSize).GetMultiplyY(-1);
     }
     public static EnemyEditorGUI GetEnemyEditor(Type editorType)
     {

@@ -4,8 +4,12 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody2D), typeof(CircleCollider2D))]
 public abstract class Item : MonoBehaviour
 {
-    protected PlayerController player => PlayerController.instance;
+    public abstract ItemData ItemData { get; set; }
 
+    void Start()
+    {
+        if (ItemData.pool.holder == null) ItemData.pool.Init();
+    }
     void Update()
     {
         if (GameManager.IsEditor)

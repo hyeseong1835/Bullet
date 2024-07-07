@@ -23,10 +23,22 @@ public abstract class Enemy : Entity
         {
             if (random <= drop.ratio)
             {
-                if (drop.prefab == null) break;
-
-                GameObject itemInstance = Instantiate(drop.prefab);
-                itemInstance.transform.position = transform.position;
+                if (drop.prefabs != null)
+                {
+                    foreach (GameObject prefab in drop.prefabs)
+                    {
+                        GameObject instance = Instantiate(prefab);
+                        instance.transform.position = transform.position;
+                    }
+                }
+                if (drop.items != null)
+                {
+                    foreach (ItemData dropables in drop.items)
+                    {
+                        Item instance = dropables.Drop();
+                        instance.transform.position = transform.position;
+                    }
+                }
                 break;
             }
             random -= drop.ratio;
