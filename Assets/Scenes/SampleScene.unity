@@ -3000,67 +3000,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: af33f1d30440fdd4abfd6fd3507d4c92, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  pools:
-  - prefab: {fileID: 5235914642448064442, guid: 3ed429bc1e8a29444962959c6d58af02, type: 3}
-    destroyDelay: 1
-    startCount: 0
-    stayCount: 0
-    pool: []
-    waitDestroy: []
-  - prefab: {fileID: 5235914642448064442, guid: 37af630dcfdcfde45b2d347b2e9bebb0, type: 3}
-    destroyDelay: 1
-    startCount: 0
-    stayCount: 0
-    pool: []
-    waitDestroy: []
-  - prefab: {fileID: 5235914642448064442, guid: 3ed429bc1e8a29444962959c6d58af02, type: 3}
-    destroyDelay: 1
-    startCount: 0
-    stayCount: 0
-    pool: []
-    waitDestroy: []
-  - prefab: {fileID: 5235914642448064442, guid: 37af630dcfdcfde45b2d347b2e9bebb0, type: 3}
-    destroyDelay: 1
-    startCount: 0
-    stayCount: 0
-    pool: []
-    waitDestroy: []
-  - prefab: {fileID: 5235914642448064442, guid: 3ed429bc1e8a29444962959c6d58af02, type: 3}
-    destroyDelay: 1
-    startCount: 0
-    stayCount: 0
-    pool: []
-    waitDestroy: []
-  - prefab: {fileID: 5235914642448064442, guid: 37af630dcfdcfde45b2d347b2e9bebb0, type: 3}
-    destroyDelay: 1
-    startCount: 0
-    stayCount: 0
-    pool: []
-    waitDestroy: []
-  - prefab: {fileID: 5235914642448064442, guid: 3ed429bc1e8a29444962959c6d58af02, type: 3}
-    destroyDelay: 1
-    startCount: 0
-    stayCount: 0
-    pool: []
-    waitDestroy: []
-  - prefab: {fileID: 5235914642448064442, guid: 37af630dcfdcfde45b2d347b2e9bebb0, type: 3}
-    destroyDelay: 1
-    startCount: 0
-    stayCount: 0
-    pool: []
-    waitDestroy: []
-  - prefab: {fileID: 5235914642448064442, guid: 3ed429bc1e8a29444962959c6d58af02, type: 3}
-    destroyDelay: 1
-    startCount: 0
-    stayCount: 0
-    pool: []
-    waitDestroy: []
-  - prefab: {fileID: 5235914642448064442, guid: 37af630dcfdcfde45b2d347b2e9bebb0, type: 3}
-    destroyDelay: 1
-    startCount: 0
-    stayCount: 0
-    pool: []
-    waitDestroy: []
+  pools: []
   enemyPools: []
   bulletPools: []
   itemPools: []

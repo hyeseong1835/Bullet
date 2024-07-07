@@ -67,6 +67,10 @@ public class Pool
             holder = new GameObject(prefab.name).transform;
             holder.SetParent(PoolHolder.instance.transform);
         }
+        
+        pool = new List<GameObject>();
+        waitDestroy = new List<WaitDestroyElement>();
+        
         foreach (GameObject obj in pool)
         {
             if (obj != null) UnityEngine.Object.Destroy(obj);
@@ -75,8 +79,7 @@ public class Pool
         {
             if (element.obj != null) UnityEngine.Object.Destroy(element.obj);
         }
-        pool.Clear();
-        waitDestroy.Clear();
+        
         for (int i = 0; i < startCount; i++)
         {
             Add().SetActive(false);

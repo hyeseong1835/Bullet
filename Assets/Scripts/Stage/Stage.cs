@@ -35,8 +35,6 @@ public class Stage : ScriptableObject
             enemy.EnemySpawnData = data;
             enemyObj.SetActive(true);
             prevTime = data.spawnTime;
-            
-            Debug.Log($"Spawn: {enemyObj.name} [{data.spawnTime}]");
         }
     }
 }

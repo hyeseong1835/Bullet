@@ -15,5 +15,5 @@ MonoBehaviour:
   prefabIndex: 0
   spawnTime: 3
   weapon: {fileID: 0}
-  startPos: {x: 2, y: 8}
-  endPos: {x: -1, y: -1}
+  startPos: {x: -2, y: 6}
+  endPos: {x: 1, y: -1}

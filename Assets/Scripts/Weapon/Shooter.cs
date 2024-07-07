@@ -14,6 +14,7 @@ public class Shooter : Weapon
     void Awake()
     {
         bullet = data.bulletPrefab.GetComponent<Bullet>();
+        
         if (bullet.BulletData.pool.holder == null) bullet.BulletData.pool.Init();
     }
     protected override void Use()
