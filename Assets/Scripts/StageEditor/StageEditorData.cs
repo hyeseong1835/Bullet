@@ -223,16 +223,12 @@ public class StageEditorData : ScriptableObject
         {
             if (enemyData.spawnTime != prevTime)
             {
-                if (timeFoldout.TryGetValue(enemyData.spawnTime, out bool foldout))
+                if (newTimeFoldout.ContainsKey(enemyData.spawnTime) == false)
                 {
-                    if (newTimeFoldout.ContainsKey(enemyData.spawnTime) == false)
-                    {
-                        newTimeFoldout.Add(enemyData.spawnTime, foldout);
-                    }
-                }
-                else
-                {
-                    newTimeFoldout.Add(enemyData.spawnTime, false);
+                    bool foldout;
+                    if (!timeFoldout.TryGetValue(enemyData.spawnTime, out foldout)) foldout = false;
+                    
+                    newTimeFoldout.Add(enemyData.spawnTime, foldout);
                 }
             }
         }

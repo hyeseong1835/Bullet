@@ -13,9 +13,9 @@ MonoBehaviour:
   m_Name: Stage1
   m_EditorClassIdentifier: 
   enemySpawnData:
+  - {fileID: 11400000, guid: 1ce05f10e192fc947b81651b5f1b07a1, type: 2}
   - {fileID: 11400000, guid: c049cec819d03c041963f163983f7449, type: 2}
   - {fileID: 11400000, guid: 1808e9a53cecd814d8c9b985f0f21418, type: 2}
-  - {fileID: 11400000, guid: 1ce05f10e192fc947b81651b5f1b07a1, type: 2}
   - {fileID: 11400000, guid: aace5dc1dfef134488eb6822d7b0e4d6, type: 2}
   - {fileID: 11400000, guid: e5b681e63ff394146b09bf02fc80b011, type: 2}
   - {fileID: 11400000, guid: 33a5b40bb70fa9d4098d89795acd6573, type: 2}
