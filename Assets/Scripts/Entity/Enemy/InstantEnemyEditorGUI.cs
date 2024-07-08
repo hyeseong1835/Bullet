@@ -1,10 +1,11 @@
+using System.IO;
+using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
 
 public class InstantEnemyEditorGUI : EnemyEditorGUI
 {
     static Event e => UnityEngine.Event.current;
-    static Texture2D prefabPreview;
     public override void Event()
     {
         switch (e.type)
@@ -52,42 +53,30 @@ public class InstantEnemyEditorGUI : EnemyEditorGUI
         data.endPos = EditorGUILayout.Vector2Field("Definition", data.endPos);
     }
 
-    public override void DrawEnemyDataGizmos(EditorEnemyData enemyData)
+    public override void DrawSelectedEnemyDataGizmos(EditorEnemyData enemyData)
     {
         InstantEnemySpawnData data = (InstantEnemySpawnData)enemyData.spawnData;
 
-        if (false && prefabPreview == null)
-        {
-            var previewRender = new PreviewRenderUtility();
-            previewRender.camera.backgroundColor = Color.clear;
-            previewRender.camera.clearFlags = CameraClearFlags.Color;
-            previewRender.camera.cameraType = CameraType.Game;
-            previewRender.camera.farClipPlane = 1000f;
-            previewRender.camera.nearClipPlane = 0.1f;
-
-            previewRender.BeginStaticPreview(new Rect(0.0f, 0.0f, 1080.0f / 4.0f, 1920.0f / 4.0f));
-
-            var canvasInstance = previewRender.InstantiatePrefabInScene(enemyData.prefab).GetComponent<Canvas>();
-            canvasInstance.renderMode = RenderMode.ScreenSpaceCamera;
-            canvasInstance.worldCamera = previewRender.camera;
-
-            previewRender.Render();
-
-            prefabPreview = previewRender.EndStaticPreview();
-
-            previewRender.camera.targetTexture = null;
-            previewRender.Cleanup();
-        }
         Vector2 startScreenPos = StageEditor.WorldToScreenPos(data.startPos);
         Vector2 endScreenPos = StageEditor.WorldToScreenPos(data.endPos);
 
-        GUI.DrawTexture(new Rect(startScreenPos, 50 * Vector2.one), prefabPreview ?? Texture2D.whiteTexture);
-        
         Handles.color = Color.cyan;
         Handles.DrawLine(startScreenPos, endScreenPos);
         Vector2 X = new Vector2(StageEditor.setting.definitionGizmoSize, -StageEditor.setting.definitionGizmoSize);
         Handles.DrawLine(endScreenPos + X, endScreenPos - X);
         Handles.DrawLine(endScreenPos + Vector2.one * StageEditor.setting.definitionGizmoSize, endScreenPos - Vector2.one * StageEditor.setting.definitionGizmoSize);
         Handles.color = Color.white;
+    }
+    public override void Render(PreviewRenderUtility renderer, EditorEnemyData enemyData)
+    {
+        InstantEnemySpawnData data = (InstantEnemySpawnData)enemyData.spawnData;
+        GameObject obj = renderer.InstantiatePrefabInScene(enemyData.prefab);
+        obj.transform.position = Vector3.zero;
+        renderer.camera.transform.LookAt(obj.transform);
+        Debug.Log(obj);
+    }
+    public override void DrawSameTimeEnemyDataGizmos(EditorEnemyData enemyData)
+    {
+        DrawSelectedEnemyDataGizmos(enemyData);
     }
 }

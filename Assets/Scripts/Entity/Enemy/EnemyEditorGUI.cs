@@ -1,3 +1,5 @@
+using UnityEditor;
+
 public abstract class EnemyEditorGUI
 {
 
@@ -9,6 +11,8 @@ public abstract class EnemyEditorGUI
     /// 에디터의 이벤트를 받은 후 호출됩니다.
     /// </summary>
     public virtual void LateEvent() { }
-    public abstract void DrawInspectorGUI(EditorEnemyData enemyData);
-    public abstract void DrawEnemyDataGizmos(EditorEnemyData enemyData);
+    public virtual void DrawInspectorGUI(EditorEnemyData enemyData) { }
+    public virtual void DrawSelectedEnemyDataGizmos(EditorEnemyData enemyData) { }
+    public virtual void DrawSameTimeEnemyDataGizmos(EditorEnemyData enemyData) { }
+    public virtual void Render(PreviewRenderUtility renderer, EditorEnemyData enemyData) { }
 }

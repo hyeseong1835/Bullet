@@ -7,19 +7,24 @@ using UnityEngine;
 public class Stage : ScriptableObject
 {
     public EnemySpawnData[] enemySpawnData;
-    public GameObject[] enemyPrefabs;
-    public Pool[] enemyPool;
-
+    public GameObject[][] enemyPrefabs;
+    public Pool[][] enemyPool;
+    
     public void Init()
     {
-        enemyPool = new Pool[enemyPrefabs.Length];
+        enemyPool = new Pool[enemyPrefabs.Length][];
         
-        for (int i = 0; i < enemyPrefabs.Length; i++)
+        for (int arrayIndex = 0; arrayIndex < enemyPrefabs.Length; arrayIndex++)
         {
-            GameObject prefab = enemyPrefabs[i];
-            Pool pool = new Pool(prefab, 1, 0, 0);
-            pool.Init();
-            enemyPool[i] = pool;
+            GameObject[] prefabArray = enemyPrefabs[arrayIndex];
+            enemyPool[arrayIndex] = new Pool[prefabArray.Length];
+
+            for (int prefabIndex = 0; prefabIndex < prefabArray.Length; prefabIndex++)
+            {
+                Pool pool = new Pool(prefabArray[prefabIndex], 1, 0, 0);
+                pool.Init();
+                enemyPool[arrayIndex][prefabIndex] = pool;
+            }
         }
     }
     public IEnumerator Start()
@@ -36,7 +41,7 @@ public class Stage : ScriptableObject
             StageEditor.instance.playTime = data.spawnTime;
             StageEditor.data.SelectEnemySpawnData(data);
 #endif
-            GameObject enemyObj = enemyPool[data.prefabIndex].Get();
+            GameObject enemyObj = enemyPool[data.prefabTypeIndex][data.prefabIndex].Get();
 
             Enemy enemy = enemyObj.GetComponent<Enemy>();
             enemy.EnemySpawnData = data;

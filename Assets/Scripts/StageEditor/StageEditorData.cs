@@ -17,18 +17,11 @@ public class EditorEnemyData
     public GameObject prefab;
     public Type prefabType;
 
-    public EditorEnemyData(EnemySpawnData spawnData, EnemyEditorGUI editorGUI, GameObject prefab, Type prefabType)
-    {
-        this.spawnData = spawnData;
-        unSafeEditorGUI = editorGUI;
-        this.prefab = prefab;
-        this.prefabType = prefabType;
-    }
     public EditorEnemyData(Stage stage, EnemySpawnData spawnData)
     {
         this.spawnData = spawnData;
-        //unSafeEditorGUI = StageEditor.data.GetEnemyEditor(spawnData);
-        prefab = stage.enemyPrefabs[spawnData.prefabIndex];
+
+        prefab = SelectPrefab(spawnData.prefabIndex);
         prefabType = prefab.GetComponent<Enemy>().GetType();
     }
     public void Apply()
@@ -56,6 +49,11 @@ public class EditorEnemyData
     {
         spawnData.prefabIndex = StageEditor.data.GetPrefabList(prefabType).IndexOf(prefab);
     }
+    public void SetPrefab(GameObject prefab)
+    {
+        this.prefab = prefab;
+        prefabType = prefab.GetComponent<Enemy>().GetType();
+    }
     public GameObject SelectPrefab(int index)
     {
         List<GameObject> prefabList = StageEditor.data.GetPrefabList(prefabType);
@@ -71,7 +69,7 @@ public class EditorEnemyData
                 prefab = null;
                 spawnData.prefabIndex = -1;
                 Debug.LogError("Can't Select Prefab (PrefabList is Empty)");
-                return prefab;
+                return null;
             }
         }
         spawnData.prefabIndex = index;
@@ -103,7 +101,6 @@ public class StageEditorData : ScriptableObject
     
     public int prefabLength { get; private set; }
 
-    public Box preview { get; private set; }
     public Vector2 previewPos;
 
     public float cellSize = 50;
@@ -115,14 +112,6 @@ public class StageEditorData : ScriptableObject
     public float timeLength;
 
     public float timeMoveSnap = 0.5f;
-
-    private void OnValidate()
-    {
-        preview = new Box(
-            new Vector2(Window.GameWidth, Window.GameHeight) * cellSize,
-             new Vector2(0, -0.5f * Window.GameHeight * cellSize)
-        );
-    }
 
     #region Stage
     public int SelectStage(Stage stage)
@@ -152,8 +141,8 @@ public class StageEditorData : ScriptableObject
             selectedStageIndex = index;
         }
 
-        RefreshEnemySpawnDataList();
         RefreshPrefabList();
+        RefreshEnemySpawnDataList();
         
         return selectedStage;
     }
@@ -206,7 +195,7 @@ public class StageEditorData : ScriptableObject
 
     public void ApplyPrefabListToStageEnemyPrefabs()
     {
-        selectedStage.enemyPrefabs = GetAllPrefabList().ToArray();
+        selectedStage.enemyPrefabs = prefabLists.Select((list) => list.ToArray()).ToArray();
     }
     public List<GameObject> GetAllPrefabList()
     {
@@ -353,9 +342,9 @@ public class StageEditorData : ScriptableObject
     }
     public void ApplyEnemySpawnData()
     {
-        RefreshEnemySpawnDataList();
+        //RefreshEnemySpawnDataList();
         
-        selectedStage.enemySpawnData = enemyList.Select((enemy) => enemy.spawnData).ToArray();
+        //selectedStage.enemySpawnData = enemyList.Select((enemy) => enemy.spawnData).ToArray();
     }
     public EnemyEditorGUI GetEnemyEditor(EnemySpawnData spawnData) => GetEnemyEditor(spawnData.EditorType);
     public EnemyEditorGUI GetEnemyEditor(Type editorType)

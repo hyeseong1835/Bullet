@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Xml.Linq;
 using UnityEditor;
 using UnityEditor.Experimental;
@@ -16,13 +17,13 @@ public class StageEditor : EditorWindow
     
     static Event e => Event.current;
     
-    Rect fileViewerRect = new Rect();
-    Rect inspectorRect = new Rect();
-    Rect previewRect = new Rect();
+    public Rect fileViewerRect = new Rect();
+    public Rect inspectorRect = new Rect();
+    public Rect previewRect = new Rect();
     
     public bool debug = false;
     public float playTime = -1;
-
+    Texture2D prefabPreview;
     enum HoldType
     {
         None,
@@ -334,7 +335,11 @@ public class StageEditor : EditorWindow
 
         void PreviewCheck()
         {
-            if (data.preview.IsExit(data.previewPos, position.height, 0, (position.width - data.inspectorLinePosX), data.fileViewerLinePosX, out Vector2 previewContact))
+            Box previewBox = new Box(
+                new Vector2(Window.GameWidth, Window.GameHeight) * data.cellSize,
+                 new Vector2(0, -0.5f * Window.GameHeight * data.cellSize)
+            );
+            if (previewBox.IsExit(data.previewPos, position.height, 0, (position.width - data.inspectorLinePosX), data.fileViewerLinePosX, out Vector2 previewContact))
             {
                 data.previewPos = previewContact;
             }
@@ -752,7 +757,34 @@ public class StageEditor : EditorWindow
         void DrawPreview()
         {
             RefreshPreviewRect();
-            CustomGUI.DrawSquare(previewRect, setting.previewBackGroundColor);
+            if(e.type == EventType.Repaint)
+            {
+                PreviewRenderUtility previewRender = new PreviewRenderUtility();
+                Camera gameCam = CameraController.instance.cam;
+                previewRender.camera.orthographic = gameCam.orthographic;
+                previewRender.camera.orthographicSize = gameCam.orthographicSize;
+                previewRender.camera.transform.position = Vector3.zero; //ScreenToWorldPoint(data.previewPos.GetAddY(0.5f * previewRect.size.y));
+                previewRender.camera.transform.rotation = gameCam.transform.rotation;
+                previewRender.camera.clearFlags = gameCam.clearFlags;
+                previewRender.camera.backgroundColor = setting.previewBackGroundColor;
+                previewRender.camera.cullingMask = gameCam.cullingMask;
+                previewRender.camera.fieldOfView = gameCam.fieldOfView;
+                previewRender.camera.nearClipPlane = gameCam.nearClipPlane;
+                previewRender.camera.farClipPlane = gameCam.farClipPlane;
+                
+                previewRender.BeginStaticPreview(new Rect(Vector2.zero, previewRect.size));
+
+                data.selectedEnemyData?.editorGUI.Render(previewRender, data.selectedEnemyData);
+
+                previewRender.Render();
+
+                prefabPreview = previewRender.EndStaticPreview();
+
+                previewRender.camera.targetTexture = null;
+                previewRender.Cleanup();
+            }
+            GUI.DrawTexture(previewRect, prefabPreview ?? Texture2D.whiteTexture);
+
             Vector2Int cellCount = 3 * Vector2Int.one + new Vector2Int(
                 Mathf.FloorToInt(previewRect.width / data.cellSize),
                 Mathf.FloorToInt(previewRect.height / data.cellSize)
@@ -764,7 +796,25 @@ public class StageEditor : EditorWindow
 
             if (data.selectedEnemyData != null && data.selectedEnemyData.editorGUI != null) 
             {
-                data.selectedEnemyData.editorGUI.DrawEnemyDataGizmos(data.selectedEnemyData);
+                for (int i = data.selectedEnemyDataIndex + 1; i < data.enemyList.Count; i++)
+                {
+                    EditorEnemyData enemyData = data.enemyList[i];
+                    if(data.selectedEnemyData.spawnData.spawnTime == enemyData.spawnData.spawnTime)
+                    {
+                        enemyData.editorGUI.DrawSameTimeEnemyDataGizmos(enemyData);
+                    }
+                    else break;
+                }
+                for (int i = data.selectedEnemyDataIndex - 1; i >= 0; i--)
+                {
+                    EditorEnemyData enemyData = data.enemyList[i];
+                    if (data.selectedEnemyData.spawnData.spawnTime == enemyData.spawnData.spawnTime)
+                    {
+                        enemyData.editorGUI.DrawSameTimeEnemyDataGizmos(enemyData);
+                    }
+                    else break;
+                }
+                data.selectedEnemyData.editorGUI.DrawSelectedEnemyDataGizmos(data.selectedEnemyData);
                 DrawTimeLine();
             }
         }

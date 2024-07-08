@@ -34,6 +34,8 @@ public class Window : MonoBehaviour
     public static float screenRight { get; private set; }
     public static float screenLeft { get; private set; }
 
+    public static Vector2Int ScreenSize => new Vector2Int(ScreenWidth, ScreenHeight);
+    public static Vector2Int GameSize => new Vector2Int(GameWidth, GameHeight);
     public static int GameHeight => instance.gameHeight;
     [SerializeField] int gameHeight = 1;
     public static int GameWidth => instance.gameWidth;

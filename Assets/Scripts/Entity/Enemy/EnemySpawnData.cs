@@ -6,6 +6,7 @@ public abstract class EnemySpawnData : ScriptableObject
 {
     public abstract Type EditorType { get; }
 
-    public int prefabIndex;
+    public int prefabIndex = -1;
+    public int prefabTypeIndex = -1;
     public float spawnTime;
 }
