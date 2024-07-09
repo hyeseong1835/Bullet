@@ -138,7 +138,7 @@ public class StageEditorData : ScriptableObject
 
     public void ApplyPrefabListToStageEnemyPrefabs()
     {
-        selectedStage.enemyPrefabs = prefabLists.Select((list) => list.ToArray()).ToArray();
+        selectedStage.enemyPrefabs = new SerializableGameObjectDoubleArray(prefabLists.Select((list) => list.ToArray()).ToArray());
     }
     public List<GameObject> GetAllPrefabList()
     {

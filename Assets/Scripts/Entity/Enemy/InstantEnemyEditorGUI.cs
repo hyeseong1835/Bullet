@@ -61,10 +61,11 @@ public class InstantEnemyEditorGUI : EnemyEditorGUI
         Vector2 endScreenPos = StageEditor.WorldToScreenPos(data.endPos);
 
         Handles.color = Color.cyan;
+        Handles.DrawWireDisc(startScreenPos, Vector3.forward, 10);
+
         Handles.DrawLine(startScreenPos, endScreenPos);
-        Vector2 X = new Vector2(StageEditor.setting.definitionGizmoSize, -StageEditor.setting.definitionGizmoSize);
-        Handles.DrawLine(endScreenPos + X, endScreenPos - X);
-        Handles.DrawLine(endScreenPos + Vector2.one * StageEditor.setting.definitionGizmoSize, endScreenPos - Vector2.one * StageEditor.setting.definitionGizmoSize);
+        
+        CustomGUI.DrawArrow(startScreenPos, endScreenPos, 0.25f * Mathf.PI, 25);
         Handles.color = Color.white;
     }
     public override void Render(PreviewRenderUtility renderer, EditorEnemyData enemyData)
@@ -85,6 +86,17 @@ public class InstantEnemyEditorGUI : EnemyEditorGUI
     }
     public override void DrawSameTimeEnemyDataGizmos(EditorEnemyData enemyData)
     {
-        DrawSelectedEnemyDataGizmos(enemyData);
+        InstantEnemySpawnData data = (InstantEnemySpawnData)enemyData.spawnData;
+
+        Vector2 startScreenPos = StageEditor.WorldToScreenPos(data.startPos);
+        Vector2 endScreenPos = StageEditor.WorldToScreenPos(data.endPos);
+
+        Handles.color = new Color(0, 0.25f, 0.25f, 1);
+        Handles.DrawWireDisc(startScreenPos, Vector3.forward, 10);
+
+        Handles.DrawLine(startScreenPos, endScreenPos);
+
+        CustomGUI.DrawArrow(startScreenPos, endScreenPos, 0.25f * Mathf.PI, 25);
+        Handles.color = Color.white;
     }
 }

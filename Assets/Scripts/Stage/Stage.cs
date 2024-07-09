@@ -6,22 +6,24 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "Stage", menuName = "Data/Stage")]
 public class Stage : ScriptableObject
 {
+    public SerializableGameObjectDoubleArray enemyPrefabs;
     public EnemySpawnData[] enemySpawnData;
-    public GameObject[][] enemyPrefabs;
+
     public Pool[][] enemyPool;
     
     public void Init()
     {
         List<Pool[]> poolLists = new List<Pool[]>();
-        for (int arrayIndex = 0; arrayIndex < enemyPrefabs.Length; arrayIndex++)
+        for (int arrayIndex = 0; arrayIndex < enemyPrefabs.arrays.Length; arrayIndex++)
         {
-            GameObject[] prefabArray = enemyPrefabs[arrayIndex];
+            GameObject[] prefabArray = enemyPrefabs.arrays[arrayIndex];
             Pool[] poolArray = new Pool[prefabArray.Length];
 
             for (int prefabIndex = 0; prefabIndex < prefabArray.Length; prefabIndex++)
             {
                 Pool pool = new Pool(prefabArray[prefabIndex], 1, 0, 0);
                 pool.Init();
+                poolArray[prefabIndex] = pool;
             }
             poolLists.Add(poolArray);
         }

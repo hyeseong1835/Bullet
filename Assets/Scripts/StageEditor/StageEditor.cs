@@ -56,33 +56,16 @@ public class StageEditor : EditorWindow
     {
         data = (StageEditorData)EditorResources.Load<ScriptableObject>("StageEditor/Data.asset");
         setting = (StageEditorSetting)EditorResources.Load<ScriptableObject>("StageEditor/Setting.asset");
-
-        previewRender = new PreviewRenderUtility();
-        Camera gameCam = CameraController.instance.cam;
-        previewRender.camera.orthographic = gameCam.orthographic;
-        previewRender.camera.orthographicSize = gameCam.orthographicSize;
-        previewRender.camera.transform.position = Vector3.zero; //ScreenToWorldPoint(data.previewPos.GetAddY(0.5f * previewRect.size.y));
-        previewRender.camera.transform.rotation = gameCam.transform.rotation;
-        previewRender.camera.clearFlags = gameCam.clearFlags;
-        previewRender.camera.backgroundColor = setting.previewBackGroundColor;
-        previewRender.camera.cullingMask = gameCam.cullingMask;
-        previewRender.camera.fieldOfView = gameCam.fieldOfView;
-        previewRender.camera.nearClipPlane = gameCam.nearClipPlane;
-        previewRender.camera.farClipPlane = gameCam.farClipPlane;
-    }
-    void OnDisable()
-    {
-        previewRender.camera.targetTexture = null;
-        previewRender.Cleanup();
-    }
     
+        wantsMouseEnterLeaveWindow = true;
+    }
+
     #endregion
 
     void OnGUI()
     {
         #region Init
 
-        wantsMouseEnterLeaveWindow = true;
         Handles.color = Color.white;
         
 #if UNITY_EDITOR
@@ -215,26 +198,62 @@ public class StageEditor : EditorWindow
                     EditorGUILayout.ObjectField(data, typeof(StageEditorData), false);
                     EditorGUILayout.ObjectField(setting, typeof(StageEditorSetting), false);
 
+                    DrawSelectStage();
+
                     DrawStageList();
 
                     DrawPrefabList();
                     
-                    TitleHeaderLabel("Select");
-                    BeginNewTab();
+                    CustomGUILayout.TitleHeaderLabel("Select");
+                    CustomGUILayout.BeginNewTab();
                     {
                         DrawSelectInfo();
                     }
-                    EndNewTab();
+                    CustomGUILayout.EndNewTab();
 
+                    void DrawSelectStage()
+                    {
+                        CustomGUILayout.TitleHeaderLabel("Selected Stage");
+                        
+                        if (data.selectedStage == null)
+                        {
+                            CustomGUILayout.WarningLabel("SelectedStage is null");
+                            return;
+                        }
+
+                        CustomGUILayout.BeginNewTab();
+                        {
+                            CustomGUILayout.TitleHeaderLabel("Prefab");
+                            if (data.selectedStage.enemyPrefabs == null) CustomGUILayout.WarningLabel("data.selectedStage.enemyPrefabs is null");
+                            else if(data.selectedStage.enemyPrefabs.arrays == null) CustomGUILayout.WarningLabel("data.selectedStage.enemyPrefabs.arrays is null");
+                            else if (data.selectedStage.enemyPrefabs.arrays.Length == 0) CustomGUILayout.WarningLabel("data.selectedStage.enemyPrefabs.arrays is Empty");
+                            else
+                            {
+                                CustomGUILayout.BeginNewTab();
+                                {
+                                    foreach (GameObject[] prefabArray in data.selectedStage.enemyPrefabs.arrays)
+                                    {
+                                        CustomGUILayout.TitleHeaderLabel(prefabArray[0].name);
+                                        foreach (GameObject prefab in prefabArray)
+                                        {
+                                            EditorGUILayout.ObjectField(prefab, typeof(GameObject), false);
+                                        }
+                                    }
+                                }
+                                CustomGUILayout.EndNewTab();
+                            }
+                        }
+                        CustomGUILayout.EndNewTab();
+                    }
 
                     void DrawStageList()
                     {
-                        TitleHeaderLabel("Stage");
-                        BeginNewTab();
+                        CustomGUILayout.TitleHeaderLabel("Stage");
+                        CustomGUILayout.BeginNewTab();
                         {
-                            TitleHeaderLabel("Stage List");
-                            if (data.stageArray == null) WarningLabel("Stage Array is null");
-                            else if (data.stageArray.Length < 1) WarningLabel("Stage Array is Empty");
+                            CustomGUILayout.TitleHeaderLabel("Stage List");
+                            if (data.stageArray == null) CustomGUILayout.WarningLabel("Stage Array is null");
+                            else if (data.stageArray.Length < 1) CustomGUILayout.WarningLabel("Stage Array is Empty");
                             else
                             {
                                 foreach (Stage stage in data.stageArray)
@@ -243,21 +262,21 @@ public class StageEditor : EditorWindow
                                 }
                             }
                         }
-                        EndNewTab();
+                        CustomGUILayout.EndNewTab();
 
                     }
 
                     void DrawPrefabList()
                     {
-                        TitleHeaderLabel("Prefab");
+                        CustomGUILayout.TitleHeaderLabel("Prefab");
                         
                         if (data.prefabLists == null || data.prefabLists.Count == 0)
                         {
-                            WarningLabel("Empty PrefabList");
+                            CustomGUILayout.WarningLabel("Empty PrefabList");
                         }
                         else
                         {
-                            BeginNewTab();
+                            CustomGUILayout.BeginNewTab();
                             {
                                 for (int listIndex = 0; listIndex < data.prefabLists.Count; listIndex++)
                                 {
@@ -266,7 +285,7 @@ public class StageEditor : EditorWindow
 
                                     if (curList.Count < 1)
                                     {
-                                        WarningLabel("Empty List");
+                                        CustomGUILayout.WarningLabel("Empty List");
                                         continue;
                                     }
                                     CustomGUILayout.UnderBarTitleText(listType.Name);
@@ -277,18 +296,18 @@ public class StageEditor : EditorWindow
                                     }
                                 }
                             }
-                            EndNewTab();
+                            CustomGUILayout.EndNewTab();
                         }
                     }
                     
                     void DrawSelectInfo()
                     {
-                        TitleHeaderLabel("Stage");
+                        CustomGUILayout.TitleHeaderLabel("Stage");
                         EditorGUILayout.ObjectField(data.selectedStage, typeof(Stage), false);
 
                         if (data.selectedStage == null)
                         {
-                            WarningLabel("SelectedStage is null");
+                            CustomGUILayout.WarningLabel("SelectedStage is null");
                             return;
                         }
 
@@ -298,10 +317,10 @@ public class StageEditor : EditorWindow
 
                         void DrawSelectedEnemyData()
                         {
-                            TitleHeaderLabel("Enemy");
+                            CustomGUILayout.TitleHeaderLabel("Enemy");
                             if (data.selectedEnemyData == null)
                             {
-                                WarningLabel("SelectedEnemyData is null");
+                                CustomGUILayout.WarningLabel("SelectedEnemyData is null");
                                 return;
                             }
 
@@ -326,13 +345,13 @@ public class StageEditor : EditorWindow
                     }
                 }
 
-                void DrawStageSelect()
+                void DrawStageSelect()      
                 {
                     GUILayout.BeginHorizontal();
                     {
                         if (data.stageArray == null)
                         {
-                            WarningLabel("StageArray is null");
+                            CustomGUILayout.WarningLabel("StageArray is null");
                         }
                         else
                         {
@@ -367,13 +386,13 @@ public class StageEditor : EditorWindow
                     GUILayout.EndHorizontal();
                 }
 
-                void DrawSpawnDataSelect()
+                void DrawSpawnDataSelect()  
                 {
                     EditorGUILayout.Space(5);
                     EditorGUILayout.LabelField("Spawn Data", EditorStyles.boldLabel);
                     if (data.enemyList == null || data.enemyList.Count < 1)
                     {
-                        WarningLabel("EnemySpawnData is Empty");
+                        CustomGUILayout.WarningLabel("EnemySpawnData is Empty");
                         return;
                     }
                     // Enemy List
@@ -555,7 +574,7 @@ public class StageEditor : EditorWindow
             }
         }
 
-        void DrawInspectorGUI()
+        void DrawInspectorGUI() 
         {
             Rect area = new Rect();
             area.position = inspectorRect.position + new Vector2(setting.inspectorLeftSpace, setting.inspectorTopSpace);
@@ -576,7 +595,7 @@ public class StageEditor : EditorWindow
                     string[] selectablePrefabNameArray;
                     if (prefabList == null)
                     {
-                        WarningLabel("Cannot Found Type: " + data.selectedEnemyData.spawnData.GetType());
+                        CustomGUILayout.WarningLabel("Cannot Found Type: " + data.selectedEnemyData.spawnData.GetType());
                     }
                     else
                     {
@@ -604,11 +623,11 @@ public class StageEditor : EditorWindow
                     #endregion
 
                     if (data.selectedEnemyData.editorGUI != null) data.selectedEnemyData.editorGUI.DrawInspectorGUI(data.selectedEnemyData);
-                    else WarningLabel("EditorGUI Missing");
+                    else CustomGUILayout.WarningLabel("EditorGUI Missing");
                 }
                 else
                 {
-                    WarningLabel("Select Enemy Spawn Data");
+                    CustomGUILayout.WarningLabel("Select Enemy Spawn Data");
                 }
             }
             GUILayout.EndArea();
@@ -616,25 +635,7 @@ public class StageEditor : EditorWindow
         
         void DrawPreview()
         {
-            if (e.type == EventType.Repaint)
-            {
-                if (previewRender == null)
-                {
-                    Debug.LogError("PreviewRender is null");
-                }
-                else if (previewRect.size.x != 0 && previewRect.size.y != 0)
-                {
-                    previewRender.BeginStaticPreview(new Rect(Vector2.zero, previewRect.size));
-
-                    data.selectedEnemyData?.editorGUI.Render(previewRender, data.selectedEnemyData);
-
-                    previewRender.Render();
-
-                    prefabPreview = previewRender.EndStaticPreview();
-                }
-            }
-
-            GUI.DrawTexture(previewRect, prefabPreview ?? Texture2D.whiteTexture);
+            CustomGUI.DrawSquare(previewRect, setting.previewBackGroundColor);
 
             Vector2Int cellCount = 3 * Vector2Int.one + new Vector2Int(
                 Mathf.FloorToInt(previewRect.width / data.cellSize),
@@ -990,30 +991,9 @@ public class StageEditor : EditorWindow
 
         #endregion
 
-        #region UI Utility
+        #region UI
 
-        void WarningLabel(string message)
-        {
-            EditorGUILayout.Space(10);
-            EditorGUILayout.LabelField(message, EditorStyles.centeredGreyMiniLabel);
-            EditorGUILayout.Space(10);
-        }
-        void TitleHeaderLabel(string title)
-        {
-            EditorGUILayout.Space(5);
-            CustomGUILayout.UnderBarTitleText(title);
-        }
-        void BeginNewTab()
-        {
-            float areaWidth = EditorGUILayout.BeginHorizontal().width;
-            EditorGUILayout.Space(10, false);
-            EditorGUILayout.BeginVertical(GUILayout.Width(areaWidth));
-        }
-        void EndNewTab()
-        {
-            EditorGUILayout.EndVertical();
-            EditorGUILayout.EndHorizontal();
-        }
+        
 
         #endregion
     }

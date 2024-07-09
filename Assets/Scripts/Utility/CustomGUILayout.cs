@@ -1,4 +1,5 @@
 using System;
+using System.Security.Cryptography;
 using UnityEditor;
 using UnityEngine;
 
@@ -33,5 +34,27 @@ public static class CustomGUILayout
         Vector3 p1 = new Vector3(labelRect.x, lineY);
         Vector3 p2 = new Vector3(labelRect.x + labelRect.width, lineY);
         Handles.DrawLine(p1, p2);
+    }
+    public static void WarningLabel(string message, float topSpace = 10, float bottomSpace = 10)
+    {
+        EditorGUILayout.Space(topSpace);
+        EditorGUILayout.LabelField(message, EditorStyles.centeredGreyMiniLabel);
+        EditorGUILayout.Space(bottomSpace);
+    }
+    public static void TitleHeaderLabel(string title, float space = 5)
+    {
+        EditorGUILayout.Space(space);
+        CustomGUILayout.UnderBarTitleText(title);
+    }
+    public static void BeginNewTab(float space = 10)
+    {
+        EditorGUILayout.BeginHorizontal();
+        EditorGUILayout.Space(space, false);
+        EditorGUILayout.BeginVertical();
+    }
+    public static void EndNewTab()
+    {
+        EditorGUILayout.EndVertical();
+        EditorGUILayout.EndHorizontal();
     }
 }

@@ -19,6 +19,18 @@ public static class CustomGUI
     {
         Handles.DrawSolidRectangleWithOutline(rect, color, color);
     }
+    public static void DrawArrow(Vector2 start, Vector2 end, float angle, float length)
+    {
+        Handles.DrawLine(start, end);
+
+        Vector2 reverseDir = (start - end).normalized;
+
+        Vector2 a = end + reverseDir.Rotate(angle) * length;
+        Vector2 b = end + reverseDir.Rotate(-angle) * length;
+
+        Handles.DrawLine(end, a);
+        Handles.DrawLine(end, b);
+    }
     public static void DrawOpenGrid(Vector2 pos, Vector2Int cellCount, float cellSize, Color color)
     {
         Handles.color = color;

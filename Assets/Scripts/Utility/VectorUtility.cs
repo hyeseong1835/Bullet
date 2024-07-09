@@ -44,6 +44,17 @@ public static class VectorUtility
     public static Vector3 GetMultiplyY(this Vector3 vector, float value) => vector.MultiplyY(value);
     public static Vector3 GetMultiplyZ(this Vector3 vector, float value) => vector.MultiplyZ(value);
 
+    public static Vector2 Rotate(this Vector2 vector, float delta)
+    {
+        float sin = Mathf.Sin(delta);
+        float cos = Mathf.Cos(delta);
+
+        return new Vector2(
+            vector.x * cos - vector.y * sin,
+            vector.x * sin + vector.y * cos
+        );
+    }
+
     public static Vector2 Bezier(Vector2 startPos, Vector2 endPos, Vector2 handlePos, float t)
     {
         Vector2 a = Vector2.Lerp(startPos, handlePos, t);
