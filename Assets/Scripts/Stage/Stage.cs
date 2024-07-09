@@ -12,20 +12,20 @@ public class Stage : ScriptableObject
     
     public void Init()
     {
-        enemyPool = new Pool[enemyPrefabs.Length][];
-        
+        List<Pool[]> poolLists = new List<Pool[]>();
         for (int arrayIndex = 0; arrayIndex < enemyPrefabs.Length; arrayIndex++)
         {
             GameObject[] prefabArray = enemyPrefabs[arrayIndex];
-            enemyPool[arrayIndex] = new Pool[prefabArray.Length];
+            Pool[] poolArray = new Pool[prefabArray.Length];
 
             for (int prefabIndex = 0; prefabIndex < prefabArray.Length; prefabIndex++)
             {
                 Pool pool = new Pool(prefabArray[prefabIndex], 1, 0, 0);
                 pool.Init();
-                enemyPool[arrayIndex][prefabIndex] = pool;
             }
+            poolLists.Add(poolArray);
         }
+        enemyPool = poolLists.ToArray();
     }
     public IEnumerator Start()
     {

@@ -69,11 +69,19 @@ public class InstantEnemyEditorGUI : EnemyEditorGUI
     }
     public override void Render(PreviewRenderUtility renderer, EditorEnemyData enemyData)
     {
+        if (enemyData.prefab == null)
+        {
+            Debug.LogError("Prefab is null");
+            return;
+        }
+
         InstantEnemySpawnData data = (InstantEnemySpawnData)enemyData.spawnData;
+
         GameObject obj = renderer.InstantiatePrefabInScene(enemyData.prefab);
         obj.transform.position = Vector3.zero;
         renderer.camera.transform.LookAt(obj.transform);
-        Debug.Log(obj);
+        
+        Debug.Log($"Render: {enemyData.prefab}");
     }
     public override void DrawSameTimeEnemyDataGizmos(EditorEnemyData enemyData)
     {

@@ -35,7 +35,9 @@ public class GameManager : MonoBehaviour
     }
     void Start()
     {
-        stage1.Init();
+#if UNITY_EDITOR
+        if (EditorApplication.isPlaying) stage1.Init();
+#endif
     }
 
     void Update()
