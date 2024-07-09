@@ -6,26 +6,29 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "Stage", menuName = "Data/Stage")]
 public class Stage : ScriptableObject
 {
-    public SerializableGameObjectDoubleArray enemyPrefabs;
+    public GameObject[] enemyPrefabs;
+    public int[] enemyPrefabArrayCounts;
     public EnemySpawnData[] enemySpawnData;
 
     public Pool[][] enemyPool;
-    
+
     public void Init()
     {
         List<Pool[]> poolLists = new List<Pool[]>();
-        for (int arrayIndex = 0; arrayIndex < enemyPrefabs.arrays.Length; arrayIndex++)
+        int startIndex = 0;
+        for (int arrayIndex = 0; arrayIndex < enemyPrefabArrayCounts.Length; arrayIndex++)
         {
-            GameObject[] prefabArray = enemyPrefabs.arrays[arrayIndex];
-            Pool[] poolArray = new Pool[prefabArray.Length];
+            int count = enemyPrefabArrayCounts[arrayIndex];
+            Pool[] poolArray = new Pool[count];
 
-            for (int prefabIndex = 0; prefabIndex < prefabArray.Length; prefabIndex++)
+            for (int poolIndex = 0; poolIndex < count; poolIndex++)
             {
-                Pool pool = new Pool(prefabArray[prefabIndex], 1, 0, 0);
+                Pool pool = new Pool(enemyPrefabs[startIndex + poolIndex], 1, 0, 0);
                 pool.Init();
-                poolArray[prefabIndex] = pool;
+                poolArray[poolIndex] = pool;
             }
             poolLists.Add(poolArray);
+            startIndex += count;
         }
         enemyPool = poolLists.ToArray();
     }
@@ -38,11 +41,15 @@ public class Stage : ScriptableObject
         for (int i = 0; i < enemySpawnData.Length; i++)
         {
             EnemySpawnData data = enemySpawnData[i];
-            yield return new WaitForSeconds(data.spawnTime - prevTime);
+
+            float waitTime = data.spawnTime - prevTime;
+            if (waitTime != 0) yield return new WaitForSeconds(waitTime);
+
 #if UNITY_EDITOR
             StageEditor.instance.playTime = data.spawnTime;
             StageEditor.data.SelectEnemySpawnData(data);
 #endif
+            
             GameObject enemyObj = enemyPool[data.prefabTypeIndex][data.prefabIndex].Get();
 
             Enemy enemy = enemyObj.GetComponent<Enemy>();

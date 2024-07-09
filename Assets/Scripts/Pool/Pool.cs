@@ -28,14 +28,14 @@ public class WaitDestroyElement
     public void CancelDestroy(Pool pool)
     {
         coroutineRunner.StopCoroutine(destroyCoroutine);
-        pool.pool.Add(obj);
+        pool.objects.Add(obj);
         pool.waitDestroy.Remove(this);
     }
 }
 [Serializable]
 public class Pool
 {
-    public int count { get { return pool.Count; } }
+    public int count { get { return objects.Count; } }
 
     public GameObject prefab;
 
@@ -45,7 +45,7 @@ public class Pool
     public int startCount;
     public int stayCount;
 
-    [HideInInspector] public List<GameObject> pool = new List<GameObject>();
+    [HideInInspector] public List<GameObject> objects = new List<GameObject>();
     [HideInInspector] public List<WaitDestroyElement> waitDestroy = new List<WaitDestroyElement>();//-|
 
     [SerializeField] Action<GameObject> addEvent;
@@ -67,14 +67,14 @@ public class Pool
             holder = new GameObject(prefab.name).transform;
             holder.SetParent(PoolHolder.instance.transform);
         }
-        if (pool != null)
+        if (objects != null)
         {
-            foreach (GameObject obj in pool)
+            foreach (GameObject obj in objects)
             {
                 if (obj != null) UnityEngine.Object.Destroy(obj);
             }
         }
-        pool = new List<GameObject>();
+        objects = new List<GameObject>();
 
         if (waitDestroy != null)
         {
@@ -97,12 +97,12 @@ public class Pool
     public GameObject Get()
     {
         //비활성화 오브젝트 찾기
-        foreach (GameObject gameObject in pool)
+        foreach (GameObject gameObject in objects)
         {
             if (gameObject == null)
             {
                 Debug.LogWarning("Pool has null element");
-                pool.Remove(gameObject);
+                objects.Remove(gameObject);
                 continue;
             }
             if (gameObject.activeInHierarchy == false)
@@ -139,7 +139,7 @@ public class Pool
         if (count > stayCount)
         {
             waitDestroy.Add(new WaitDestroyElement(this, obj));
-            pool.Remove(obj);
+            objects.Remove(obj);
 
             obj.SetActive(false);
 
@@ -158,7 +158,7 @@ public class Pool
         obj.name = holder.name;
         obj.SetActive(false);
 
-        pool.Add(obj);
+        objects.Add(obj);
         if (addEvent != null) addEvent(obj);
         return obj;
     }

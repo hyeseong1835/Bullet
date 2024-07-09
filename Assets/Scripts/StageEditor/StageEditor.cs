@@ -225,19 +225,14 @@ public class StageEditor : EditorWindow
                         {
                             CustomGUILayout.TitleHeaderLabel("Prefab");
                             if (data.selectedStage.enemyPrefabs == null) CustomGUILayout.WarningLabel("data.selectedStage.enemyPrefabs is null");
-                            else if(data.selectedStage.enemyPrefabs.arrays == null) CustomGUILayout.WarningLabel("data.selectedStage.enemyPrefabs.arrays is null");
-                            else if (data.selectedStage.enemyPrefabs.arrays.Length == 0) CustomGUILayout.WarningLabel("data.selectedStage.enemyPrefabs.arrays is Empty");
+                            else if (data.selectedStage.enemyPrefabs.Length == 0) CustomGUILayout.WarningLabel("data.selectedStage.enemyPrefabs is Empty");
                             else
                             {
                                 CustomGUILayout.BeginNewTab();
                                 {
-                                    foreach (GameObject[] prefabArray in data.selectedStage.enemyPrefabs.arrays)
+                                    foreach (GameObject prefab in data.selectedStage.enemyPrefabs)
                                     {
-                                        CustomGUILayout.TitleHeaderLabel(prefabArray[0].name);
-                                        foreach (GameObject prefab in prefabArray)
-                                        {
-                                            EditorGUILayout.ObjectField(prefab, typeof(GameObject), false);
-                                        }
+                                        EditorGUILayout.ObjectField(prefab, typeof(GameObject), false);
                                     }
                                 }
                                 CustomGUILayout.EndNewTab();

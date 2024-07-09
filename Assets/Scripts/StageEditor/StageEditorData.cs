@@ -138,7 +138,8 @@ public class StageEditorData : ScriptableObject
 
     public void ApplyPrefabListToStageEnemyPrefabs()
     {
-        selectedStage.enemyPrefabs = new SerializableGameObjectDoubleArray(prefabLists.Select((list) => list.ToArray()).ToArray());
+        selectedStage.enemyPrefabArrayCounts = prefabLists.Select((list) => list.Count).ToArray();
+        selectedStage.enemyPrefabs = GetAllPrefabArray();
     }
     public List<GameObject> GetAllPrefabList()
     {
@@ -148,6 +149,10 @@ public class StageEditorData : ScriptableObject
             result.AddRange(list);
         }
         return result;
+    }
+    public GameObject[] GetAllPrefabArray()
+    {
+        return GetAllPrefabList().ToArray();
     }
     public List<GameObject> GetPrefabList(EnemySpawnData enemyData) => GetPrefabList(enemyData.GetType());
     public List<GameObject> GetPrefabList(Type spawnDataType)
