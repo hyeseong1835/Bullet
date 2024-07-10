@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.UIElements;
 
 public interface IOnWindowValidateReceiver
 {
@@ -78,11 +79,28 @@ public class Window : MonoBehaviour
     {
         Set();
     }
+    void MatchCanvas()
+    {
+        float scale;
+        if (isDriveHeight) scale = WindowHeight / scaleFactor;
+        else scale = WindowWidth * screenRatio / scaleFactor;
+
+        canvasScaler.scaleFactor = scale;
+
+        float factor = pixelPerUnit / scale;
+
+        screenRect.anchoredPosition = new Vector2(0, 0.5f * screenHeight) * factor;
+        screenRect.sizeDelta = new Vector2(screenWidth, screenHeight) * factor;
+
+        gameRect.anchoredPosition = new Vector2(0, 0.5f * gameHeight) * factor;
+        gameRect.sizeDelta = new Vector2(gameWidth, gameHeight) * factor;
+    }
     void Update()
     {
         if (WindowHeight != 0 && WindowWidth != 0 && WindowHeight != prevWindowHeight || WindowWidth != prevWindowWidth)
         {
             Refresh();
+            MatchCanvas();
 
             if (onScreenResizedRecieverList != null)
             {
@@ -103,20 +121,6 @@ public class Window : MonoBehaviour
         isDriveHeight = windowRatio < screenRatio;
 
         pixelPerUnit = isDriveHeight ? (WindowHeight / screenHeight) : (WindowWidth / screenWidth);
-        
-        float scale;
-        if (isDriveHeight) scale = WindowHeight / scaleFactor;
-        else scale = WindowWidth * screenRatio / scaleFactor;
-        
-        canvasScaler.scaleFactor = scale;
-
-        float factor = pixelPerUnit / scale;
-
-        screenRect.anchoredPosition = new Vector2(0, 0.5f * screenHeight) * factor;
-        screenRect.sizeDelta = new Vector2(screenWidth, screenHeight) * factor;
-
-        gameRect.anchoredPosition = new Vector2(0, 0.5f * gameHeight) * factor;
-        gameRect.sizeDelta = new Vector2(gameWidth , gameHeight) * factor;
     }
     void OnValidate()
     {
