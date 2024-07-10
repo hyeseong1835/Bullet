@@ -3,7 +3,7 @@ using UnityEngine.UI;
 
 public class ExpBar : MonoBehaviour
 {
-    [SerializeField] PlayerController player;
+    PlayerController player => PlayerController.instance;
     [SerializeField] Slider slider;
     void Awake()
     {

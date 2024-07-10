@@ -1,10 +1,12 @@
 using UnityEngine;
 
+[ExecuteAlways]
 [RequireComponent(typeof(Camera))]
 public class CameraController : MonoBehaviour, IOnScreenResizedReceiver
 {
     public static CameraController instance;
     public Camera cam;
+    public Vector2 viewSize;
   
     void Awake()
     {
@@ -12,9 +14,13 @@ public class CameraController : MonoBehaviour, IOnScreenResizedReceiver
         if (cam == null) cam = GetComponent<Camera>();
     }
 
-    void Update()
+    void OnEnable()
     {
-
+        Window.onScreenResizedRecieverList.Add(this);
+    }
+    void OnDisable()
+    {
+        Window.onScreenResizedRecieverList.Remove(this);
     }
 
     void OnDrawGizmos()
@@ -28,12 +34,12 @@ public class CameraController : MonoBehaviour, IOnScreenResizedReceiver
     }
     public void OnScreenResized()
     {
-        Vector3 camPos = cam.transform.position;
-        
-        if (Window.isDriveHeight) camPos.y = 0.5f * Window.ScreenHeight;
-        else camPos.y = 0.5f * Window.windowRatio * Window.ScreenWidth;
-
-        cam.transform.position = camPos;
-        cam.orthographicSize = camPos.y;
+        if (Window.isDriveHeight)
+        {
+            viewSize = new Vector2(Window.ScreenHeight / Window.windowRatio, Window.ScreenHeight);
+        }
+        else viewSize = new Vector2(Window.ScreenWidth, Window.ScreenWidth * Window.windowRatio);
+        cam.transform.position = cam.transform.position.GetSetY(0.5f * viewSize.y);
+        cam.orthographicSize = 0.5f * viewSize.y;
     }
 }

@@ -1,3 +1,5 @@
+using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
@@ -22,24 +24,27 @@ public class Window : MonoBehaviour
 
     public static int WindowHeight => Screen.height;
     public static int WindowWidth => Screen.width;
+    /// <summary>
+    /// Height / Width
+    /// </summary>
     public static float windowRatio { get; private set; }
 
+    public static Vector2Int ScreenSize => new Vector2Int(ScreenWidth, ScreenHeight);
     public static int ScreenHeight => instance.screenHeight;
-    [SerializeField] int screenHeight = 1;
+    [SerializeField] int screenHeight = 5;
     public static int ScreenWidth => instance.screenWidth;
-    [SerializeField] int screenWidth = 1;
+    [SerializeField] int screenWidth = 4;
     public static float screenRatio { get; private set; }
     public static float screenUp { get; private set; }
     public static float screenDown { get; private set; }
     public static float screenRight { get; private set; }
     public static float screenLeft { get; private set; }
 
-    public static Vector2Int ScreenSize => new Vector2Int(ScreenWidth, ScreenHeight);
     public static Vector2Int GameSize => new Vector2Int(GameWidth, GameHeight);
     public static int GameHeight => instance.gameHeight;
-    [SerializeField] int gameHeight = 1;
+    [SerializeField] int gameHeight = 5;
     public static int GameWidth => instance.gameWidth;
-    [SerializeField] int gameWidth = 1;
+    [SerializeField] int gameWidth = 2;
     public static float gameRatio { get; private set; }
     public static float gameUp { get; private set; }
     public static float gameDown { get; private set; }
@@ -53,8 +58,7 @@ public class Window : MonoBehaviour
 
     public static bool isDriveHeight { get; private set; }
 
-    IOnScreenResizedReceiver[] onScreenResizedReceivers;
-
+    public static List<IOnScreenResizedReceiver> onScreenResizedRecieverList = new List<IOnScreenResizedReceiver>();
     float prevWindowHeight;
     float prevWindowWidth;
 
@@ -77,31 +81,20 @@ public class Window : MonoBehaviour
     void Awake()
     {
         Set();
-
-        var onWindowValidaterecieverIt = FindObjectsOfType<MonoBehaviour>()
-                                                   .OfType<IOnWindowValidateReceiver>();
-
-        foreach (IOnWindowValidateReceiver receiver in onWindowValidaterecieverIt)
-        {
-            receiver.OnWindowValidate();
-        }
-
-        var onScreenResizedRecieverIt = FindObjectsOfType<MonoBehaviour>()
-                                                  .OfType<IOnScreenResizedReceiver>();
-
-        onScreenResizedReceivers = onScreenResizedRecieverIt.ToArray();
     }
     void Update()
     {
         if (WindowHeight != prevWindowHeight || WindowWidth != prevWindowWidth)
         {
-            windowRatio = (float)WindowHeight / WindowWidth;
-            
+            Set();
             Refresh();
 
-            foreach (IOnScreenResizedReceiver receiver in onScreenResizedReceivers)
+            if (onScreenResizedRecieverList != null)
             {
-                receiver.OnScreenResized();
+                foreach (IOnScreenResizedReceiver receiver in onScreenResizedRecieverList)
+                {
+                    receiver.OnScreenResized();
+                }
             }
 
             prevWindowHeight = WindowHeight;
@@ -110,6 +103,8 @@ public class Window : MonoBehaviour
     }
     public void Refresh()
     {
+        windowRatio = (float)WindowHeight / WindowWidth;
+        
         isDriveHeight = windowRatio < screenRatio;
 
         pixelPerUnit = isDriveHeight ? (WindowHeight / screenHeight) : (WindowWidth / screenWidth);
@@ -139,10 +134,5 @@ public class Window : MonoBehaviour
         {
             receiver.OnWindowValidate();
         }
-
-        var onScreenResizedRecieverIt = FindObjectsOfType<MonoBehaviour>()
-                                                  .OfType<IOnScreenResizedReceiver>();
-
-        onScreenResizedReceivers = onScreenResizedRecieverIt.ToArray();
     }
 }

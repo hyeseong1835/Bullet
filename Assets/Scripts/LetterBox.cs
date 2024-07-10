@@ -1,25 +1,43 @@
 using UnityEngine;
 
-public class LetterBox : MonoBehaviour, IOnWindowValidateReceiver
+[ExecuteAlways]
+public class LetterBox : MonoBehaviour, IOnScreenResizedReceiver
 {
-    public Transform top, bottom, right, left;
-    [SerializeField] float size;
+    public GameObject top, right, left;
 
+    void OnEnable()
+    {
+        Window.onScreenResizedRecieverList.Add(this);
+    }
+    void OnDisable()
+    {
+        Window.onScreenResizedRecieverList.Remove(this);
+    }
     void Refresh()
     {
-        top.position = new Vector3(0, Window.ScreenHeight + 0.5f * size, 0);
-        top.localScale = new Vector3(Window.ScreenWidth, size, 1);
+        if (Window.isDriveHeight)
+        {
+            top.SetActive(false);
 
-        bottom.position = new Vector3(0, -0.5f * size, 0);
-        bottom.localScale = new Vector3(Window.ScreenWidth, size, 1);
+            right.SetActive(true);
+            right.transform.localScale = new Vector3(0.5f * (CameraController.instance.viewSize.x - Window.ScreenWidth), CameraController.instance.viewSize.y, 1);
+            right.transform.position = new Vector3(0.5f * CameraController.instance.viewSize.x - 0.5f * right.transform.localScale.x, 0.5f * right.transform.localScale.y, 0);
 
-        right.position = new Vector3(0.5f * Window.ScreenWidth + 0.5f * size, 0.5f * Window.ScreenHeight, 0);
-        right.localScale = new Vector3(size, Window.ScreenHeight + 2 * size, 1);
+            left.SetActive(true);
+            left.transform.localScale = new Vector3(0.5f * (CameraController.instance.viewSize.x - Window.ScreenWidth), CameraController.instance.viewSize.y, 1);
+            left.transform.position = new Vector3(-(0.5f * CameraController.instance.viewSize.x - 0.5f * left.transform.localScale.x), 0.5f * left.transform.localScale.y, 0);
+        }
+        else
+        {
+            right.SetActive(false);
+            left.SetActive(false);
 
-        left.position = new Vector3(-0.5f * Window.ScreenWidth - 0.5f * size, 0.5f * Window.ScreenHeight, 0);
-        left.localScale = new Vector3(size, Window.ScreenHeight + 2 * size, 1);
+            top.SetActive(true);
+            top.transform.localScale = new Vector3(CameraController.instance.viewSize.x, CameraController.instance.viewSize.y - Window.screenUp, 1);
+            top.transform.position = new Vector3(0, Window.ScreenHeight + 0.5f * top.transform.localScale.y, 0);
+        }
     }
-    public void OnWindowValidate()
+    public void OnScreenResized()
     {
         Refresh();
     }

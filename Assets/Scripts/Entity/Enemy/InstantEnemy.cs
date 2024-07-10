@@ -21,11 +21,9 @@ public class InstantEnemy : Enemy
     public float speed;
 
     Vector3 dir;
-    new void OnEnable()
+    void OnEnable()
     {
         if (spawnData == null) return;
-
-        base.OnEnable();
 
         hp = data.maxHp;
         transform.position = spawnData.startPos;

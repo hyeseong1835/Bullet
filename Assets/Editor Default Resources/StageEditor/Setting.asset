@@ -47,7 +47,7 @@ MonoBehaviour:
     outline: {r: 1, g: 1, b: 1, a: 1}
   enemySpawnTimeColor:
     face: {r: 1, g: 1, b: 1, a: 0}
-    outline: {r: 0.11764706, g: 0.11764706, b: 0.11764706, a: 1}
+    outline: {r: 0.39215687, g: 0.39215687, b: 0.39215687, a: 1}
   screenMoveSpeed: 1
   zoomSpeed: 10
   cellSizeMin: 5

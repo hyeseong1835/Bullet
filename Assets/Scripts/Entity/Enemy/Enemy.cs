@@ -8,14 +8,6 @@ public abstract class Enemy : Entity
     public abstract EnemySpawnData EnemySpawnData { get; set; }
     public abstract Type EnemySpawnDataType { get; }
 
-    protected void OnEnable()
-    {
-        GameManager.instance.enableEnemyList.Add(this);
-    }
-    protected void OnDisable()
-    {
-        GameManager.instance.enableEnemyList.Remove(this);
-    }
     protected void Drop()
     {
         float random = UnityEngine.Random.Range(0, EnemyData.ratioMax);

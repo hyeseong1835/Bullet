@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   prefabIndex: 0
   prefabTypeIndex: 0
-  spawnTime: 0
+  spawnTime: 1
   weapon: {fileID: 0}
   startPos: {x: 2, y: 6}
-  endPos: {x: -2, y: 2}
+  endPos: {x: -1, y: -1}

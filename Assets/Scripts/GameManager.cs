@@ -15,9 +15,6 @@ public class GameManager : MonoBehaviour
     public GameState state;
     public static bool IsEditor => instance.state == GameState.Editor;
 
-    public List<Enemy> enableEnemyList = new List<Enemy>();
-
-
     [SerializeField] GameObject mainPanel;
     [SerializeField] Stage stage1;
 
@@ -25,7 +22,6 @@ public class GameManager : MonoBehaviour
     {
         instance = this;
 
-        enableEnemyList.Clear();
 #if UNITY_EDITOR
         if (EditorApplication.isPlaying) state = GameState.Ready;
         else state = GameState.Editor;

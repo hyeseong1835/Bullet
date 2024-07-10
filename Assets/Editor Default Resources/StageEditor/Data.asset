@@ -12,10 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 72707a419bef5a144a8467c4489e64dc, type: 3}
   m_Name: Data
   m_EditorClassIdentifier: 
-  previewPos: {x: 757.77527, y: 621.0759}
-  cellSize: 51.97519
+  previewPos: {x: 736.9752, y: 694.47595}
+  cellSize: 84.97519
   inspectorLinePosX: 334
-  fileViewerLinePosX: 361
+  fileViewerLinePosX: 374
   enemyScroll: 0
   timeLength: 10
   timeMoveSnap: 0.5
