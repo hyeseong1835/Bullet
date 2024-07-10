@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c19460cbbd9821a4b80e2a5542f2f2d0, type: 3}
   m_Name: InstantEnemy SpawnData
   m_EditorClassIdentifier: 
-  prefabIndex: 0
+  prefabIndex: 1
   prefabTypeIndex: 0
   spawnTime: 1
   weapon: {fileID: 0}

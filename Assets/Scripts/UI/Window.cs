@@ -82,7 +82,6 @@ public class Window : MonoBehaviour
     {
         if (WindowHeight != 0 && WindowWidth != 0 && WindowHeight != prevWindowHeight || WindowWidth != prevWindowWidth)
         {
-            Set();
             Refresh();
 
             if (onScreenResizedRecieverList != null)

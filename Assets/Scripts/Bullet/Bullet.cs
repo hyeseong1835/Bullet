@@ -2,7 +2,6 @@ using System;
 using Unity.VisualScripting;
 using UnityEngine;
 
-[ExecuteAlways]
 [RequireComponent(typeof(Rigidbody2D), typeof(Collider2D))]
 public abstract class Bullet : MonoBehaviour
 {
@@ -23,6 +22,17 @@ public abstract class Bullet : MonoBehaviour
     Action<Bullet, Collider2D> stayEvent;
     Action<Bullet, Collider2D> exitEvent;
 
+    void OnValidate()
+    {
+        if (bulletType == BulletType.Player) gameObject.layer = LayerMask.NameToLayer("PlayerBullet");
+        else if (bulletType == BulletType.Enemy) gameObject.layer = LayerMask.NameToLayer("EnemyBullet");
+
+        if (rigid == null) rigid = GetComponent<Rigidbody2D>();
+        rigid.bodyType = RigidbodyType2D.Kinematic;
+
+        if (coll == null) coll = GetComponent<CircleCollider2D>();
+        coll.isTrigger = true;
+    }
     public void Initialize(
         Action<Bullet> updateEvent = null,
         Action<Bullet> destroyEvent = null,
@@ -44,21 +54,6 @@ public abstract class Bullet : MonoBehaviour
     }
     protected void Update()
     {
-#if UNITY_EDITOR
-        if (GameManager.IsEditor)
-        {
-            if (bulletType == BulletType.Player) gameObject.layer = LayerMask.NameToLayer("PlayerBullet");
-            else if (bulletType == BulletType.Enemy) gameObject.layer = LayerMask.NameToLayer("EnemyBullet");
-
-            if (rigid == null) rigid = GetComponent<Rigidbody2D>();
-            rigid.bodyType = RigidbodyType2D.Kinematic;
-
-            if (coll == null) coll = GetComponent<CircleCollider2D>();
-            coll.isTrigger = true;
-        
-            return;
-        }
-#endif
         if (updateEvent != null) updateEvent.Invoke(this);
     }
     protected virtual void Enter(Collider2D coll)

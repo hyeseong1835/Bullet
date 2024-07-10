@@ -55,7 +55,7 @@ public class PlayerController : Entity
     }
     void Move()
     {
-        Vector3 input = new Vector3(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"), 0);
+        Vector3 input = new Vector3(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"), 0);
         if (input != Vector3.zero)
         {
             transform.Translate(input.normalized * speed * Time.deltaTime);
