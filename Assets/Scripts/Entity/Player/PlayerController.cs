@@ -11,6 +11,8 @@ public class PlayerController : Entity
     public PlayerControllerData data;
     public override EntityData EntityData => data;
 
+    [SerializeField] Transform grafic;
+
     static Window GameCanvas => Window.instance;
     static GameManager Game => GameManager.instance;
 
@@ -54,7 +56,11 @@ public class PlayerController : Entity
     void Move()
     {
         Vector3 input = new Vector3(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"), 0);
-        transform.Translate(input.normalized * speed * Time.deltaTime);
+        if (input != Vector3.zero)
+        {
+            transform.Translate(input.normalized * speed * Time.deltaTime);
+            grafic.rotation = Quaternion.Euler(0, 0, -Mathf.Atan2(input.x, input.y) * Mathf.Rad2Deg);
+        }
     }
     void WallCollide()
     {

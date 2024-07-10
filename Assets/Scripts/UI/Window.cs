@@ -27,38 +27,34 @@ public class Window : MonoBehaviour
     /// <summary>
     /// Height / Width
     /// </summary>
-    public static float windowRatio { get; private set; }
+    public float windowRatio;
 
-    public static Vector2Int ScreenSize => new Vector2Int(ScreenWidth, ScreenHeight);
-    public static int ScreenHeight => instance.screenHeight;
-    [SerializeField] int screenHeight = 5;
-    public static int ScreenWidth => instance.screenWidth;
-    [SerializeField] int screenWidth = 4;
-    public static float screenRatio { get; private set; }
-    public static float screenUp { get; private set; }
-    public static float screenDown { get; private set; }
-    public static float screenRight { get; private set; }
-    public static float screenLeft { get; private set; }
+    public Vector2 ScreenSize => new Vector2(screenWidth, screenHeight);
+    public float screenHeight = 5;
+    public float screenWidth = 4;
+    public float screenRatio;
+    public float screenUp;
+    public float screenDown;
+    public float screenRight;
+    public float screenLeft;
 
-    public static Vector2Int GameSize => new Vector2Int(GameWidth, GameHeight);
-    public static int GameHeight => instance.gameHeight;
-    [SerializeField] int gameHeight = 5;
-    public static int GameWidth => instance.gameWidth;
-    [SerializeField] int gameWidth = 2;
-    public static float gameRatio { get; private set; }
-    public static float gameUp { get; private set; }
-    public static float gameDown { get; private set; }
-    public static float gameRight { get; private set; }
-    public static float gameLeft { get; private set; }
+    public Vector2Int GameSize => new Vector2Int(gameWidth, gameHeight);
+    public int gameHeight = 5;
+    public int gameWidth = 2;
+    public float gameRatio; 
+    public float gameUp;
+    public float gameDown;
+    public float gameRight;
+    public float gameLeft;
 
 
     public float scaleFactor = 1024;
 
-    public static float pixelPerUnit { get; private set; }
+    public float pixelPerUnit;
 
-    public static bool isDriveHeight { get; private set; }
+    public bool isDriveHeight;
 
-    public static List<IOnScreenResizedReceiver> onScreenResizedRecieverList = new List<IOnScreenResizedReceiver>();
+    public List<IOnScreenResizedReceiver> onScreenResizedRecieverList = new List<IOnScreenResizedReceiver>();
     float prevWindowHeight;
     float prevWindowWidth;
 
@@ -72,7 +68,7 @@ public class Window : MonoBehaviour
         screenRight = 0.5f * screenWidth;
         screenLeft = -0.5f * screenWidth;
 
-        gameRatio = gameHeight / gameWidth;
+        gameRatio = (float)gameHeight / gameWidth;
         gameUp = gameHeight;
         gameDown = 0;
         gameRight = 0.5f * gameWidth;
@@ -84,7 +80,7 @@ public class Window : MonoBehaviour
     }
     void Update()
     {
-        if (WindowHeight != prevWindowHeight || WindowWidth != prevWindowWidth)
+        if (WindowHeight != 0 && WindowWidth != 0 && WindowHeight != prevWindowHeight || WindowWidth != prevWindowWidth)
         {
             Set();
             Refresh();
@@ -126,6 +122,7 @@ public class Window : MonoBehaviour
     void OnValidate()
     {
         Set();
+        Refresh();
 
         var onWindowValidaterecieverIt = FindObjectsOfType<MonoBehaviour>()
                                                    .OfType<IOnWindowValidateReceiver>();

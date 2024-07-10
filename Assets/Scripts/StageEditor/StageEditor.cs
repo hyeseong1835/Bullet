@@ -16,7 +16,8 @@ public class StageEditor : EditorWindow
     public static StageEditorSetting setting;
     
     static Event e => Event.current;
-    
+    static Window Win => Window.instance;
+
     public Rect fileViewerRect = new Rect();
     public Rect inspectorRect = new Rect();
     public Rect previewRect = new Rect();
@@ -639,7 +640,7 @@ public class StageEditor : EditorWindow
             Vector2 offset = new Vector2((data.previewPos.x) % data.cellSize, (data.previewPos.y) % data.cellSize);
             Vector2 start = new Vector2(Mathf.Floor(previewRect.x / data.cellSize) * data.cellSize, Mathf.Floor(previewRect.y / data.cellSize) * data.cellSize);
             CustomGUI.DrawOpenGrid(start + offset - data.cellSize * Vector2.one, cellCount, data.cellSize, setting.previewOutGridColor);
-            CustomGUI.DrawCloseGrid(data.previewPos + data.cellSize * new Vector2(-0.5f * Window.GameWidth, -Window.GameHeight), new Vector2Int(Window.GameWidth, Window.GameHeight), data.cellSize, setting.previewGameGridColor);
+            CustomGUI.DrawCloseGrid(data.previewPos + data.cellSize * new Vector2(-0.5f * Win.gameWidth, -Win.gameHeight), new Vector2Int(Win.gameWidth, Win.gameHeight), data.cellSize, setting.previewGameGridColor);
 
             if (data.selectedEnemyData != null && data.selectedEnemyData.editorGUI != null)
             {
@@ -958,8 +959,8 @@ public class StageEditor : EditorWindow
         void PreviewCheck()
         {
             Box previewBox = new Box(
-                new Vector2(Window.GameWidth, Window.GameHeight) * data.cellSize,
-                 new Vector2(0, -0.5f * Window.GameHeight * data.cellSize)
+                new Vector2(Win.gameWidth, Win.gameHeight) * data.cellSize,
+                 new Vector2(0, -0.5f * Win.gameHeight * data.cellSize)
             );
             if (previewBox.IsExit(data.previewPos, position.height, 0, (position.width - data.inspectorLinePosX), data.fileViewerLinePosX, out Vector2 previewContact))
             {

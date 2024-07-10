@@ -5,6 +5,8 @@ using UnityEngine;
 public class CameraController : MonoBehaviour, IOnScreenResizedReceiver
 {
     public static CameraController instance;
+    static Window Win => Window.instance;
+
     public Camera cam;
     public Vector2 viewSize;
   
@@ -16,17 +18,17 @@ public class CameraController : MonoBehaviour, IOnScreenResizedReceiver
 
     void OnEnable()
     {
-        Window.onScreenResizedRecieverList.Add(this);
+        Win.onScreenResizedRecieverList.Add(this);
     }
     void OnDisable()
     {
-        Window.onScreenResizedRecieverList.Remove(this);
+        Win.onScreenResizedRecieverList.Remove(this);
     }
 
     void OnDrawGizmos()
     {
         Gizmos.color = Color.white;
-        Gizmos.DrawWireCube(new Vector2(0, 0.5f * Window.ScreenHeight), new Vector2(2, Window.ScreenHeight));
+        Gizmos.DrawWireCube(new Vector2(0, 0.5f * Win.screenHeight), new Vector2(2, Win.screenHeight));
     }
     void OnValidate()
     {
@@ -34,11 +36,11 @@ public class CameraController : MonoBehaviour, IOnScreenResizedReceiver
     }
     public void OnScreenResized()
     {
-        if (Window.isDriveHeight)
+        if (Win.isDriveHeight)
         {
-            viewSize = new Vector2(Window.ScreenHeight / Window.windowRatio, Window.ScreenHeight);
+            viewSize = new Vector2(Win.screenHeight / Win.windowRatio, Win.screenHeight);
         }
-        else viewSize = new Vector2(Window.ScreenWidth, Window.ScreenWidth * Window.windowRatio);
+        else viewSize = new Vector2(Win.screenWidth, Win.screenWidth * Win.windowRatio);
         cam.transform.position = cam.transform.position.GetSetY(0.5f * viewSize.y);
         cam.orthographicSize = 0.5f * viewSize.y;
     }
