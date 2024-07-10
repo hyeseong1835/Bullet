@@ -47,4 +47,6 @@ public class StageEditorSetting : ScriptableObject
 
     public SquareColor selectBoxColor;
     public Color selectHideInHeaderColor;
+
+    public SquareColor floatingAreaBackGroundColor;
 }

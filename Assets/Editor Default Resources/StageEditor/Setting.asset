@@ -58,3 +58,6 @@ MonoBehaviour:
     face: {r: 1, g: 1, b: 1, a: 0.19607843}
     outline: {r: 1, g: 1, b: 1, a: 1}
   selectHideInHeaderColor: {r: 0, g: 0, b: 0, a: 0}
+  floatingAreaBackGroundColor:
+    face: {r: 0.078431375, g: 0.078431375, b: 0.078431375, a: 1}
+    outline: {r: 0, g: 0, b: 0, a: 1}

@@ -10,11 +10,6 @@ public abstract class Bullet : MonoBehaviour
     public Rigidbody2D rigid;
     public Collider2D coll;
 
-#if UNITY_EDITOR
-    enum BulletType { Player, Enemy }
-    [SerializeField] BulletType bulletType = BulletType.Enemy;
-#endif
-
     Action<Bullet> updateEvent;
     Action<Bullet> destroyEvent;
 
@@ -22,17 +17,6 @@ public abstract class Bullet : MonoBehaviour
     Action<Bullet, Collider2D> stayEvent;
     Action<Bullet, Collider2D> exitEvent;
 
-    void OnValidate()
-    {
-        if (bulletType == BulletType.Player) gameObject.layer = LayerMask.NameToLayer("PlayerBullet");
-        else if (bulletType == BulletType.Enemy) gameObject.layer = LayerMask.NameToLayer("EnemyBullet");
-
-        if (rigid == null) rigid = GetComponent<Rigidbody2D>();
-        rigid.bodyType = RigidbodyType2D.Kinematic;
-
-        if (coll == null) coll = GetComponent<CircleCollider2D>();
-        coll.isTrigger = true;
-    }
     public void Initialize(
         Action<Bullet> updateEvent = null,
         Action<Bullet> destroyEvent = null,

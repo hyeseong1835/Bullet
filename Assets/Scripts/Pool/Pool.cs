@@ -101,8 +101,7 @@ public class Pool
         {
             if (gameObject == null)
             {
-                Debug.LogWarning("Pool has null element");
-                objects.Remove(gameObject);
+                Debug.LogError("Pool has null element");
                 continue;
             }
             if (gameObject.activeInHierarchy == false)

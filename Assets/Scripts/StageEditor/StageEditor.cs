@@ -27,6 +27,8 @@ public class StageEditor : EditorWindow
 
     PreviewRenderUtility previewRender;
     Texture2D prefabPreview;
+
+    FloatingAreaManager floatingArea;
     
     enum HoldType
     {
@@ -59,6 +61,7 @@ public class StageEditor : EditorWindow
         setting = (StageEditorSetting)EditorResources.Load<ScriptableObject>("StageEditor/Setting.asset");
     
         wantsMouseEnterLeaveWindow = true;
+        floatingArea = new FloatingAreaManager();
     }
 
     #endregion
@@ -68,7 +71,8 @@ public class StageEditor : EditorWindow
         #region Init
 
         Handles.color = Color.white;
-        
+        floatingArea.backGroundColor = setting.floatingAreaBackGroundColor;
+
 #if UNITY_EDITOR
         if (EditorApplication.isPlaying)
         {
@@ -82,6 +86,8 @@ public class StageEditor : EditorWindow
 
         #endregion
 
+        floatingArea.EventListen(e);
+
         RefreshPreviewRect();
         DrawPreview();
 
@@ -92,6 +98,8 @@ public class StageEditor : EditorWindow
 
         if (data.fileViewerLinePosX != 0) DrawFileViewerGUI();
         if (data.inspectorLinePosX != 0) DrawInspectorGUI();
+
+        floatingArea.Draw();
 
         if (position.width != prevScreenWidth)
         {
@@ -187,7 +195,17 @@ public class StageEditor : EditorWindow
                 DrawDebug();
 
                 DrawStageSelect();
+                bool createButtonDown = GUILayout.Button("Create");
+                if (e.type == EventType.Repaint) floatingArea.SetRect(GUILayoutUtility.GetLastRect().GetAddPos(area.position.GetAddY(5 - data.enemyScroll)));
 
+                if (createButtonDown)
+                {
+                    if (floatingArea.area == null)
+                    {
+                        floatingArea.Create(new CreateNewEnemyFloatingArea());
+                    }
+                    else floatingArea.Destroy();
+                }
                 DrawSpawnDataSelect();
 
 
