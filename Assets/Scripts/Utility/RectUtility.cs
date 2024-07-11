@@ -5,6 +5,8 @@ using UnityEngine.UIElements;
 
 public static class RectUtility
 {
+    public static Vector2 GetCenter(this Rect rect) => rect.position + 0.5f * rect.size;
+
     #region Set
 
     #region Position

@@ -914,7 +914,7 @@ MonoBehaviour:
   screenRect: {fileID: 229016481}
   gameRect: {fileID: 832406927}
   canvasScaler: {fileID: 413152972}
-  windowRatio: 0.8333333
+  windowRatio: 0.97151
   screenHeight: 5
   screenWidth: 6
   screenRatio: 0.8333333
@@ -930,7 +930,7 @@ MonoBehaviour:
   gameRight: 2
   gameLeft: -2
   scaleFactor: 1024
-  pixelPerUnit: 360
+  pixelPerUnit: 175.5
   isDriveHeight: 0
 --- !u!1 &416056629
 GameObject:
@@ -3321,7 +3321,7 @@ MonoBehaviour:
   m_MinValue: 0
   m_MaxValue: 1
   m_WholeNumbers: 0
-  m_Value: 0.3
+  m_Value: 0
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
