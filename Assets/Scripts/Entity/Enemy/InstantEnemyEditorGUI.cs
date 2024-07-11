@@ -6,6 +6,17 @@ using UnityEngine;
 public class InstantEnemyEditorGUI : EnemyEditorGUI
 {
     static Event e => UnityEngine.Event.current;
+
+    public override void OnSelected(EditorEnemyData enemyData)
+    {
+        GameObject obj = StageEditor.data.previewRender.InstantiatePrefabInScene(enemyData.prefab);
+        obj.transform.position = ((InstantEnemySpawnData)(enemyData.spawnData)).startPos;
+    }
+    public override void OnDeSelected(EditorEnemyData enemyData)
+    {
+        StageEditor.DestroyImmediate(enemyData.prefab);
+    }
+
     public override void Event()
     {
         switch (e.type)
@@ -44,7 +55,6 @@ public class InstantEnemyEditorGUI : EnemyEditorGUI
 
         }
     }
-    
     public override void DrawInspectorGUI(EditorEnemyData enemyData)
     {
         InstantEnemySpawnData data = (InstantEnemySpawnData)enemyData.spawnData;
@@ -61,10 +71,6 @@ public class InstantEnemyEditorGUI : EnemyEditorGUI
         Vector2 endScreenPos = StageEditor.WorldToScreenPos(data.endPos);
 
         Handles.color = Color.cyan;
-        Handles.DrawWireDisc(startScreenPos, Vector3.forward, 10);
-
-        Handles.DrawLine(startScreenPos, endScreenPos);
-        
         CustomGUI.DrawArrow(startScreenPos, endScreenPos, 0.25f * Mathf.PI, 25);
         Handles.color = Color.white;
     }
@@ -92,10 +98,6 @@ public class InstantEnemyEditorGUI : EnemyEditorGUI
         Vector2 endScreenPos = StageEditor.WorldToScreenPos(data.endPos);
 
         Handles.color = new Color(0, 0.25f, 0.25f, 1);
-        Handles.DrawWireDisc(startScreenPos, Vector3.forward, 10);
-
-        Handles.DrawLine(startScreenPos, endScreenPos);
-
         CustomGUI.DrawArrow(startScreenPos, endScreenPos, 0.25f * Mathf.PI, 25);
         Handles.color = Color.white;
     }

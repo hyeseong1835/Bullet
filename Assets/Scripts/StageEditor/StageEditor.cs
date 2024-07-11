@@ -49,26 +49,8 @@ public class StageEditor : EditorWindow
         instance.Show();
     }
 
-    private PreviewRenderUtility previewRender;
     private Texture _outputTexture;
 
-    private RenderTexture CreatePreviewTexture(GameObject obj)
-    {
-        previewRender.BeginPreview(previewRect, GUIStyle.none);
-
-        previewRender.lights[0].transform.localEulerAngles = new Vector3(30, 30, 0);
-        previewRender.lights[0].intensity = 2;
-
-        previewRender.AddSingleGO(obj);
-        previewRender.camera.Render();
-
-        return (RenderTexture)previewRender.EndPreview();
-    }
-
-    private void OnDisable()
-    {
-        previewRender.Cleanup();
-    }
     void OnValidate()
     {
         instance = this;
@@ -80,36 +62,6 @@ public class StageEditor : EditorWindow
     
         wantsMouseEnterLeaveWindow = true;
         floatingArea = new FloatingAreaManager();
-
-        if (previewRender != null)
-            previewRender.Cleanup();
-
-        previewRender = new PreviewRenderUtility(true);
-
-        System.GC.SuppressFinalize(previewRender);
-
-        var camera = previewRender.camera;
-        Camera gameCam = CameraController.instance.cam;
-        camera.orthographic = gameCam.orthographic;
-        camera.orthographicSize = 1;
-
-        camera.transform.rotation = gameCam.transform.rotation;
-        
-        camera.clearFlags = gameCam.clearFlags;
-        camera.backgroundColor = setting.previewBackGroundColor;
-        camera.cullingMask = gameCam.cullingMask;
-        
-        camera.fieldOfView = gameCam.fieldOfView;
-        
-        camera.nearClipPlane = gameCam.nearClipPlane;
-        
-        camera.farClipPlane = gameCam.farClipPlane;
-        
-
-        //var obj = GameObject.CreatePrimitive(PrimitiveType.Cube);
-        //obj.transform.position = new Vector3(0, 2.5f, 0);
-        //_outputTexture = CreatePreviewTexture(obj);
-        //DestroyImmediate(obj);
     }
 
     #endregion
@@ -137,6 +89,10 @@ public class StageEditor : EditorWindow
         floatingArea.EventListen(e);
 
         RefreshPreviewRect();
+        if (data.previewRender == null)
+        {
+            data.PreviewInit();
+        }
         DrawPreview();
 
         Input();
@@ -699,14 +655,9 @@ public class StageEditor : EditorWindow
         {
             //CustomGUI.DrawSquare(previewRect, setting.previewBackGroundColor);
             
-            if (e.type == EventType.Repaint && previewRender != null)
+            if (e.type == EventType.Repaint)
             {
-                previewRender.camera.transform.position = ((Vector3)ScreenToWorldPoint(previewRect.GetCenter())).GetSetZ(-10);
-                previewRender.camera.orthographicSize = 0.5f * (previewRect.height / data.cellSize);
-
-                var obj = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                obj.transform.position = new Vector3(0, 2.5f, 0);
-                _outputTexture = CreatePreviewTexture(obj);
+                _outputTexture = data.CreatePreviewTexture();
             }
             if (_outputTexture != null)
                 GUI.DrawTexture(previewRect, _outputTexture);
@@ -732,6 +683,7 @@ public class StageEditor : EditorWindow
                     EditorEnemyData enemyData = data.enemyList[i];
                     if (data.selectedEnemyData.spawnData.spawnTime == enemyData.spawnData.spawnTime)
                     {
+                        data.DrawEnemyPreview(enemyData);
                         enemyData.editorGUI.DrawSameTimeEnemyDataGizmos(enemyData);
                     }
                     else break;
@@ -741,10 +693,12 @@ public class StageEditor : EditorWindow
                     EditorEnemyData enemyData = data.enemyList[i];
                     if (data.selectedEnemyData.spawnData.spawnTime == enemyData.spawnData.spawnTime)
                     {
+                        data.DrawEnemyPreview(enemyData);
                         enemyData.editorGUI.DrawSameTimeEnemyDataGizmos(enemyData);
                     }
                     else break;
                 }
+                data.DrawEnemyPreview(data.selectedEnemyData);
                 data.selectedEnemyData.editorGUI.DrawSelectedEnemyDataGizmos(data.selectedEnemyData);
             }
         }
@@ -1072,22 +1026,11 @@ public class StageEditor : EditorWindow
         #endregion
     }
 
-    bool FileViewerWindowCheck()
-    {
-        float fileViewerLineMax = position.width - (data.inspectorLinePosX + setting.minDistanceBetweenLines);
-
-        return data.fileViewerLinePosX <= fileViewerLineMax;
-    }
     bool FileViewerWindowCheck(out float fileViewerLineMax)
     {
         fileViewerLineMax = position.width - (data.inspectorLinePosX + setting.minDistanceBetweenLines);
 
         return data.fileViewerLinePosX <= fileViewerLineMax;
-    }
-    bool InspectorWindowCheck()
-    {
-        float inspectorLineMax = position.width - (data.fileViewerLinePosX + setting.minDistanceBetweenLines);
-        return data.inspectorLinePosX <= inspectorLineMax;
     }
     bool InspectorWindowCheck(out float inspectorLineMax)
     {

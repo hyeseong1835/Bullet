@@ -11,6 +11,8 @@ using UnityEngine.Rendering.Universal;
 [CreateAssetMenu(fileName = "Data", menuName = "StageEditor/Data")]
 public class StageEditorData : ScriptableObject
 {
+    static StageEditor Editor => StageEditor.instance;
+
     public static Dictionary<Type, EnemyEditorGUI> enemyEditorGUIDictionary = new Dictionary<Type, EnemyEditorGUI>();
     public Dictionary<float, bool> timeFoldout { get; private set; } = new Dictionary<float, bool>();
 
@@ -32,6 +34,8 @@ public class StageEditorData : ScriptableObject
     public int prefabLength { get; private set; }
 
     public Vector2 previewPos;
+    
+    public PreviewRenderUtility previewRender;
 
     public float cellSize = 50;
 
@@ -42,6 +46,25 @@ public class StageEditorData : ScriptableObject
     public float timeLength;
 
     public float timeMoveSnap = 0.5f;
+
+    public List<EditorEnemyData> drawEditorEnemyDataList = new List<EditorEnemyData>();
+
+    #region Event
+
+    private void OnEnable()
+    {
+        PreviewInit();
+    }
+    private void OnDisable()
+    {
+        foreach (EditorEnemyData enemyData in drawEditorEnemyDataList)
+        {
+            ExcludeDrawEnemy(enemyData);
+        }
+        previewRender.Cleanup();
+    }
+
+    #endregion
 
     #region Stage
 
@@ -220,6 +243,69 @@ public class StageEditorData : ScriptableObject
             }
         }
         timeFoldout = newTimeFoldout;
+    }
+
+    #endregion
+
+    #region DrawPreview
+
+    public RenderTexture CreatePreviewTexture()
+    {
+        previewRender.camera.transform.position = ((Vector3)StageEditor.ScreenToWorldPoint(Editor.previewRect.GetCenter())).GetSetZ(-10);
+        previewRender.camera.orthographicSize = 0.5f * (Editor.previewRect.height / cellSize);
+
+        previewRender.BeginPreview(Editor.previewRect, GUIStyle.none);
+
+        //previewRender.lights[0].transform.localEulerAngles = new Vector3(30, 30, 0);
+        previewRender.lights[0].intensity = 2;
+
+        previewRender.camera.Render();
+
+        return (RenderTexture)previewRender.EndPreview();
+    }
+    public void PreviewInit()
+    {
+        foreach (EditorEnemyData enemyData in drawEditorEnemyDataList)
+        {
+            ExcludeDrawEnemy(enemyData);
+        }
+
+        if (previewRender != null)
+            previewRender.Cleanup();
+
+        previewRender = new PreviewRenderUtility(true);
+
+        System.GC.SuppressFinalize(previewRender);
+
+        var camera = previewRender.camera;
+        Camera gameCam = CameraController.instance.cam;
+        camera.orthographic = gameCam.orthographic;
+        camera.orthographicSize = 1;
+
+        camera.transform.rotation = gameCam.transform.rotation;
+
+        camera.clearFlags = gameCam.clearFlags;
+        camera.backgroundColor = StageEditor.setting.previewBackGroundColor;
+        camera.cullingMask = gameCam.cullingMask;
+
+        camera.fieldOfView = gameCam.fieldOfView;
+
+        camera.nearClipPlane = gameCam.nearClipPlane;
+
+        camera.farClipPlane = gameCam.farClipPlane;
+    }
+    public void DrawEnemyPreview(EditorEnemyData enemyData)
+    {
+        if (drawEditorEnemyDataList.Contains(enemyData) == false)
+        {
+            enemyData.editorGUI.OnSelected(enemyData);
+            drawEditorEnemyDataList.Add(enemyData);
+        }
+    }
+    public void ExcludeDrawEnemy(EditorEnemyData enemyData)
+    {
+        enemyData.editorGUI.OnDeSelected(enemyData);
+        drawEditorEnemyDataList.Remove(enemyData);
     }
 
     #endregion
