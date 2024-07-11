@@ -7,7 +7,6 @@ using UnityEngine.UIElements;
 public class FloatingAreaManager
 {
     public FloatingArea area;
-    public SquareColor backGroundColor;
     public Vector2 position;
     public float width;
     public Rect rect;
@@ -57,6 +56,8 @@ public class FloatingAreaManager
 public abstract class FloatingArea
 {
     public FloatingAreaManager manager;
+    public SquareColor backGroundColor = new SquareColor(Color.black, Color.white);
+    
     public abstract float GetHeight();
 
     public abstract void EventListen(Event e);
@@ -66,7 +67,7 @@ public abstract class FloatingArea
     public virtual void CreateField()
     {
         GUI.SetNextControlName("FloatingArea");
-        CustomGUI.DrawSquare(manager.rect, manager.backGroundColor);
+        CustomGUI.DrawSquare(manager.rect, backGroundColor);
     }
     public virtual void OnCreated()
     {

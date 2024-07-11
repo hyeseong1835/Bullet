@@ -71,7 +71,7 @@ public class StageEditor : EditorWindow
         #region Init
 
         Handles.color = Color.white;
-        floatingArea.backGroundColor = setting.floatingAreaBackGroundColor;
+        if(floatingArea.area != null) floatingArea.area.backGroundColor = setting.floatingAreaBackGroundColor;
 
 #if UNITY_EDITOR
         if (EditorApplication.isPlaying)
