@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.IO;
 using Unity.VisualScripting;
 using UnityEditor;
@@ -6,15 +7,20 @@ using UnityEngine;
 public class InstantEnemyEditorGUI : EnemyEditorGUI
 {
     static Event e => UnityEngine.Event.current;
+    Dictionary<EditorEnemyData, GameObject> instance = new Dictionary<EditorEnemyData, GameObject>();
 
     public override void OnSelected(EditorEnemyData enemyData)
     {
-        GameObject obj = StageEditor.data.previewRender.InstantiatePrefabInScene(enemyData.prefab);
+        GameObject obj = StageEditor.instance.previewRender.InstantiatePrefabInScene(enemyData.prefab);
+        Debug.Log($"Selected: {obj.name}#{obj.GetHashCode()}");
+        instance.Add(enemyData, obj);
         obj.transform.position = ((InstantEnemySpawnData)(enemyData.spawnData)).startPos;
     }
     public override void OnDeSelected(EditorEnemyData enemyData)
     {
-        StageEditor.DestroyImmediate(enemyData.prefab);
+        Debug.Log($"DeSelected: {instance[enemyData].name}#{instance[enemyData].GetHashCode()}");
+        Object.DestroyImmediate(instance[enemyData]);
+        instance.Remove(enemyData);
     }
 
     public override void Event()

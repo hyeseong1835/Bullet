@@ -55,10 +55,15 @@ public class PlayerController : Entity
         {
             Key();
 
-            if (moveInput != Vector2.zero)
+            if (moveInput == Vector2.zero)
             {
-                Move();
+                grafic.rotation = Quaternion.Euler(0, 0, -Mathf.Atan2(toMouse.x, toMouse.y) * Mathf.Rad2Deg);
+            }
+            else 
+            {
                 lastMoveInput = moveInput;
+                
+                Move();
             }
             if (Input.GetMouseButtonDown(1))
             {
@@ -88,8 +93,6 @@ public class PlayerController : Entity
         
         foreach (RaycastHit2D hitInfo in Physics2D.CircleCastAll(transform.position, coll.radius, toMouse, toMouse.magnitude, Physics2D.GetLayerCollisionMask(LayerMask.NameToLayer("Player"))))
         {
-            Debug.Log($"{LayerMask.LayerToName(hitInfo.collider.gameObject.layer)}: {hitInfo.collider.gameObject.name}");
-            
             switch (hitInfo.collider.gameObject.layer)
             {
                 case 20:

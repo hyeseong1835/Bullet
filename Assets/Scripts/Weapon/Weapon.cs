@@ -6,7 +6,7 @@ public abstract class Weapon : MonoBehaviour
 {
     public abstract WeaponData WeaponData { get; }
     public bool canUse = true;
-
+    
     public virtual bool TryUse()
     {
         if (canUse)

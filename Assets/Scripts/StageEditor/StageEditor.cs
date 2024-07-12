@@ -9,6 +9,7 @@ using UnityEditor;
 using UnityEditor.Experimental;
 using UnityEngine;
 
+[InitializeOnLoad]
 public class StageEditor : EditorWindow
 {
     public static StageEditor instance;
@@ -26,45 +27,133 @@ public class StageEditor : EditorWindow
     public float playTime = -1;
 
     FloatingAreaManager floatingArea;
-    
-    enum HoldType
-    {
-        None,
-        Preview,
-        FileViewerLine,
-        InspectorLine
-    }
+    public Dictionary<Type, EnemyEditorGUI> enemyEditorGUIDictionary = new Dictionary<Type, EnemyEditorGUI>();
+
+    public float enemyScroll;
+
+    enum HoldType { None, Preview, FileViewerLine, InspectorLine }
     HoldType hold = HoldType.None;
 
     Vector2 offset;
     float prevScreenWidth;
 
+    public PreviewRenderUtility previewRender = null;
+
     #region Event
+
+    static StageEditor()
+    {
+        Debug.Log("Initialize");
+        
+        EditorApplication.wantsToQuit += OnQuit;
+    }
 
     [MenuItem("Window/StageEditor")]
     public static void CreateWindow()
     {
+        Debug.Log("Create");
+
         instance = (StageEditor)GetWindow(typeof(StageEditor));
 
         instance.Show();
     }
 
-    private Texture _outputTexture;
+    Texture _outputTexture;
 
+    static bool OnQuit()
+    {
+        Debug.Log("Quit");
+
+        data.SelectEnemyData(-1);
+
+        return true;
+    }
     void OnValidate()
     {
+        Debug.Log("Validate");
+        
         instance = this;
     }
     void OnEnable()
     {
+        Debug.Log("Enable");
+        
         data = (StageEditorData)EditorResources.Load<ScriptableObject>("StageEditor/Data.asset");
         setting = (StageEditorSetting)EditorResources.Load<ScriptableObject>("StageEditor/Setting.asset");
     
         wantsMouseEnterLeaveWindow = true;
         floatingArea = new FloatingAreaManager();
+
+        PreviewInit();
+    }
+
+    private void OnDisable()
+    {
+        Debug.Log("Disable");
+
+        ClearPreview();
     }
 
     #endregion
+    public EnemyEditorGUI GetEnemyEditor(EnemySpawnData spawnData) => GetEnemyEditor(spawnData.EditorType);
+    public EnemyEditorGUI GetEnemyEditor(Type editorType)
+    {
+        EnemyEditorGUI editorInstance;
+
+        if (enemyEditorGUIDictionary.TryGetValue(editorType, out editorInstance) == false)
+        {
+            editorInstance = (EnemyEditorGUI)Activator.CreateInstance(editorType);
+            enemyEditorGUIDictionary.Add(editorType, editorInstance);
+        }
+        return editorInstance;
+    }
+    #region DrawPreview
+
+    public void ClearPreview()
+    {
+        data.SelectEnemyData(-1);
+        previewRender.Cleanup();
+    }
+    public RenderTexture CreatePreviewTexture(Rect rect)
+    {
+        previewRender.camera.transform.position = ((Vector3)StageEditor.ScreenToWorldPoint(rect.GetCenter())).GetSetZ(-10);
+        previewRender.camera.orthographicSize = 0.5f * (rect.height / data.cellSize);
+
+        previewRender.BeginPreview(rect, GUIStyle.none);
+
+        //previewRender.lights[0].transform.localEulerAngles = new Vector3(30, 30, 0);
+        previewRender.lights[0].intensity = 2;
+
+        previewRender.camera.Render();
+
+        return (RenderTexture)previewRender.EndPreview();
+    }
+    public void PreviewInit()
+    {
+        if (previewRender != null) ClearPreview();
+
+        previewRender = new PreviewRenderUtility(true);
+
+        GC.SuppressFinalize(previewRender);
+
+        var camera = previewRender.camera;
+        Camera gameCam = CameraController.instance.cam;
+        camera.orthographic = gameCam.orthographic;
+        camera.orthographicSize = 1;
+
+        camera.transform.rotation = gameCam.transform.rotation;
+
+        camera.clearFlags = gameCam.clearFlags;
+        camera.backgroundColor = StageEditor.setting.previewBackGroundColor;
+        camera.cullingMask = gameCam.cullingMask;
+
+        camera.fieldOfView = gameCam.fieldOfView;
+        camera.nearClipPlane = gameCam.nearClipPlane;
+        camera.farClipPlane = gameCam.farClipPlane;
+    }
+
+    #endregion
+
 
     void OnGUI()
     {
@@ -92,10 +181,6 @@ public class StageEditor : EditorWindow
         
         if(previewRect.width != 0)
         {
-            if (data.previewRender == null)
-            {
-                data.PreviewInit();
-            }
             DrawPreview();
         }
 
@@ -163,7 +248,7 @@ public class StageEditor : EditorWindow
             );
             GUILayout.BeginArea(area);
             {
-                data.enemyScroll = EditorGUILayout.BeginScrollView(new Vector2(0, data.enemyScroll), false, true, GUIStyle.none, GUI.skin.verticalScrollbar, GUIStyle.none).y;
+                enemyScroll = EditorGUILayout.BeginScrollView(new Vector2(0, enemyScroll), false, true, GUIStyle.none, GUI.skin.verticalScrollbar, GUIStyle.none).y;
                 area.width -= 15;
                 {
                     EditorGUILayout.BeginHorizontal();
@@ -204,7 +289,7 @@ public class StageEditor : EditorWindow
 
                 DrawStageSelect();
                 bool createButtonDown = GUILayout.Button("Create");
-                if (e.type == EventType.Repaint) floatingArea.SetRect(GUILayoutUtility.GetLastRect().GetAddPos(area.position.GetAddY(5 - data.enemyScroll)));
+                if (e.type == EventType.Repaint) floatingArea.SetRect(GUILayoutUtility.GetLastRect().GetAddPos(area.position.GetAddY(5 - enemyScroll)));
 
                 if (createButtonDown)
                 {
@@ -403,6 +488,7 @@ public class StageEditor : EditorWindow
                         {
                             data.RefreshStageArray();
                             data.RefreshTimeFoldout();
+                            data.SelectEnemyData(-1);
                         }
                     }
                     GUILayout.EndHorizontal();
@@ -550,8 +636,7 @@ public class StageEditor : EditorWindow
 
                             if (GUI.Button(GUILayoutUtility.GetRect(setting.buttonWidth, setting.buttonHeight, GUILayout.ExpandWidth(false)).GetAddY(2), "Select"))
                             {
-                                GUI.FocusControl(null);
-                                data.SelectEnemyData(i);
+                                SelectEnemyData(i);
                             }
 
                             ShowHasData(enemyData, objectRect);
@@ -592,7 +677,7 @@ public class StageEditor : EditorWindow
             void SelectEnemyData(int index)
             {
                 GUI.FocusControl(null);
-                data.SelectEnemyData(index);
+                if (data.selectedEnemyDataIndex != index) data.SelectEnemyData(index);
             }
         }
 
@@ -657,11 +742,9 @@ public class StageEditor : EditorWindow
         
         void DrawPreview()
         {
-            //CustomGUI.DrawSquare(previewRect, setting.previewBackGroundColor);
-            
-            if (e.type == EventType.Repaint)
+            if (e.type == EventType.Repaint && previewRect.width > 0 && previewRect.height > 0)
             {
-                _outputTexture = data.CreatePreviewTexture();
+                _outputTexture = CreatePreviewTexture(previewRect);
             }
             if (_outputTexture != null)
                 GUI.DrawTexture(previewRect, _outputTexture);
@@ -675,34 +758,17 @@ public class StageEditor : EditorWindow
             CustomGUI.DrawOpenGrid(start + offset - data.cellSize * Vector2.one, cellCount, data.cellSize, setting.previewOutGridColor);
             CustomGUI.DrawCloseGrid(data.previewPos + data.cellSize * new Vector2(-0.5f * Win.gameWidth, -Win.gameHeight), new Vector2Int(Win.gameWidth, Win.gameHeight), data.cellSize, setting.previewGameGridColor);
 
-            if (data.selectedEnemyData != null && data.selectedEnemyData.editorGUI != null)
+            if (data.selectedEnemyData != null)
             {
                 DrawEnemyGizmos();
                 DrawTimeLine();
             }
             void DrawEnemyGizmos()
             {
-                for (int i = data.selectedEnemyDataIndex + 1; i < data.enemyList.Count; i++)
+                foreach(EditorEnemyData editorEnemyData in data.sameTimeEnemyList)
                 {
-                    EditorEnemyData enemyData = data.enemyList[i];
-                    if (data.selectedEnemyData.spawnData.spawnTime == enemyData.spawnData.spawnTime)
-                    {
-                        data.DrawEnemyPreview(enemyData);
-                        enemyData.editorGUI.DrawSameTimeEnemyDataGizmos(enemyData);
-                    }
-                    else break;
+                    editorEnemyData.editorGUI.DrawSameTimeEnemyDataGizmos(editorEnemyData);
                 }
-                for (int i = data.selectedEnemyDataIndex - 1; i >= 0; i--)
-                {
-                    EditorEnemyData enemyData = data.enemyList[i];
-                    if (data.selectedEnemyData.spawnData.spawnTime == enemyData.spawnData.spawnTime)
-                    {
-                        data.DrawEnemyPreview(enemyData);
-                        enemyData.editorGUI.DrawSameTimeEnemyDataGizmos(enemyData);
-                    }
-                    else break;
-                }
-                data.DrawEnemyPreview(data.selectedEnemyData);
                 data.selectedEnemyData.editorGUI.DrawSelectedEnemyDataGizmos(data.selectedEnemyData);
             }
         }
@@ -875,12 +941,12 @@ public class StageEditor : EditorWindow
                         case KeyCode.Comma:
                             if (data.selectedEnemyData != null && 0 < data.selectedEnemyData.spawnData.spawnTime)
                             { 
-                                data.selectedEnemyData.spawnData.spawnTime -= data.timeMoveSnap;
+                                data.selectedEnemyData.spawnData.spawnTime -= setting.timeMoveSnap;
                                 if (data.selectedEnemyData.spawnData.spawnTime < 0)
                                 {
                                     data.selectedEnemyData.spawnData.spawnTime = 0;
                                 }
-                                else data.selectedEnemyData.spawnData.spawnTime = Mathf.Ceil(data.selectedEnemyData.spawnData.spawnTime / data.timeMoveSnap) * data.timeMoveSnap;
+                                else data.selectedEnemyData.spawnData.spawnTime = Mathf.Ceil(data.selectedEnemyData.spawnData.spawnTime / setting.timeMoveSnap) * setting.timeMoveSnap;
                                 
                                 data.SortSelectedEnemyData();
                                 Repaint();
@@ -889,8 +955,8 @@ public class StageEditor : EditorWindow
                         case KeyCode.Period:
                             if (data.selectedEnemyData != null)
                             {
-                                data.selectedEnemyData.spawnData.spawnTime += data.timeMoveSnap;
-                                data.selectedEnemyData.spawnData.spawnTime = Mathf.Floor(data.selectedEnemyData.spawnData.spawnTime / data.timeMoveSnap) * data.timeMoveSnap;
+                                data.selectedEnemyData.spawnData.spawnTime += setting.timeMoveSnap;
+                                data.selectedEnemyData.spawnData.spawnTime = Mathf.Floor(data.selectedEnemyData.spawnData.spawnTime / setting.timeMoveSnap) * setting.timeMoveSnap;
                                 
                                 if (data.selectedEnemyData.spawnData.spawnTime > data.timeLength)
                                 {

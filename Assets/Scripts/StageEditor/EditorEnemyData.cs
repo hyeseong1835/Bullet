@@ -31,7 +31,7 @@ public class EditorEnemyData
 
     public EnemyEditorGUI SetEditorGUI()
     {
-        unSafeEditorGUI = StageEditor.data.GetEnemyEditor(spawnData.EditorType);
+        unSafeEditorGUI = StageEditor.instance.GetEnemyEditor(spawnData.EditorType);
 
         return unSafeEditorGUI;
     }

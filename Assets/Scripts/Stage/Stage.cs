@@ -47,7 +47,7 @@ public class Stage : ScriptableObject
 
 #if UNITY_EDITOR
             StageEditor.instance.playTime = data.spawnTime;
-            StageEditor.data.SelectEnemySpawnData(data);
+            StageEditor.data.SelectEnemyData(data);
 #endif
             
             GameObject enemyObj = enemyPool[data.prefabTypeIndex][data.prefabIndex].Get();

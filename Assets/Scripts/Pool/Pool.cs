@@ -45,8 +45,8 @@ public class Pool
     public int startCount;
     public int stayCount;
 
-    [HideInInspector] public List<GameObject> objects = new List<GameObject>();
-    [HideInInspector] public List<WaitDestroyElement> waitDestroy = new List<WaitDestroyElement>();//-|
+    [HideInInspector] public List<GameObject> objects;
+    [HideInInspector] public List<WaitDestroyElement> waitDestroy;//-|
 
     [SerializeField] Action<GameObject> addEvent;
 
@@ -67,23 +67,25 @@ public class Pool
             holder = new GameObject(prefab.name).transform;
             holder.SetParent(PoolHolder.instance.transform);
         }
-        if (objects != null)
+        if (objects == null) objects = new List<GameObject>();
+        else
         {
             foreach (GameObject obj in objects)
             {
                 if (obj != null) UnityEngine.Object.Destroy(obj);
             }
+            objects.Clear();
         }
-        objects = new List<GameObject>();
 
-        if (waitDestroy != null)
+        if (waitDestroy == null) waitDestroy = new List<WaitDestroyElement>();
+        else
         {
             foreach (WaitDestroyElement element in waitDestroy)
-            {
+            { 
                 if (element.obj != null) UnityEngine.Object.Destroy(element.obj);
             }
+            waitDestroy.Clear();
         }
-        waitDestroy = new List<WaitDestroyElement>();
         
         
         
@@ -97,16 +99,18 @@ public class Pool
     public GameObject Get()
     {
         //비활성화 오브젝트 찾기
-        foreach (GameObject gameObject in objects)
+        for (int i = objects.Count - 1; i >= 0; i--)
         {
-            if (gameObject == null)
+            GameObject obj = objects[i];
+            if (obj == null)
             {
                 Debug.LogError("Pool has null element");
+                objects.RemoveAt(i);
                 continue;
             }
-            if (gameObject.activeInHierarchy == false)
+            if (obj.activeInHierarchy == false)
             {
-                return gameObject;
+                return obj;
             }
         }
         //파괴 예정 오브젝트가 있을 때

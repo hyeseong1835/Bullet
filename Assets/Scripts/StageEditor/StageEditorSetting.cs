@@ -49,4 +49,6 @@ public class StageEditorSetting : ScriptableObject
     public Color selectHideInHeaderColor;
 
     public SquareColor floatingAreaBackGroundColor;
+
+    public float timeMoveSnap = 0.5f;
 }

@@ -11,9 +11,6 @@ using UnityEngine.Rendering.Universal;
 [CreateAssetMenu(fileName = "Data", menuName = "StageEditor/Data")]
 public class StageEditorData : ScriptableObject
 {
-    static StageEditor Editor => StageEditor.instance;
-
-    public static Dictionary<Type, EnemyEditorGUI> enemyEditorGUIDictionary = new Dictionary<Type, EnemyEditorGUI>();
     public Dictionary<float, bool> timeFoldout { get; private set; } = new Dictionary<float, bool>();
 
     //Stage
@@ -25,6 +22,8 @@ public class StageEditorData : ScriptableObject
     public EditorEnemyData selectedEnemyData { get; private set; }
     public int selectedEnemyDataIndex { get; private set; } = -1;
     
+    public List<EditorEnemyData> sameTimeEnemyList { get; private set; } = new List<EditorEnemyData>();
+
     public List<EditorEnemyData> enemyList { get; private set; } = new List<EditorEnemyData>();
 
     //Prefab
@@ -35,33 +34,23 @@ public class StageEditorData : ScriptableObject
 
     public Vector2 previewPos;
     
-    public PreviewRenderUtility previewRender;
-
     public float cellSize = 50;
 
-    public float inspectorLinePosX;
-    public float fileViewerLinePosX;
+    public float inspectorLinePosX = 0;
+    public float fileViewerLinePosX = 0;
 
-    public float enemyScroll;
     public float timeLength;
 
-    public float timeMoveSnap = 0.5f;
-
-    public List<EditorEnemyData> drawEditorEnemyDataList = new List<EditorEnemyData>();
 
     #region Event
 
     private void OnEnable()
     {
-        PreviewInit();
+
     }
     private void OnDisable()
     {
-        foreach (EditorEnemyData enemyData in drawEditorEnemyDataList)
-        {
-            ExcludeDrawEnemy(enemyData);
-        }
-        previewRender.Cleanup();
+        
     }
 
     #endregion
@@ -246,74 +235,13 @@ public class StageEditorData : ScriptableObject
     }
 
     #endregion
-
-    #region DrawPreview
-
-    public RenderTexture CreatePreviewTexture()
-    {
-        previewRender.camera.transform.position = ((Vector3)StageEditor.ScreenToWorldPoint(Editor.previewRect.GetCenter())).GetSetZ(-10);
-        previewRender.camera.orthographicSize = 0.5f * (Editor.previewRect.height / cellSize);
-
-        previewRender.BeginPreview(Editor.previewRect, GUIStyle.none);
-
-        //previewRender.lights[0].transform.localEulerAngles = new Vector3(30, 30, 0);
-        previewRender.lights[0].intensity = 2;
-
-        previewRender.camera.Render();
-
-        return (RenderTexture)previewRender.EndPreview();
-    }
-    public void PreviewInit()
-    {
-        foreach (EditorEnemyData enemyData in drawEditorEnemyDataList)
-        {
-            ExcludeDrawEnemy(enemyData);
-        }
-
-        if (previewRender != null)
-            previewRender.Cleanup();
-
-        previewRender = new PreviewRenderUtility(true);
-
-        System.GC.SuppressFinalize(previewRender);
-
-        var camera = previewRender.camera;
-        Camera gameCam = CameraController.instance.cam;
-        camera.orthographic = gameCam.orthographic;
-        camera.orthographicSize = 1;
-
-        camera.transform.rotation = gameCam.transform.rotation;
-
-        camera.clearFlags = gameCam.clearFlags;
-        camera.backgroundColor = StageEditor.setting.previewBackGroundColor;
-        camera.cullingMask = gameCam.cullingMask;
-
-        camera.fieldOfView = gameCam.fieldOfView;
-
-        camera.nearClipPlane = gameCam.nearClipPlane;
-
-        camera.farClipPlane = gameCam.farClipPlane;
-    }
-    public void DrawEnemyPreview(EditorEnemyData enemyData)
-    {
-        if (drawEditorEnemyDataList.Contains(enemyData) == false)
-        {
-            enemyData.editorGUI.OnSelected(enemyData);
-            drawEditorEnemyDataList.Add(enemyData);
-        }
-    }
-    public void ExcludeDrawEnemy(EditorEnemyData enemyData)
-    {
-        enemyData.editorGUI.OnDeSelected(enemyData);
-        drawEditorEnemyDataList.Remove(enemyData);
-    }
-
-    #endregion
-
+    
     #region EnemySpawnData
 
-    public int SelectEnemySpawnData(EditorEnemyData data)
+    public int SelectEnemyData(EditorEnemyData data)
     {
+        selectedEnemyData?.editorGUI.OnDeSelected(selectedEnemyData);
+
         if (data == null)
         {
             SelectEnemyData(-1);
@@ -326,10 +254,11 @@ public class StageEditorData : ScriptableObject
             SelectEnemyData(-1);
             return -1;
         }
-        selectedEnemyData = data;
+        SelectEnemyData(enemyList.IndexOf(data));
+        
         return selectedEnemyDataIndex = index;
     }
-    public int SelectEnemySpawnData(EnemySpawnData data)
+    public int SelectEnemyData(EnemySpawnData data)
     {
         int dataIndex = enemyList.TakeWhile((enemy) => enemy.spawnData != data).Count();
         SelectEnemyData(dataIndex);
@@ -339,14 +268,66 @@ public class StageEditorData : ScriptableObject
     {
         if (enemyList == null || index < 0 || enemyList.Count <= index)
         {
-            selectedEnemyData = null;
-            selectedEnemyDataIndex = -1;
+            if (selectedEnemyData != null)
+            {
+                selectedEnemyData.editorGUI.OnDeSelected(selectedEnemyData);
+                selectedEnemyData = null;
+                selectedEnemyDataIndex = -1;
+            }
+
+            foreach (EditorEnemyData editorEnemyData in sameTimeEnemyList)
+            {
+                editorEnemyData.editorGUI.OnDeSelected(editorEnemyData);
+            }
+            sameTimeEnemyList.Clear();
+
+            return null;
         }
-        else
+        float prevSpawnTime = selectedEnemyData?.spawnData.spawnTime ?? -1;
+
+        if (selectedEnemyDataIndex != index)
         {
+            selectedEnemyData?.editorGUI.OnDeSelected(selectedEnemyData);
             selectedEnemyData = enemyList[index];
             selectedEnemyDataIndex = index;
+            selectedEnemyData.editorGUI.OnSelected(selectedEnemyData);
         }
+
+        if (selectedEnemyData.spawnData.spawnTime != prevSpawnTime)
+        {
+            foreach (EditorEnemyData enemyData in sameTimeEnemyList)
+            {
+                if (enemyData.spawnData.spawnTime != selectedEnemyData.spawnData.spawnTime)
+                {
+                    enemyData.editorGUI.OnDeSelected(enemyData);
+                }
+            }
+
+            for (int i = selectedEnemyDataIndex + 1; i < enemyList.Count; i++)
+            {
+                EditorEnemyData enemyData = enemyList[i];
+                if (selectedEnemyData.spawnData.spawnTime == enemyData.spawnData.spawnTime)
+                {
+                    if (sameTimeEnemyList.Contains(enemyData) == false)
+                    {
+                        sameTimeEnemyList.Add(enemyData);
+                        enemyData.editorGUI.OnSelected(enemyData);
+                    }
+                }
+                else break;
+            }
+            for (int i = selectedEnemyDataIndex - 1; i >= 0; i--)
+            {
+                EditorEnemyData enemyData = enemyList[i];
+                if (sameTimeEnemyList.Contains(enemyData) == false)
+                {
+                    sameTimeEnemyList.Add(enemyData);
+                    enemyData.editorGUI.OnSelected(enemyData);
+                }
+                else break;
+            }
+        }
+        
         return selectedEnemyData;
     }
     public int SortSelectedEnemyData()
@@ -393,18 +374,13 @@ public class StageEditorData : ScriptableObject
         
         //selectedStage.enemySpawnData = enemyList.Select((enemy) => enemy.spawnData).ToArray();
     }
-    public EnemyEditorGUI GetEnemyEditor(EnemySpawnData spawnData) => GetEnemyEditor(spawnData.EditorType);
-    public EnemyEditorGUI GetEnemyEditor(Type editorType)
-    {
-        EnemyEditorGUI editorInstance;
+    
 
-        if (enemyEditorGUIDictionary.TryGetValue(editorType, out editorInstance) == false)
-        {
-            editorInstance = (EnemyEditorGUI)Activator.CreateInstance(editorType);
-            enemyEditorGUIDictionary.Add(editorType, editorInstance);
-        }
-        return editorInstance;
-    }
+    #endregion
+
+    #region Preview
+
+    
 
     #endregion
 }
