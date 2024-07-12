@@ -23,7 +23,7 @@ public abstract class Item : MonoBehaviour
             collider.isTrigger = true;
         }
     }
-    void OnTriggerEnter2D(Collider2D collision)
+    public void OnTriggerEnter2D(Collider2D collision)
     {
         OnPickup();
 

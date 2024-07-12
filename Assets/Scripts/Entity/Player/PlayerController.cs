@@ -3,7 +3,7 @@ using UnityEditor;
 using UnityEngine;
 
 [ExecuteAlways]
-[RequireComponent(typeof(Rigidbody2D), typeof(Collider2D))]
+[RequireComponent(typeof(Rigidbody2D), typeof(CircleCollider2D))]
 public class PlayerController : Entity
 {
     public static PlayerController instance;
@@ -17,7 +17,7 @@ public class PlayerController : Entity
     static GameManager Game => GameManager.instance;
 
     [HideInInspector] public Rigidbody2D rigid;
-    [HideInInspector] public Collider2D coll;
+    [HideInInspector] public CircleCollider2D coll;
     [SerializeField] Transform weaponHolder;
     [SerializeField] float speed = 1;
     [SerializeField] float dash = 2;
@@ -40,7 +40,7 @@ public class PlayerController : Entity
 
         instance = this;
         rigid = GetComponent<Rigidbody2D>();
-        coll = GetComponent<Collider2D>();
+        coll = GetComponent<CircleCollider2D>();
     }
     void Update()
     {
@@ -62,7 +62,9 @@ public class PlayerController : Entity
             }
             if (Input.GetMouseButtonDown(1))
             {
-                Dash();
+                if (toMouse.magnitude <= dash) Dash(toMouse);
+                else Dash(toMouse.normalized * dash);
+                
             }
             WallCollide();
             UseWeapon();
@@ -80,12 +82,23 @@ public class PlayerController : Entity
         transform.Translate(moveInput.normalized * speed * Time.deltaTime);
         grafic.rotation = Quaternion.Euler(0, 0, -Mathf.Atan2(moveInput.x, moveInput.y) * Mathf.Rad2Deg);
     }
-    void Dash()
+    void Dash(Vector2 move)
     {
-        if (toMouse.magnitude <= dash) transform.position = mouseWorldPos;
-        else transform.Translate(toMouse.normalized * dash);
-
         grafic.rotation = Quaternion.Euler(0, 0, -Mathf.Atan2(toMouse.x, toMouse.y) * Mathf.Rad2Deg);
+        
+        foreach (RaycastHit2D hitInfo in Physics2D.CircleCastAll(transform.position, coll.radius, toMouse, toMouse.magnitude, Physics2D.GetLayerCollisionMask(LayerMask.NameToLayer("Player"))))
+        {
+            Debug.Log($"{LayerMask.LayerToName(hitInfo.collider.gameObject.layer)}: {hitInfo.collider.gameObject.name}");
+            
+            switch (hitInfo.collider.gameObject.layer)
+            {
+                case 20:
+                    hitInfo.collider.GetComponent<Item>().OnTriggerEnter2D(coll);
+                    break;
+            }    
+        }
+        
+        transform.Translate(move);
     }
     void WallCollide()
     {

@@ -2120,6 +2120,7 @@ MonoBehaviour:
   coll: {fileID: 975585799}
   weaponHolder: {fileID: 699863005}
   speed: 2.5
+  dash: 2
   moveLock:
     size: {x: 0.5, y: 0.5}
     center: {x: 0, y: 0.1}
@@ -2222,7 +2223,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 126457917473087771, guid: 1ba181bf0a4154a41b1ee34b42cea96d, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: 0.1
       objectReference: {fileID: 0}
     - target: {fileID: 126457917473087771, guid: 1ba181bf0a4154a41b1ee34b42cea96d, type: 3}
       propertyPath: m_LocalPosition.z
@@ -3849,7 +3850,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8532601136008918798, guid: 1ebba1f360ac6534393bdb7f6e0230c1, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: 0.1
       objectReference: {fileID: 0}
     - target: {fileID: 8532601136008918798, guid: 1ebba1f360ac6534393bdb7f6e0230c1, type: 3}
       propertyPath: m_LocalPosition.z
