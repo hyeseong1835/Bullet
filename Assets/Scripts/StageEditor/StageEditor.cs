@@ -89,11 +89,15 @@ public class StageEditor : EditorWindow
         floatingArea.EventListen(e);
 
         RefreshPreviewRect();
-        if (data.previewRender == null)
+        
+        if(previewRect.width != 0)
         {
-            data.PreviewInit();
+            if (data.previewRender == null)
+            {
+                data.PreviewInit();
+            }
+            DrawPreview();
         }
-        DrawPreview();
 
         Input();
         

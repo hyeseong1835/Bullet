@@ -18,8 +18,9 @@ public class PlayerController : Entity
 
     [HideInInspector] public Rigidbody2D rigid;
     [HideInInspector] public Collider2D coll;
-
+    [SerializeField] Transform weaponHolder;
     [SerializeField] float speed = 1;
+    [SerializeField] float dash = 2;
 
     [SerializeField] Box moveLock;
 
@@ -29,6 +30,10 @@ public class PlayerController : Entity
     public float exp;
     public int level;
 
+    Vector2 moveInput;
+    Vector2 lastMoveInput;
+    Vector2 mouseWorldPos;
+    Vector2 toMouse;
     void Awake()
     {
         if (GameManager.IsEditor) return;
@@ -48,19 +53,39 @@ public class PlayerController : Entity
 
         if (Game.state == GameState.Play)
         {
-            Move();
+            Key();
+
+            if (moveInput != Vector2.zero)
+            {
+                Move();
+                lastMoveInput = moveInput;
+            }
+            if (Input.GetMouseButtonDown(1))
+            {
+                Dash();
+            }
             WallCollide();
             UseWeapon();
         }
     }
+    void Key()
+    {
+        moveInput = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
+        mouseWorldPos = CameraController.instance.cam.ScreenToWorldPoint(Input.mousePosition);
+        toMouse = (mouseWorldPos - (Vector2)transform.position);
+        weaponHolder.rotation = Quaternion.Euler(0, 0, -Mathf.Atan2(toMouse.x, toMouse.y) * Mathf.Rad2Deg);
+    }
     void Move()
     {
-        Vector3 input = new Vector3(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"), 0);
-        if (input != Vector3.zero)
-        {
-            transform.Translate(input.normalized * speed * Time.deltaTime);
-            grafic.rotation = Quaternion.Euler(0, 0, -Mathf.Atan2(input.x, input.y) * Mathf.Rad2Deg);
-        }
+        transform.Translate(moveInput.normalized * speed * Time.deltaTime);
+        grafic.rotation = Quaternion.Euler(0, 0, -Mathf.Atan2(moveInput.x, moveInput.y) * Mathf.Rad2Deg);
+    }
+    void Dash()
+    {
+        if (toMouse.magnitude <= dash) transform.position = mouseWorldPos;
+        else transform.Translate(toMouse.normalized * dash);
+
+        grafic.rotation = Quaternion.Euler(0, 0, -Mathf.Atan2(toMouse.x, toMouse.y) * Mathf.Rad2Deg);
     }
     void WallCollide()
     {
@@ -85,14 +110,15 @@ public class PlayerController : Entity
         exp += amount;
         for (int levelIndex = level + 1; levelIndex < data.levelUpExp.Length; levelIndex++)
         {
-            if (exp >= data.levelUpExp[levelIndex]) LevelUp();
-            else break;
+            if (exp < data.levelUpExp[levelIndex]) break;
+            
+            LevelUp();
         }
     }
     void LevelUp()
     {
         level++;
-        Debug.Log("Level Up! " + level);
+        Debug.Log($"Level Up! ({level})");
     }
     void OnValidate()
     {

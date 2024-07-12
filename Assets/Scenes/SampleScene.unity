@@ -244,7 +244,6 @@ Transform:
   - {fileID: 424470503}
   - {fileID: 1975190251}
   - {fileID: 1956690538}
-  - {fileID: 699863005}
   m_Father: {fileID: 975585798}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!120 &128929274
@@ -914,7 +913,7 @@ MonoBehaviour:
   screenRect: {fileID: 229016481}
   gameRect: {fileID: 832406927}
   canvasScaler: {fileID: 413152972}
-  windowRatio: 0.97151
+  windowRatio: 0.8333333
   screenHeight: 5
   screenWidth: 6
   screenRatio: 0.8333333
@@ -930,7 +929,7 @@ MonoBehaviour:
   gameRight: 2
   gameLeft: -2
   scaleFactor: 1024
-  pixelPerUnit: 175.5
+  pixelPerUnit: 360
   isDriveHeight: 0
 --- !u!1 &416056629
 GameObject:
@@ -1640,7 +1639,7 @@ Transform:
   m_Children:
   - {fileID: 2144339705}
   - {fileID: 1170394860}
-  m_Father: {fileID: 128929273}
+  m_Father: {fileID: 975585798}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &824373698
 GameObject:
@@ -2036,6 +2035,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 128929273}
+  - {fileID: 699863005}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!58 &975585799
@@ -2118,6 +2118,7 @@ MonoBehaviour:
   grafic: {fileID: 128929273}
   rigid: {fileID: 975585800}
   coll: {fileID: 975585799}
+  weaponHolder: {fileID: 699863005}
   speed: 2.5
   moveLock:
     size: {x: 0.5, y: 0.5}
