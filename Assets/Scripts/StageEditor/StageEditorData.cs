@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using UnityEditor;
+using UnityEditor.UI;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
 
@@ -293,33 +294,38 @@ public class StageEditorData : ScriptableObject
             selectedEnemyData.editorGUI.OnSelected(selectedEnemyData);
         }
 
-        if (selectedEnemyData.spawnData.spawnTime != prevSpawnTime)
+        if (selectedEnemyData.spawnData.spawnTime == prevSpawnTime)
+        {
+            sameTimeEnemyList.Remove(selectedEnemyData);
+            
+            selectedEnemyData = enemyList[index];
+            selectedEnemyDataIndex = index;
+
+            sameTimeEnemyList.Add(selectedEnemyData);
+        }
+        else
         {
             foreach (EditorEnemyData enemyData in sameTimeEnemyList)
             {
-                if (enemyData.spawnData.spawnTime != selectedEnemyData.spawnData.spawnTime)
-                {
-                    enemyData.editorGUI.OnDeSelected(enemyData);
-                }
+                enemyData.editorGUI.OnDeSelected(enemyData);
             }
+            sameTimeEnemyList.Clear();
 
             for (int i = selectedEnemyDataIndex + 1; i < enemyList.Count; i++)
             {
                 EditorEnemyData enemyData = enemyList[i];
+
                 if (selectedEnemyData.spawnData.spawnTime == enemyData.spawnData.spawnTime)
                 {
-                    if (sameTimeEnemyList.Contains(enemyData) == false)
-                    {
-                        sameTimeEnemyList.Add(enemyData);
-                        enemyData.editorGUI.OnSelected(enemyData);
-                    }
+                    sameTimeEnemyList.Add(enemyData);
+                    enemyData.editorGUI.OnSelected(enemyData);
                 }
                 else break;
             }
             for (int i = selectedEnemyDataIndex - 1; i >= 0; i--)
             {
                 EditorEnemyData enemyData = enemyList[i];
-                if (sameTimeEnemyList.Contains(enemyData) == false)
+                if (selectedEnemyData.spawnData.spawnTime == enemyData.spawnData.spawnTime)
                 {
                     sameTimeEnemyList.Add(enemyData);
                     enemyData.editorGUI.OnSelected(enemyData);

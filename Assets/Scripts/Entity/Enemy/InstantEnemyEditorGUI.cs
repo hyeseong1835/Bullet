@@ -12,13 +12,11 @@ public class InstantEnemyEditorGUI : EnemyEditorGUI
     public override void OnSelected(EditorEnemyData enemyData)
     {
         GameObject obj = StageEditor.instance.previewRender.InstantiatePrefabInScene(enemyData.prefab);
-        Debug.Log($"Selected: {obj.name}#{obj.GetHashCode()}");
         instance.Add(enemyData, obj);
         obj.transform.position = ((InstantEnemySpawnData)(enemyData.spawnData)).startPos;
     }
     public override void OnDeSelected(EditorEnemyData enemyData)
     {
-        Debug.Log($"DeSelected: {instance[enemyData].name}#{instance[enemyData].GetHashCode()}");
         Object.DestroyImmediate(instance[enemyData]);
         instance.Remove(enemyData);
     }

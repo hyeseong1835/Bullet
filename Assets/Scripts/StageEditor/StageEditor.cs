@@ -677,7 +677,11 @@ public class StageEditor : EditorWindow
             void SelectEnemyData(int index)
             {
                 GUI.FocusControl(null);
-                if (data.selectedEnemyDataIndex != index) data.SelectEnemyData(index);
+                if (data.selectedEnemyDataIndex != index)
+                {
+                    data.SelectEnemyData(-1);
+                    data.SelectEnemyData(index);
+                }
             }
         }
 
@@ -771,72 +775,72 @@ public class StageEditor : EditorWindow
                 }
                 data.selectedEnemyData.editorGUI.DrawSelectedEnemyDataGizmos(data.selectedEnemyData);
             }
-        }
 
-        void DrawTimeLine()
-        {
-            float timeLineStart = data.fileViewerLinePosX + setting.timeHorizontalSpace;
-            float timeLineEnd = (position.width - data.inspectorLinePosX) - setting.timeHorizontalSpace;
-
-            if (timeLineStart > timeLineEnd) return;
-
-            float timeLineY = position.height - setting.timeBottomSpace;
-
-            Handles.color = setting.timeLineColor;
-            Handles.DrawLine(
-                new Vector3(timeLineStart, timeLineY),
-                new Vector3(timeLineEnd, timeLineY)
-            );
-            Handles.DrawLine(
-                new Vector2(timeLineStart, timeLineY + setting.timeLengthFieldOffsetY),
-                new Vector2(timeLineStart, timeLineY - setting.timeLengthFieldOffsetY)
-            );
-            Handles.DrawLine(
-                new Vector2(timeLineEnd, timeLineY + setting.timeLengthFieldOffsetY),
-                new Vector2(timeLineEnd, timeLineY - setting.timeLengthFieldOffsetY)
-            );
-            if (playTime != -1)
+            void DrawTimeLine()
             {
-                Vector2 playTimeLineScreenPos = GetTimeScreenPos(playTime);
-                Handles.color = Color.green;
+                float timeLineStart = data.fileViewerLinePosX + setting.timeHorizontalSpace;
+                float timeLineEnd = (position.width - data.inspectorLinePosX) - setting.timeHorizontalSpace;
+
+                if (timeLineStart > timeLineEnd) return;
+
+                float timeLineY = position.height - setting.timeBottomSpace;
+
+                Handles.color = setting.timeLineColor;
                 Handles.DrawLine(
-                    playTimeLineScreenPos.GetAddY(setting.timeLengthFieldOffsetY),
-                    playTimeLineScreenPos.GetAddY(-setting.timeLengthFieldOffsetY)
+                    new Vector3(timeLineStart, timeLineY),
+                    new Vector3(timeLineEnd, timeLineY)
                 );
-                Handles.color = Color.white;
-            }
+                Handles.DrawLine(
+                    new Vector2(timeLineStart, timeLineY + setting.timeLengthFieldOffsetY),
+                    new Vector2(timeLineStart, timeLineY - setting.timeLengthFieldOffsetY)
+                );
+                Handles.DrawLine(
+                    new Vector2(timeLineEnd, timeLineY + setting.timeLengthFieldOffsetY),
+                    new Vector2(timeLineEnd, timeLineY - setting.timeLengthFieldOffsetY)
+                );
+                if (playTime != -1)
+                {
+                    Vector2 playTimeLineScreenPos = GetTimeScreenPos(playTime);
+                    Handles.color = Color.green;
+                    Handles.DrawLine(
+                        playTimeLineScreenPos.GetAddY(setting.timeLengthFieldOffsetY),
+                        playTimeLineScreenPos.GetAddY(-setting.timeLengthFieldOffsetY)
+                    );
+                    Handles.color = Color.white;
+                }
 
-            for (int i = 0; i < data.enemyList.Count; i++)
-            {
-                if (i == data.selectedEnemyDataIndex) continue;
+                for (int i = 0; i < data.enemyList.Count; i++)
+                {
+                    if (i == data.selectedEnemyDataIndex) continue;
 
+                    DrawTimeLineMarker(
+                        data.enemyList[i].spawnData.spawnTime,
+                        setting.enemySpawnTimeColor
+                    );
+                }
                 DrawTimeLineMarker(
-                    data.enemyList[i].spawnData.spawnTime,
-                    setting.enemySpawnTimeColor
+                    data.selectedEnemyData.spawnData.spawnTime,
+                    setting.selectEnemySpawnTimeColor
                 );
-            }
-            DrawTimeLineMarker(
-                data.selectedEnemyData.spawnData.spawnTime,
-                setting.selectEnemySpawnTimeColor
-            );
 
-            void DrawTimeLineMarker(float time, SquareColor color)
-            {
-                Rect timeLineMarkerRect = new Rect();
-                timeLineMarkerRect.size = Vector2.one * setting.timeCubeSize;
-                timeLineMarkerRect.position = GetTimeScreenPos(time) - 0.5f * timeLineMarkerRect.size;
+                void DrawTimeLineMarker(float time, SquareColor color)
+                {
+                    Rect timeLineMarkerRect = new Rect();
+                    timeLineMarkerRect.size = Vector2.one * setting.timeCubeSize;
+                    timeLineMarkerRect.position = GetTimeScreenPos(time) - 0.5f * timeLineMarkerRect.size;
 
-                CustomGUI.DrawSquare(timeLineMarkerRect, color);
-            }
-            Rect timeLengthFieldRect = new Rect();
-            timeLengthFieldRect.position = new Vector2(timeLineEnd, timeLineY - (setting.timeLengthFieldSize.y + setting.timeLengthFieldOffsetY));
-            timeLengthFieldRect.size = setting.timeLengthFieldSize;
+                    CustomGUI.DrawSquare(timeLineMarkerRect, color);
+                }
+                Rect timeLengthFieldRect = new Rect();
+                timeLengthFieldRect.position = new Vector2(timeLineEnd, timeLineY - (setting.timeLengthFieldSize.y + setting.timeLengthFieldOffsetY));
+                timeLengthFieldRect.size = setting.timeLengthFieldSize;
 
-            data.timeLength = EditorGUI.DelayedFloatField(timeLengthFieldRect, data.timeLength);
-            if (data.enemyList.Count >= 1)
-            {
-                float lastTime = data.enemyList[^1].spawnData.spawnTime;
-                if (lastTime > data.timeLength) data.timeLength = lastTime;
+                data.timeLength = EditorGUI.DelayedFloatField(timeLengthFieldRect, data.timeLength);
+                if (data.enemyList.Count >= 1)
+                {
+                    float lastTime = data.enemyList[^1].spawnData.spawnTime;
+                    if (lastTime > data.timeLength) data.timeLength = lastTime;
+                }
             }
         }
 

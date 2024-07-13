@@ -47,6 +47,7 @@ public class Stage : ScriptableObject
 
 #if UNITY_EDITOR
             StageEditor.instance.playTime = data.spawnTime;
+            StageEditor.data.SelectEnemyData(-1);
             StageEditor.data.SelectEnemyData(data);
 #endif
             
