@@ -485,7 +485,6 @@ public class StageEditor : EditorWindow
             }
             GUILayout.EndArea();
 
-
             Rect rect = new Rect();
             rect.size = new Vector2(setting.buttonWidth, setting.buttonHeight);
             rect.position = area.position + area.size - rect.size;
@@ -803,37 +802,67 @@ public class StageEditor : EditorWindow
                     {
                         EditorGUILayout.Space(5);
 
-                        GUILayout.BeginHorizontal();
+                        Rect fieldRect = GUILayoutUtility.GetRect(
+                            area.width, 
+                            EditorGUIUtility.singleLineHeight, 
+                            GUILayout.ExpandWidth(true)
+                        );
+
+                        //Time Label
+                        Rect timeRect = fieldRect.GetSetWidth(setting.timeWidth);
+                        EditorGUI.LabelField(timeRect, enemyData.spawnData.spawnTime.ToString("F1"));
+
+                        if (EventUtility.MouseDown(0) && timeRect.Contains(e.mousePosition))
                         {
-                            //Time Label
-                            Rect timeRect = GUILayoutUtility.GetRect(setting.timeWidth, EditorGUIUtility.singleLineHeight, GUILayout.ExpandWidth(false));
-                            EditorGUI.LabelField(timeRect, enemyData.spawnData.spawnTime.ToString("F1"));
-
-                            if (EventUtility.MouseDown(0) && timeRect.Contains(e.mousePosition))
-                            {
-                                data.timeFoldout[enemyData.spawnData.spawnTime] = !foldout;
-                                Repaint();
-                            }
-
-                            //Object Field
-                            EditorGUILayout.ObjectField(enemyData.spawnData, typeof(EnemySpawnData), false, GUILayout.Height(setting.buttonHeight));
-                            Rect objectRect = GUILayoutUtility.GetLastRect();
-
-                            //Select Button
-                            if (GUI.Button(GUILayoutUtility.GetRect(setting.buttonWidth, setting.buttonHeight, GUILayout.ExpandWidth(false)).GetAddY(2), "Select"))
-                            {
-                                SelectEnemyData(i);
-                            }
-
-                            ShowHasData(enemyData, objectRect);
-
-                            headerRect = objectRect;
-                            if (enemyData == data.selectedEnemyData)
-                            {
-                                selectRect = headerRect;
-                            }
+                            data.timeFoldout[enemyData.spawnData.spawnTime] = !foldout;
+                            Repaint();
                         }
-                        GUILayout.EndHorizontal();
+
+                        //Object Field
+                        Rect objectRect = fieldRect.GetAddX(timeRect.width).GetAddWidth(-(timeRect.width + setting.buttonWidth));
+                        if (EventUtility.MouseDown(1) && objectRect.Contains(e.mousePosition))
+                        {
+                            e.Use();
+                            GenericMenu menu = new GenericMenu();
+                            menu.AddItem(
+                                new GUIContent("Delete"),
+                                false,
+                                () =>
+                                {
+                                    AssetDatabase.DeleteAsset(
+                                        AssetDatabase.GetAssetPath(
+                                            data.editorEnemySpawnDataList[i].spawnData
+                                        )
+                                    );
+                                    data.editorEnemySpawnDataList.RemoveAt(i);
+                                    Repaint();
+                                }
+                            );
+                            menu.ShowAsContext();
+                        }
+                        EditorGUI.ObjectField(
+                            objectRect, 
+                            "",
+                            enemyData.spawnData,
+                            typeof(EnemySpawnData),
+                            false
+                        );
+
+
+                        //Select Button
+                        Rect selectButtonRect = objectRect.GetAddX(objectRect.width).GetSetWidth(setting.buttonWidth);
+                        if (GUI.Button(selectButtonRect, "Select"))
+                        {
+                            SelectEnemyData(i);
+                        }
+
+                        ShowHasData(enemyData, objectRect);
+
+                        headerRect = objectRect;
+                        if (enemyData == data.selectedEnemyData)
+                        {
+                            selectRect = headerRect;
+                        }
                     }
                     void CloseHeader(EditorEnemyData enemyData, int i)
                     {
@@ -842,26 +871,53 @@ public class StageEditor : EditorWindow
 
                     void OpenElement(EditorEnemyData enemyData, int i)
                     {
-                        GUILayout.BeginHorizontal();
+                        Rect fieldRect = GUILayoutUtility.GetRect(
+                            area.width,
+                            EditorGUIUtility.singleLineHeight,
+                            GUILayout.ExpandWidth(true)
+                        );
+
+                        //Time Label
+                        Rect timeRect = fieldRect.GetSetWidth(setting.timeWidth);
+
+                        //Object Field
+                        Rect objectRect = fieldRect.GetAddX(timeRect.width).GetAddWidth(-(timeRect.width + setting.buttonWidth));
+                        if (EventUtility.MouseDown(1) && objectRect.Contains(e.mousePosition))
                         {
-                            Rect timeRect = GUILayoutUtility.GetRect(setting.timeWidth, EditorGUIUtility.singleLineHeight, GUILayout.ExpandWidth(false));
-
-                            EditorGUILayout.ObjectField(enemyData.spawnData, typeof(EnemyData), false, GUILayout.Height(EditorGUIUtility.singleLineHeight));
-                            Rect objectRect = GUILayoutUtility.GetLastRect();
-
-                            if (GUI.Button(GUILayoutUtility.GetRect(setting.buttonWidth, setting.buttonHeight, GUILayout.ExpandWidth(false)).GetAddY(2), "Select"))
-                            {
-                                SelectEnemyData(i);
-                            }
-
-                            ShowHasData(enemyData, objectRect);
-
-                            if (enemyData == data.selectedEnemyData)
-                            {
-                                selectRect = headerRect.GetSetY(objectRect.y);
-                            }
+                            e.Use();
+                            GenericMenu menu = new GenericMenu();
+                            menu.AddItem(
+                                new GUIContent("Delete"),
+                                false,
+                                () =>
+                                {
+                                    data.editorEnemySpawnDataList.RemoveAt(i);
+                                    Repaint();
+                                }
+                            );
                         }
-                        GUILayout.EndHorizontal();
+                        EditorGUI.ObjectField(
+                            objectRect,
+                            "",
+                            enemyData.spawnData,
+                            typeof(EnemySpawnData),
+                            false
+                        );
+
+
+                        //Select Button
+                        Rect selectButtonRect = objectRect.GetAddX(objectRect.width).GetSetWidth(setting.buttonWidth);
+                        if (GUI.Button(selectButtonRect, "Select"))
+                        {
+                            SelectEnemyData(i);
+                        }
+
+                        ShowHasData(enemyData, objectRect);
+
+                        if (enemyData == data.selectedEnemyData)
+                        {
+                            selectRect = headerRect.GetSetY(objectRect.y);
+                        }
                     }
                     void CloseElement(EditorEnemyData enemyData, int i)
                     {
