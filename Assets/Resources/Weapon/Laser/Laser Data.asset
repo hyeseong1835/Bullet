@@ -9,11 +9,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 72707a419bef5a144a8467c4489e64dc, type: 3}
-  m_Name: Data
+  m_Script: {fileID: 11500000, guid: b5a28896ebe523b488a4ba11c7efec87, type: 3}
+  m_Name: Laser Data
   m_EditorClassIdentifier: 
-  previewPos: {x: 641.5504, y: 642.376}
-  cellSize: 92.27521
-  inspectorLinePosX: 0
-  fileViewerLinePosX: 247
-  timeLength: 10
+  cooltime: 1
+  damage: 100
+  width: 0.1

@@ -30,10 +30,11 @@ public class PlayerController : Entity
     public float exp;
     public int level;
 
-    Vector2 moveInput;
-    Vector2 lastMoveInput;
-    Vector2 mouseWorldPos;
-    Vector2 toMouse;
+    public Vector2 moveInput;
+    public Vector2 lastMoveInput;
+    public Vector2 mouseWorldPos;
+    public Vector2 toMouse;
+    public Quaternion toMouseRot;
     void Awake()
     {
         if (GameManager.IsEditor) return;
@@ -80,7 +81,9 @@ public class PlayerController : Entity
         moveInput = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
         mouseWorldPos = CameraController.instance.cam.ScreenToWorldPoint(Input.mousePosition);
         toMouse = (mouseWorldPos - (Vector2)transform.position);
-        weaponHolder.rotation = Quaternion.Euler(0, 0, -Mathf.Atan2(toMouse.x, toMouse.y) * Mathf.Rad2Deg);
+        toMouseRot = Quaternion.Euler(0, 0, -Mathf.Atan2(toMouse.x, toMouse.y) * Mathf.Rad2Deg);
+
+        //weaponHolder.rotation = Quaternion.Euler(0, 0, -Mathf.Atan2(toMouse.x, toMouse.y) * Mathf.Rad2Deg);
     }
     void Move()
     {

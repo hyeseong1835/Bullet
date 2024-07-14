@@ -16,7 +16,7 @@ public class GameManager : MonoBehaviour
     public static bool IsEditor => instance.state == GameState.Editor;
 
     [SerializeField] GameObject mainPanel;
-    [SerializeField] Stage stage1;
+    public Stage stage;
 
     void Awake()
     {
@@ -32,7 +32,7 @@ public class GameManager : MonoBehaviour
     void Start()
     {
 #if UNITY_EDITOR
-        if (EditorApplication.isPlaying) stage1.Init();
+        if (EditorApplication.isPlaying) stage.Init();
 #endif
     }
 
@@ -58,7 +58,7 @@ public class GameManager : MonoBehaviour
             state = GameState.Play;
 
             mainPanel.SetActive(false);
-            StartCoroutine(stage1.Start());
+            StartCoroutine(stage.Start());
         }
     }
     void Play()

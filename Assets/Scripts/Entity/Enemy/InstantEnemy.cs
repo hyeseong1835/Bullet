@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.Serialization.Formatters;
 using UnityEngine;
 
 public class InstantEnemy : Enemy
@@ -36,6 +37,37 @@ public class InstantEnemy : Enemy
     void Update()
     {
         transform.position += dir * speed * Time.deltaTime;
+        
+        if (spawnData.endPos.x < spawnData.startPos.x)
+        {
+            if(transform.position.x < spawnData.endPos.x)
+            {
+                DeUse();
+            }
+        }
+        else if (spawnData.endPos.x > spawnData.startPos.x)
+        {
+            if (transform.position.x > spawnData.endPos.x)
+            {
+                DeUse();
+            }
+        }
+
+        if (spawnData.endPos.y < spawnData.startPos.y)
+        {
+            if (transform.position.y < spawnData.endPos.y)
+            {
+                DeUse();
+            }
+        }
+        else if (spawnData.endPos.y > spawnData.startPos.y)
+        {
+            if (transform.position.y > spawnData.endPos.y)
+            {
+                DeUse();
+            }
+        }
+
         /*
         if (dir.x != 0) CheckOver(dir.x, transform.position.x, spawnData.endPos.x);
         else CheckOver(dir.y, transform.position.y, spawnData.endPos.y);
@@ -45,5 +77,9 @@ public class InstantEnemy : Enemy
             if ((dir > 0) ? cur > end : cur < end) Destroy(gameObject);
         }
         */
+    }
+    void DeUse()
+    {
+        GameManager.instance.stage.enemyPool[spawnData.prefabTypeIndex][spawnData.prefabIndex].DeUse(gameObject);
     }
 }

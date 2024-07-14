@@ -2,12 +2,15 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Shooter : Weapon
 {
+    static PlayerController player => PlayerController.instance;
     public ShooterData data;
     public override WeaponData WeaponData => data;
-    
+
+    [SerializeField] Transform look;
     [SerializeField] Transform tip;
     Bullet bullet;
 
@@ -19,6 +22,8 @@ public class Shooter : Weapon
     }
     protected override void Use()
     {
+        look.transform.rotation = player.toMouseRot;
+
         GameObject obj = bullet.BulletData.pool.Use();
         obj.transform.position = tip.position;
         obj.transform.rotation = tip.rotation;

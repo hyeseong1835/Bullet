@@ -61,3 +61,4 @@ MonoBehaviour:
   floatingAreaBackGroundColor:
     face: {r: 0.078431375, g: 0.078431375, b: 0.078431375, a: 1}
     outline: {r: 0, g: 0, b: 0, a: 1}
+  timeMoveSnap: 0.5
