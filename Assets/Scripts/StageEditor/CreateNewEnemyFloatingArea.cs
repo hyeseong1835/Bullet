@@ -2,19 +2,26 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.VisualScripting;
 using UnityEditor;
+using UnityEditor.TerrainTools;
 using UnityEngine;
 
 public class CreateNewEnemyFloatingArea : FloatingArea
 {
-    int selectedTypeIndex = -1;
-    Rect enemyTypePopupRect;
+    Rect nameFieldRect = default;
+    Rect enemyTypePopupRect = default;
+    Rect createButtonRect = default;
+    
     FloatingAreaManager _manager;
-    string[] selectableEnemyTypeArray;
+    string name = "";
+
+    GameObject selectPrefab;
+    int arrayIndex = -1;
+    int elementIndex = -1;
 
     public override void OnCreated()
     {
-        base.OnCreated();
         _manager = new FloatingAreaManager();
     }
     public override float GetHeight()
@@ -26,26 +33,84 @@ public class CreateNewEnemyFloatingArea : FloatingArea
     {
         _manager.EventListen(e);
 
-        if (enemyTypePopupRect != default)
+        if (EventUtility.MouseDown(0))
         {
-            CustomGUI.DrawSquare(enemyTypePopupRect, Color.white);
-            if (EventUtility.MouseDown(0) && enemyTypePopupRect.Contains(e.mousePosition))
+            if (nameFieldRect != default && nameFieldRect.Contains(e.mousePosition))
             {
-                if(_manager.area == null)
-                {
-                    _manager.Create(new TextPopupFloatingArea(selectableEnemyTypeArray, Select));
-                }
-                else
-                {
-                    _manager.Destroy();
-                }
+                FocusNameField();
+                e.Use();
+            }
+            else if (enemyTypePopupRect != default && enemyTypePopupRect.Contains(e.mousePosition))
+            {
+                ToggleArea();
+                e.Use();
+            }
+            else if (createButtonRect != default 
+                && name != ""
+                && selectPrefab != null
+                && createButtonRect.Contains(e.mousePosition))
+            {
+                Create();
                 e.Use();
             }
         }
-    }
-    void Select(int index)
-    {
-        selectedTypeIndex = index;
+
+        
+        
+        void FocusNameField()
+        {
+            EditorGUI.FocusTextInControl("NameField");
+        }   
+        void ToggleArea()
+        {
+            if (_manager.area == null)
+            {
+                StageEditor.data.RefreshPrefabList();
+
+                string[] prefabTypeNameArray = new string[StageEditor.data.prefabTypeList.Count];
+                for (int i = 0; i < StageEditor.data.prefabTypeList.Count; i++)
+                {
+                    prefabTypeNameArray[i] = StageEditor.data.prefabTypeList[i].Name;
+                }
+
+                _manager.Create(
+                    new CategoryObjectFloatingArea(
+                        prefabTypeNameArray,
+                        StageEditor.data.prefabLists.ToDoubleArray(),
+                        (i1, i2) => {
+                            arrayIndex = i1;
+                            elementIndex = i2;
+                            selectPrefab = StageEditor.data.prefabLists[i1][i2];
+                            _manager.Destroy();
+                        }
+                    )
+                );
+            }
+            else
+            {
+                enemyTypePopupRect = default;
+                _manager.Destroy();
+            }
+        }
+        void Create()
+        {
+            Debug.Log($"Create: {arrayIndex}/{elementIndex}");
+            Type prefabType = StageEditor.data.prefabTypeList[arrayIndex];
+
+            EnemySpawnData spawnData = (EnemySpawnData)ScriptableObject.CreateInstance(prefabType);
+            spawnData.prefabTypeIndex = arrayIndex;
+            spawnData.prefabIndex = elementIndex;
+
+            AssetDatabase.CreateAsset(
+                spawnData,
+                $"{StageEditor.data.GetStageDirectoryPath(StageEditor.data.selectedStage)}/EnemySpawnData/{name}.asset"
+            );
+
+            EditorEnemyData editorEnemyData = new EditorEnemyData(spawnData, prefabType);
+            StageEditor.data.InsertToEditorEnemySpawnDataList(editorEnemyData);
+
+            manager.Destroy();
+        }
     }
 
     public override void Draw()
@@ -53,37 +118,58 @@ public class CreateNewEnemyFloatingArea : FloatingArea
         GUILayout.BeginArea(manager.rect);
         {
             CustomGUILayout.TitleHeaderLabel("Create New Enemy");
+            
+            DrawNameField();
             DrawEnemyTypePopup();
+            if (name != ""
+                && selectPrefab != null
+            )
+            {
+                DrawCreateButton();
+            }
         }
         GUILayout.EndArea();
-
+        
         _manager.Draw();
 
-
-
+        void DrawNameField()
+        {
+            GUI.SetNextControlName("NameField");
+            name = EditorGUILayout.TextField(
+                "Name", 
+                name
+            );
+            
+            if (Event.current.type == EventType.Repaint)
+            {
+                nameFieldRect = GUILayoutUtility.GetLastRect().GetAddPos(manager.rect.position);
+            }
+        }
         void DrawEnemyTypePopup()
         {
-            selectableEnemyTypeArray = new string[StageEditor.data.prefabTypeList.Count + 1];
-            selectableEnemyTypeArray[0] = "None";
-
-            for (int i = 1; i < selectableEnemyTypeArray.Length; i++)
-            {
-                selectableEnemyTypeArray[i] = StageEditor.data.prefabTypeList[i - 1].Name;
-            }
-            string dropDownLabel;
-            if (selectedTypeIndex == -1)
-            {
-                dropDownLabel = "None";
-            }
-            else
-            {
-                dropDownLabel = selectableEnemyTypeArray[selectedTypeIndex];
-            }
-            EditorGUILayout.DropdownButton(new GUIContent(dropDownLabel), FocusType.Passive);
+            EditorGUILayout.DropdownButton(
+                new GUIContent(
+                    selectPrefab?.name ?? "None"
+                ),
+                FocusType.Passive
+            );
             if (Event.current.type == EventType.Repaint)
             {
                 enemyTypePopupRect = GUILayoutUtility.GetLastRect().GetAddPos(manager.rect.position);
                 _manager.SetRect(enemyTypePopupRect);
+            }
+        }
+
+        void DrawCreateButton()
+        {
+            GUILayout.Box(
+                "Create",
+                GUI.skin.button
+            );
+
+            if (Event.current.type == EventType.Repaint)
+            {
+                createButtonRect = GUILayoutUtility.GetLastRect().GetAddPos(manager.rect.position);
             }
         }
     }

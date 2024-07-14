@@ -30,7 +30,6 @@ public class Laser : Weapon
         {
             Enemy enemy = info.collider.GetComponent<Enemy>();
             enemy.TakeDamage(data.damage);
-            Debug.Log($"Hit: {info.collider.gameObject.name}");
         }
         
 

@@ -25,6 +25,7 @@ public class TextPopupFloatingArea : FloatingArea
                 {
                     selectEvent?.Invoke(i);
                     e.Use();
+                    manager.Destroy();
                 }
             }
         }
@@ -33,11 +34,13 @@ public class TextPopupFloatingArea : FloatingArea
     {
         GUILayout.BeginArea(manager.rect);
         {
-            if (Event.current.type == EventType.Repaint) rects = new Rect[array.Length];
+            if (Event.current.type == EventType.Repaint)
+            {
+                rects = new Rect[array.Length];
+            }
             for (int i = 0; i < array.Length; i++)
             {
-                //if (Event.current.type != EventType.Repaint && rects != null) CustomGUI.DrawSquare(rects[i], Color.white);
-                GUILayout.Label(array[i]);
+                GUILayout.Label(array[i], GUI.skin.label);
                 if (Event.current.type == EventType.Repaint)
                 {
                     rects[i] = GUILayoutUtility.GetLastRect();
@@ -50,6 +53,6 @@ public class TextPopupFloatingArea : FloatingArea
 
     public override float GetHeight()
     {
-        return GUI.skin.label.lineHeight * array.Length;
+        return GUI.skin.label.lineHeight * array.Length + 20;
     }
 }

@@ -5,6 +5,10 @@ using UnityEngine;
 
 public static class CustomGUILayout
 {
+    public static float UnderBarTitleTextHeight => EditorGUIUtility.singleLineHeight;
+    public static float WarningLabelHeight => EditorStyles.centeredGreyMiniLabel.lineHeight + 20;
+    public static float TitleHeaderLabelHeight => UnderBarTitleTextHeight + 5;
+
     static Event e => Event.current;
     public static ObjectT InteractionObjectField<ObjectT>(ObjectT obj, Action<Rect> interaction, float width = -1, float height = -1) where ObjectT : UnityEngine.Object
     {
@@ -35,15 +39,15 @@ public static class CustomGUILayout
         Vector3 p2 = new Vector3(labelRect.x + labelRect.width, lineY);
         Handles.DrawLine(p1, p2);
     }
-    public static void WarningLabel(string message, float topSpace = 10, float bottomSpace = 10)
+    public static void WarningLabel(string message)
     {
-        EditorGUILayout.Space(topSpace);
+        EditorGUILayout.Space(10);
         EditorGUILayout.LabelField(message, EditorStyles.centeredGreyMiniLabel);
-        EditorGUILayout.Space(bottomSpace);
+        EditorGUILayout.Space(10);
     }
-    public static void TitleHeaderLabel(string title, float space = 5)
+    public static void TitleHeaderLabel(string title)
     {
-        EditorGUILayout.Space(space);
+        EditorGUILayout.Space(5);
         CustomGUILayout.UnderBarTitleText(title);
     }
     public static void BeginNewTab(float space = 10)

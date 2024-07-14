@@ -39,6 +39,8 @@ public class StageEditor : EditorWindow
 
     public PreviewRenderUtility previewRender = null;
 
+    Rect selectRect = default;
+
     #region Event
 
     static StageEditor()
@@ -198,6 +200,220 @@ public class StageEditor : EditorWindow
         {
             OnScreanWidthResized();
             prevScreenWidth = position.width;
+        }
+
+        void Input()
+        {
+            if (data.selectedEnemyData != null) data.selectedEnemyData.editorGUI.Event();
+
+            if (e.isScrollWheel)
+            {
+                if (previewRect.Contains(e.mousePosition))
+                {
+                    switch (e.pointerType)
+                    {
+                        case PointerType.Mouse:
+                            data.cellSize += e.delta.y;
+                            break;
+                    }
+                    if (data.cellSize < setting.cellSizeMin) data.cellSize = setting.cellSizeMin;
+                    Repaint();
+                }
+            }
+
+            switch (e.type)
+            {
+                case EventType.MouseLeaveWindow:
+                    switch (hold)
+                    {
+                        case HoldType.FileViewerLine:
+                            if (e.mousePosition.x <= 0)
+                            {
+                                if (data.fileViewerLinePosX != 0)
+                                {
+                                    data.fileViewerLinePosX = 0;
+                                    Repaint();
+                                }
+                            }
+                            hold = HoldType.None;
+                            break;
+
+                        case HoldType.InspectorLine:
+                            if (e.mousePosition.x >= position.width)
+                            {
+                                if (data.inspectorLinePosX != 0)
+                                {
+                                    data.inspectorLinePosX = 0;
+                                    Repaint();
+                                }
+                            }
+                            hold = HoldType.None;
+                            break;
+
+                        case HoldType.Preview:
+                            hold = HoldType.None;
+                            break;
+                    }
+                    break;
+                case EventType.MouseDown:
+                    switch (e.button)
+                    {
+                        case 0: Mouse0Down(); break;
+                    }
+                    break;
+
+                case EventType.MouseDrag:
+                    switch (e.button)
+                    {
+                        case 0: Mouse0Drag(); break;
+                    }
+                    break;
+
+                case EventType.MouseUp:
+                    switch (e.button)
+                    {
+                        case 0: Mouse0Up(); break;
+                    }
+                    break;
+
+                case EventType.KeyDown:
+                    switch (e.keyCode)
+                    {
+                        case KeyCode.UpArrow:
+                            int prevIndex = data.selectedEnemyDataIndex - 1;
+                            if (0 <= prevIndex)
+                            {
+                                data.SelectEnemyData(prevIndex);
+                                Repaint();
+                            }
+                            break;
+
+                        case KeyCode.DownArrow:
+                            int nextIndex = data.selectedEnemyDataIndex + 1;
+                            if (data.selectedEnemyDataIndex != -1 && nextIndex < data.editorEnemySpawnDataList.Count)
+                            {
+                                data.SelectEnemyData(nextIndex);
+                                Repaint();
+                            }
+                            break;
+                        case KeyCode.Comma:
+                            if (data.selectedEnemyData != null && 0 < data.selectedEnemyData.spawnData.spawnTime)
+                            {
+                                data.selectedEnemyData.spawnData.spawnTime -= setting.timeMoveSnap;
+                                if (data.selectedEnemyData.spawnData.spawnTime < 0)
+                                {
+                                    data.selectedEnemyData.spawnData.spawnTime = 0;
+                                }
+                                else data.selectedEnemyData.spawnData.spawnTime = Mathf.Ceil(data.selectedEnemyData.spawnData.spawnTime / setting.timeMoveSnap) * setting.timeMoveSnap;
+
+                                data.SortSelectedEnemyData();
+                                Repaint();
+                            }
+                            break;
+                        case KeyCode.Period:
+                            if (data.selectedEnemyData != null)
+                            {
+                                data.selectedEnemyData.spawnData.spawnTime += setting.timeMoveSnap;
+                                data.selectedEnemyData.spawnData.spawnTime = Mathf.Floor(data.selectedEnemyData.spawnData.spawnTime / setting.timeMoveSnap) * setting.timeMoveSnap;
+
+                                if (data.selectedEnemyData.spawnData.spawnTime > data.timeLength)
+                                {
+                                    data.timeLength = data.selectedEnemyData.spawnData.spawnTime;
+                                }
+
+                                data.SortSelectedEnemyData();
+                                Repaint();
+                            }
+                            break;
+                    }
+                    break;
+            }
+
+            data.selectedEnemyData?.editorGUI.LateEvent();
+
+            void Mouse0Down()
+            {
+                if (hold == HoldType.None)
+                {
+                    float filesLineDistance = e.mousePosition.x - data.fileViewerLinePosX;
+                    if (Mathf.Abs(filesLineDistance) < setting.lineHoldWidth)
+                    {
+                        hold = HoldType.FileViewerLine;
+
+                        GUI.FocusControl(null);
+                        e.Use();
+                        return;
+                    }
+
+                    float inspectorLineDistance = e.mousePosition.x - (position.width - data.inspectorLinePosX);
+                    if (Mathf.Abs(inspectorLineDistance) < setting.lineHoldWidth)
+                    {
+                        hold = HoldType.InspectorLine;
+
+                        GUI.FocusControl(null);
+                        e.Use();
+                        return;
+                    }
+
+                    if (previewRect.Contains(e.mousePosition))
+                    {
+                        hold = HoldType.Preview;
+                        offset = data.previewPos - e.mousePosition;
+
+                        GUI.FocusControl(null);
+                        e.Use();
+                        return;
+                    }
+                }
+            }
+            void Mouse0Drag()
+            {
+                switch (hold)
+                {
+                    case HoldType.None:
+
+                        break;
+
+                    case HoldType.FileViewerLine:
+                        data.fileViewerLinePosX = e.mousePosition.x;
+                        PreviewCheck();
+
+                        if (InspectorWindowCheck(out float inspectorLineMax) == false)
+                        {
+                            data.inspectorLinePosX = inspectorLineMax;
+                        }
+
+                        Repaint();
+                        break;
+
+                    case HoldType.InspectorLine:
+                        data.inspectorLinePosX = position.width - e.mousePosition.x;
+                        PreviewCheck();
+
+                        if (FileViewerWindowCheck(out float fileViewerLineMax) == false)
+                        {
+                            data.fileViewerLinePosX = fileViewerLineMax;
+                        }
+
+                        Repaint();
+                        break;
+
+                    case HoldType.Preview:
+                        data.previewPos = e.mousePosition + offset;
+
+                        PreviewCheck();
+
+                        Repaint();
+                        break;
+                }
+            }
+            void Mouse0Up()
+            {
+                if (hold != HoldType.None)
+                {
+                    hold = HoldType.None;
+                }
+            }
         }
 
         void OnScreanWidthResized()
@@ -494,25 +710,24 @@ public class StageEditor : EditorWindow
                     GUILayout.EndHorizontal();
                 }
 
-                void DrawSpawnDataSelect()  
+                void DrawSpawnDataSelect() 
                 {
                     EditorGUILayout.Space(5);
                     EditorGUILayout.LabelField("Spawn Data", EditorStyles.boldLabel);
-                    if (data.enemyList == null || data.enemyList.Count < 1)
+                    if (data.editorEnemySpawnDataList == null || data.editorEnemySpawnDataList.Count < 1)
                     {
                         CustomGUILayout.WarningLabel("EnemySpawnData is Empty");
                         return;
                     }
                     // Enemy List
-                    Rect selectRect = Rect.zero;
                     Rect headerRect = Rect.zero;
                     bool isSelectHideByHeader = false;
                     int elementCount = 0;
                     float prevTime = -1;
                     bool foldout = false;
-                    for (int i = 0; i < data.enemyList.Count; i++)
+                    for (int i = 0; i < data.editorEnemySpawnDataList.Count; i++)
                     {
-                        EditorEnemyData enemyData = data.enemyList[i];
+                        EditorEnemyData enemyData = data.editorEnemySpawnDataList[i];
 
                         if (enemyData.spawnData.spawnTime != prevTime)
                         {
@@ -550,7 +765,7 @@ public class StageEditor : EditorWindow
 
                         prevTime = enemyData.spawnData.spawnTime;
                     }
-                    if (selectRect != Rect.zero)
+                    if (selectRect != default)
                     {
                         if (isSelectHideByHeader)
                         {
@@ -601,7 +816,7 @@ public class StageEditor : EditorWindow
                             }
 
                             //Object Field
-                            EditorGUILayout.ObjectField(enemyData.spawnData, typeof(EnemyData), false, GUILayout.Height(setting.buttonHeight));
+                            EditorGUILayout.ObjectField(enemyData.spawnData, typeof(EnemySpawnData), false, GUILayout.Height(setting.buttonHeight));
                             Rect objectRect = GUILayoutUtility.GetLastRect();
 
                             //Select Button
@@ -643,7 +858,7 @@ public class StageEditor : EditorWindow
 
                             if (enemyData == data.selectedEnemyData)
                             {
-                                selectRect = objectRect.GetSetWidth(area.width - timeRect.width);
+                                selectRect = headerRect.GetSetY(objectRect.y);
                             }
                         }
                         GUILayout.EndHorizontal();
@@ -809,12 +1024,12 @@ public class StageEditor : EditorWindow
                     Handles.color = Color.white;
                 }
 
-                for (int i = 0; i < data.enemyList.Count; i++)
+                for (int i = 0; i < data.editorEnemySpawnDataList.Count; i++)
                 {
                     if (i == data.selectedEnemyDataIndex) continue;
 
                     DrawTimeLineMarker(
-                        data.enemyList[i].spawnData.spawnTime,
+                        data.editorEnemySpawnDataList[i].spawnData.spawnTime,
                         setting.enemySpawnTimeColor
                     );
                 }
@@ -836,9 +1051,9 @@ public class StageEditor : EditorWindow
                 timeLengthFieldRect.size = setting.timeLengthFieldSize;
 
                 data.timeLength = EditorGUI.DelayedFloatField(timeLengthFieldRect, data.timeLength);
-                if (data.enemyList.Count >= 1)
+                if (data.editorEnemySpawnDataList.Count >= 1)
                 {
-                    float lastTime = data.enemyList[^1].spawnData.spawnTime;
+                    float lastTime = data.editorEnemySpawnDataList[^1].spawnData.spawnTime;
                     if (lastTime > data.timeLength) data.timeLength = lastTime;
                 }
             }
@@ -847,220 +1062,6 @@ public class StageEditor : EditorWindow
         #endregion
 
         #region Utility
-
-        void Input()
-        {
-            if (data.selectedEnemyData != null) data.selectedEnemyData.editorGUI.Event();
-            
-            if (e.isScrollWheel)
-            {
-                if(previewRect.Contains(e.mousePosition))
-                {
-                    switch (e.pointerType)
-                    {
-                        case PointerType.Mouse:
-                            data.cellSize += e.delta.y;
-                            break;
-                    }
-                    if (data.cellSize < setting.cellSizeMin) data.cellSize = setting.cellSizeMin;
-                    Repaint();
-                }
-            }
-
-            switch (e.type)
-            {
-                case EventType.MouseLeaveWindow:
-                    switch (hold)
-                    {
-                        case HoldType.FileViewerLine:
-                            if (e.mousePosition.x <= 0)
-                            {
-                                if (data.fileViewerLinePosX != 0)
-                                {
-                                    data.fileViewerLinePosX = 0;
-                                    Repaint();
-                                }
-                            }
-                            hold = HoldType.None;
-                            break;
-                        
-                        case HoldType.InspectorLine:
-                            if (e.mousePosition.x >= position.width)
-                            {
-                                if (data.inspectorLinePosX != 0)
-                                {
-                                    data.inspectorLinePosX = 0;
-                                    Repaint();
-                                }
-                            }
-                            hold = HoldType.None;
-                            break;
-
-                        case HoldType.Preview:
-                            hold = HoldType.None;
-                            break;
-                    }
-                    break;
-                case EventType.MouseDown:
-                    switch (e.button)
-                    {
-                        case 0: Mouse0Down(); break;
-                    }
-                    break;
-
-                case EventType.MouseDrag:
-                    switch (e.button)
-                    {
-                        case 0: Mouse0Drag(); break;
-                    }
-                    break;
-                
-                case EventType.MouseUp:
-                    switch (e.button)
-                    {
-                        case 0: Mouse0Up(); break;
-                    }
-                    break;
-
-                case EventType.KeyDown:
-                    switch (e.keyCode)
-                    {
-                        case KeyCode.UpArrow:
-                            int prevIndex = data.selectedEnemyDataIndex - 1;
-                            if (0 <= prevIndex)
-                            {
-                                data.SelectEnemyData(prevIndex);
-                                Repaint();
-                            }
-                            break;
-
-                        case KeyCode.DownArrow:
-                            int nextIndex = data.selectedEnemyDataIndex + 1;
-                            if (data.selectedEnemyDataIndex != -1 && nextIndex < data.enemyList.Count)
-                            {
-                                data.SelectEnemyData(nextIndex);
-                                Repaint();
-                            }
-                            break;
-                        case KeyCode.Comma:
-                            if (data.selectedEnemyData != null && 0 < data.selectedEnemyData.spawnData.spawnTime)
-                            { 
-                                data.selectedEnemyData.spawnData.spawnTime -= setting.timeMoveSnap;
-                                if (data.selectedEnemyData.spawnData.spawnTime < 0)
-                                {
-                                    data.selectedEnemyData.spawnData.spawnTime = 0;
-                                }
-                                else data.selectedEnemyData.spawnData.spawnTime = Mathf.Ceil(data.selectedEnemyData.spawnData.spawnTime / setting.timeMoveSnap) * setting.timeMoveSnap;
-                                
-                                data.SortSelectedEnemyData();
-                                Repaint();
-                            }
-                            break;
-                        case KeyCode.Period:
-                            if (data.selectedEnemyData != null)
-                            {
-                                data.selectedEnemyData.spawnData.spawnTime += setting.timeMoveSnap;
-                                data.selectedEnemyData.spawnData.spawnTime = Mathf.Floor(data.selectedEnemyData.spawnData.spawnTime / setting.timeMoveSnap) * setting.timeMoveSnap;
-                                
-                                if (data.selectedEnemyData.spawnData.spawnTime > data.timeLength)
-                                {
-                                    data.timeLength = data.selectedEnemyData.spawnData.spawnTime;
-                                }
-
-                                data.SortSelectedEnemyData();
-                                Repaint();
-                            }
-                            break;
-                    }
-                    break;
-            }
-
-            data.selectedEnemyData?.editorGUI.LateEvent();
-
-            void Mouse0Down()
-            {
-                if (hold == HoldType.None)
-                {
-                    float filesLineDistance = e.mousePosition.x - data.fileViewerLinePosX;
-                    if (Mathf.Abs(filesLineDistance) < setting.lineHoldWidth)
-                    {
-                        hold = HoldType.FileViewerLine;
-                        
-                        GUI.FocusControl(null);
-                        e.Use();
-                        return;
-                    }
-
-                    float inspectorLineDistance = e.mousePosition.x - (position.width - data.inspectorLinePosX);
-                    if (Mathf.Abs(inspectorLineDistance) < setting.lineHoldWidth)
-                    {
-                        hold = HoldType.InspectorLine;
-                        
-                        GUI.FocusControl(null);
-                        e.Use();
-                        return;
-                    }
-
-                    if (previewRect.Contains(e.mousePosition))
-                    {
-                        hold = HoldType.Preview;
-                        offset = data.previewPos - e.mousePosition;
-                        
-                        GUI.FocusControl(null);
-                        e.Use();
-                        return;
-                    }
-                }
-            }
-            void Mouse0Drag()
-            {
-                switch (hold)
-                {
-                    case HoldType.None: 
-                        
-                        break;
-
-                    case HoldType.FileViewerLine:
-                        data.fileViewerLinePosX = e.mousePosition.x;
-                        PreviewCheck();
-                        
-                        if (InspectorWindowCheck(out float inspectorLineMax) == false)
-                        {
-                            data.inspectorLinePosX = inspectorLineMax;
-                        }
-                        
-                        Repaint();
-                        break;
-
-                    case HoldType.InspectorLine:
-                        data.inspectorLinePosX = position.width - e.mousePosition.x;
-                        PreviewCheck();
-                        
-                        if (FileViewerWindowCheck(out float fileViewerLineMax) == false)
-                        {
-                            data.fileViewerLinePosX = fileViewerLineMax;
-                        }
-                        
-                        Repaint();
-                        break;
-
-                    case HoldType.Preview:
-                        data.previewPos = e.mousePosition + offset;
-                        
-                        PreviewCheck();
-
-                        Repaint();
-                        break;
-                }
-            }
-            void Mouse0Up()
-            {
-                if (hold != HoldType.None)
-                {
-                    hold = HoldType.None;
-                }
-            }
-        }
 
         void PreviewCheck()
         {
@@ -1090,12 +1091,6 @@ public class StageEditor : EditorWindow
             previewRect.position = new Vector2(data.fileViewerLinePosX, 0);
             previewRect.size = new Vector2(position.width - (data.inspectorLinePosX + data.fileViewerLinePosX), position.height);
         }
-
-        #endregion
-
-        #region UI
-
-        
 
         #endregion
     }

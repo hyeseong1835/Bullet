@@ -23,7 +23,15 @@ public class FloatingAreaManager
     }
     public void EventListen(Event e)
     {
-        area?.EventListen(e);
+        if (area != null)
+        {
+            area.EventListen(e);
+
+            if (e.isMouse && rect.Contains(e.mousePosition))
+            {
+                e.Use();
+            }
+        }
     }
     public void Create(FloatingArea area)
     {
@@ -66,11 +74,10 @@ public abstract class FloatingArea
 
     public virtual void CreateField()
     {
-        GUI.SetNextControlName("FloatingArea");
         CustomGUI.DrawSquare(manager.rect, backGroundColor);
     }
     public virtual void OnCreated()
     {
-        GUI.FocusControl("FloatingArea");
+
     }
 }
