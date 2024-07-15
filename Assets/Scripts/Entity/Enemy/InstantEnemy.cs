@@ -35,7 +35,7 @@ public class InstantEnemy : Enemy
     }
     void Update()
     {
-        transform.position += dir * speed * Time.deltaTime;
+        transform.position += GameManager.instance.gameSpeed * dir * speed * Time.deltaTime;
         
         if (spawnData.endPos.x < spawnData.startPos.x)
         {

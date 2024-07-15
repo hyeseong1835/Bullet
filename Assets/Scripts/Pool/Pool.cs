@@ -68,7 +68,7 @@ public class Pool
             holder.SetParent(PoolHolder.instance.transform);
         }
         if (objects == null) objects = new List<GameObject>();
-        else
+        else if (objects.Count != 0)
         {
             foreach (GameObject obj in objects)
             {
@@ -78,7 +78,7 @@ public class Pool
         }
 
         if (waitDestroy == null) waitDestroy = new List<WaitDestroyElement>();
-        else
+        else if (waitDestroy.Count != 0)
         {
             foreach (WaitDestroyElement element in waitDestroy)
             { 
@@ -86,8 +86,6 @@ public class Pool
             }
             waitDestroy.Clear();
         }
-        
-        
         
         for (int i = 0; i < startCount; i++)
         {

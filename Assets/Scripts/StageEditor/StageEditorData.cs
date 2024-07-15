@@ -40,9 +40,6 @@ public class StageEditorData : ScriptableObject
     public float inspectorLinePosX = 0;
     public float fileViewerLinePosX = 0;
 
-    public float timeLength;
-
-
     #region Event
 
     private void OnEnable()
@@ -285,6 +282,8 @@ public class StageEditorData : ScriptableObject
 
             return null;
         }
+        SelectEnemyData(-1);
+
         float prevSpawnTime = selectedEnemyData?.spawnData.spawnTime ?? -1;
 
         if (selectedEnemyDataIndex != index)

@@ -29,7 +29,7 @@ public class Shooter : Weapon
 
         obj.GetComponent<Bullet>().Initialize(
             (bullet) => {
-                transform.position += transform.up * speed * Time.deltaTime;
+                transform.position += GameManager.instance.gameSpeed * transform.up * speed * Time.deltaTime;
 
                 if (bullet.coll.ToBox().IsExitGame(transform.position))
                 {

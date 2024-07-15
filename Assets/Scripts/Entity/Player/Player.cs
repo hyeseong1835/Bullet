@@ -100,7 +100,7 @@ public class Player : Entity
     }
     void Move()
     {
-        transform.Translate(input.moveInput.normalized * speed * Time.deltaTime);
+        transform.Translate(GameManager.instance.gameSpeed * input.moveInput.normalized * speed * Time.deltaTime);
         grafic.rotation = Quaternion.Euler(0, 0, -Mathf.Atan2(input.moveInput.x, input.moveInput.y) * Mathf.Rad2Deg);
     }
     void Dash(Vector2 move)

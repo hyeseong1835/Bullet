@@ -24,7 +24,6 @@ public class StageEditor : EditorWindow
     public Rect previewRect = new Rect();
     
     public bool debug = false;
-    public float playTime = -1;
 
     FloatingAreaManager floatingArea;
     public Dictionary<Type, EnemyEditorGUI> enemyEditorGUIDictionary = new Dictionary<Type, EnemyEditorGUI>();
@@ -163,17 +162,6 @@ public class StageEditor : EditorWindow
 
         Handles.color = Color.white;
         if(floatingArea.area != null) floatingArea.area.backGroundColor = setting.floatingAreaBackGroundColor;
-
-#if UNITY_EDITOR
-        if (EditorApplication.isPlaying)
-        {
-
-        }
-        else
-        {
-            playTime = -1;
-        }
-#endif
 
         #endregion
 
@@ -316,9 +304,9 @@ public class StageEditor : EditorWindow
                                 data.selectedEnemyData.spawnData.spawnTime += setting.timeMoveSnap;
                                 data.selectedEnemyData.spawnData.spawnTime = Mathf.Floor(data.selectedEnemyData.spawnData.spawnTime / setting.timeMoveSnap) * setting.timeMoveSnap;
 
-                                if (data.selectedEnemyData.spawnData.spawnTime > data.timeLength)
+                                if (data.selectedEnemyData.spawnData.spawnTime > data.selectedStage.timeLength)
                                 {
-                                    data.timeLength = data.selectedEnemyData.spawnData.spawnTime;
+                                    data.selectedStage.timeLength = data.selectedEnemyData.spawnData.spawnTime;
                                 }
 
                                 data.SortSelectedEnemyData();
@@ -950,7 +938,6 @@ public class StageEditor : EditorWindow
                 GUI.FocusControl(null);
                 if (data.selectedEnemyDataIndex != index)
                 {
-                    data.SelectEnemyData(-1);
                     data.SelectEnemyData(index);
                 }
             }
@@ -1069,9 +1056,9 @@ public class StageEditor : EditorWindow
                     new Vector2(timeLineEnd, timeLineY + setting.timeLengthFieldOffsetY),
                     new Vector2(timeLineEnd, timeLineY - setting.timeLengthFieldOffsetY)
                 );
-                if (playTime != -1)
+                if (GameManager.instance.time != -1)
                 {
-                    Vector2 playTimeLineScreenPos = GetTimeScreenPos(playTime);
+                    Vector2 playTimeLineScreenPos = GetTimeScreenPos(GameManager.instance.time);
                     Handles.color = Color.green;
                     Handles.DrawLine(
                         playTimeLineScreenPos.GetAddY(setting.timeLengthFieldOffsetY),
@@ -1106,11 +1093,10 @@ public class StageEditor : EditorWindow
                 timeLengthFieldRect.position = new Vector2(timeLineEnd, timeLineY - (setting.timeLengthFieldSize.y + setting.timeLengthFieldOffsetY));
                 timeLengthFieldRect.size = setting.timeLengthFieldSize;
 
-                data.timeLength = EditorGUI.DelayedFloatField(timeLengthFieldRect, data.timeLength);
+                data.selectedStage.timeLength = EditorGUI.DelayedFloatField(timeLengthFieldRect, data.selectedStage.timeLength);
                 if (data.editorEnemySpawnDataList.Count >= 1)
                 {
-                    float lastTime = data.editorEnemySpawnDataList[^1].spawnData.spawnTime;
-                    if (lastTime > data.timeLength) data.timeLength = lastTime;
+                    data.selectedStage.timeLength = data.editorEnemySpawnDataList[^1].spawnData.spawnTime;
                 }
             }
         }
@@ -1178,7 +1164,7 @@ public class StageEditor : EditorWindow
         if (timeLineStart > timeLineEnd) return -Vector2.one;
         
         float timeLineY = instance.position.height - setting.timeBottomSpace;
-        float timeRatio = time / data.timeLength;
+        float timeRatio = time / data.selectedStage.timeLength;
 
         return new Vector2(Mathf.Lerp(timeLineStart, timeLineEnd, timeRatio), timeLineY);
     }

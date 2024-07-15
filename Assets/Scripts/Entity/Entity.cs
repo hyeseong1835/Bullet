@@ -15,8 +15,6 @@ public abstract class Entity : MonoBehaviour
     }
     public virtual void TakeDamage(float damage)
     {
-        Debug.Log($"{gameObject.name}: {damage * resistance} ({damage}) \n                {hp} -> {hp -= damage * resistance}");
-        
         hp -= damage * resistance;
         if (hp <= 0)
         {

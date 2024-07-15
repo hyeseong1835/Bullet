@@ -12,6 +12,10 @@ public class Stage : ScriptableObject
 
     public Pool[][] enemyPool;
 
+    public int lastIndex = -1;
+    public float timeLength = 0;
+
+
     public void Init()
     {
         List<Pool[]> poolLists = new List<Pool[]>();
@@ -32,50 +36,81 @@ public class Stage : ScriptableObject
         }
         enemyPool = poolLists.ToArray();
     }
-    public IEnumerator Start()
+
+    /// <summary>
+    /// {time} 바로 직전의 적들의 첫 번째 인덱스를 {startIndex}부터 양의 방향으로 탐색합니다.
+    /// </summary>
+    public int FindIndex(float time, int startIndex = 0)
+    {
+        int result = 0;
+        float prevTime = 0;
+
+        for (int i = startIndex; i < enemySpawnData.Length; i++)
+        {
+            EnemySpawnData data = enemySpawnData[i];
+            if (data.spawnTime != prevTime)
+            {
+                if (time >= data.spawnTime)
+                {
+                    return result;
+                }
+                result = i;
+            }
+        }
+        return -1;
+    }
+    /// <summary>
+    /// {time} 바로 직전의 적들의 첫 번째 인덱스를 {startIndex}부터 음의 방향으로 탐색합니다.
+    /// </summary>
+    /// <param name="startIndex">-1: enemySpawnData.Length - 1</param>
+    /// <returns></returns>
+    public int FindBackIndex(float time, int startIndex = -1)
+    {
+        if (startIndex == -1) startIndex = enemySpawnData.Length - 1;
+        
+        EnemySpawnData data = enemySpawnData[startIndex];
+        if (time < data.spawnTime)
+        {
+            return startIndex;
+        }
+
+        for (int i = startIndex - 1; i >= 0; i--)
+        {
+            data = enemySpawnData[i];
+            if (time < data.spawnTime)
+            {
+                return i + 1;
+            }
+        }
+        return -1;
+    }
+    
+    public void Read(int startIndex, float curTime)
     {
 #if UNITY_EDITOR
-        GameManager.instance.StartCoroutine(Editor());
+        StageEditor.data.RefreshStageArray();
+        StageEditor.data.SelectStage(this);
+        StageEditor.instance.Repaint();
 #endif
-        float prevTime = 0;
-        for (int i = 0; i < enemySpawnData.Length; i++)
+        for (int i = startIndex; i < enemySpawnData.Length; i++)
         {
             EnemySpawnData data = enemySpawnData[i];
 
-            float waitTime = data.spawnTime - prevTime;
-            if (waitTime != 0) yield return new WaitForSeconds(waitTime);
+            if (data.spawnTime > curTime)
+            {
+                lastIndex = i - 1;
+                break;
+            }
 
 #if UNITY_EDITOR
-            StageEditor.instance.playTime = data.spawnTime;
-            StageEditor.data.SelectEnemyData(-1);
             StageEditor.data.SelectEnemyData(data);
 #endif
-            
             GameObject enemyObj = enemyPool[data.prefabTypeIndex][data.prefabIndex].Get();
 
             Enemy enemy = enemyObj.GetComponent<Enemy>();
             enemy.EnemySpawnData = data;
             enemyObj.SetActive(true);
-            prevTime = data.spawnTime;
         }
     }
-#if UNITY_EDITOR
-    public IEnumerator Editor()
-    {
-        if (StageEditor.instance == null) StageEditor.CreateWindow();
-
-        StageEditor.data.RefreshStageArray();
-        StageEditor.data.SelectStage(this);
-        StageEditor.instance.playTime = 0;
-
-        while (StageEditor.instance.playTime < StageEditor.data.timeLength)
-        {
-            StageEditor.instance.playTime += Time.deltaTime;
-
-            StageEditor.instance.Repaint();
-            yield return null;
-        }
-    }
-#endif
 }
 

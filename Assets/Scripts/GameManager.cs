@@ -5,7 +5,7 @@ using UnityEngine;
 
 public enum GameState
 {
-    Editor, Ready, Play
+    Editor, Ready, Play, Pause
 }
 [ExecuteAlways]
 public class GameManager : MonoBehaviour
@@ -19,6 +19,8 @@ public class GameManager : MonoBehaviour
     public Stage stage;
 
     [SerializeField] ResistanceEffect Resistance2Effect;
+    public float gameSpeed = 1;
+    public float time = -1;
 
     void Awake()
     {
@@ -48,8 +50,23 @@ public class GameManager : MonoBehaviour
             case GameState.Ready:
                 Ready();
                 break;
-                case GameState.Play:
+
+            case GameState.Play:
+                if (gameSpeed == 0)
+                {
+                    state = GameState.Pause;
+                    break;
+                }
                 Play();
+                break;
+
+            case GameState.Pause:
+                if (gameSpeed != 0)
+                {
+                    state = GameState.Play;
+                    break;
+                }
+                Pause();
                 break;
         }
         DebugInput();
@@ -66,7 +83,17 @@ public class GameManager : MonoBehaviour
             {
                 Resistance2Effect.Execute(99999);
             }
-            
+        }
+        if (Input.GetKeyDown(KeyCode.P))
+        {
+            if(gameSpeed == 0)
+            {
+                gameSpeed = 1;
+            }
+            else
+            {
+                gameSpeed = 0;
+            }
         }
     }
     void Ready()
@@ -74,12 +101,28 @@ public class GameManager : MonoBehaviour
         if (Input.anyKeyDown)
         {
             state = GameState.Play;
-
             mainPanel.SetActive(false);
-            StartCoroutine(stage.Start());
+            time = 0;
+            stage.lastIndex = -1;
         }
     }
     void Play()
+    {
+        stage.Read(
+            stage.lastIndex + 1,
+            time
+        );
+
+        if (time >= stage.timeLength)
+        {
+            stage.lastIndex = -1;
+            time = 0;
+            return;
+        }
+        
+        time += gameSpeed * Time.deltaTime;
+    }
+    void Pause()
     {
 
     }
