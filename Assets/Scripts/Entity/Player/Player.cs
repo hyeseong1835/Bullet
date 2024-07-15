@@ -4,23 +4,36 @@ using UnityEngine;
 
 [ExecuteAlways]
 [RequireComponent(typeof(Rigidbody2D), typeof(CircleCollider2D))]
-public class PlayerController : Entity
+public class Player : Entity
 {
-    public static PlayerController instance;
+    public class InputData
+    {
+        public Vector2 moveInput;
+        public Vector2 lastMoveInput;
 
-    public PlayerControllerData data;
-    public override EntityData EntityData => data;
+        public Vector2 mouseWorldPos;
+        public Vector2 toMouse;
+        public Quaternion toMouseRot;
+    }
+    public InputData input = new InputData();
+
+    public static Player instance;
 
     [SerializeField] Transform grafic;
 
-    static Window GameCanvas => Window.instance;
     static GameManager Game => GameManager.instance;
 
     [HideInInspector] public Rigidbody2D rigid;
     [HideInInspector] public CircleCollider2D coll;
     [SerializeField] Transform weaponHolder;
-    [SerializeField] float speed = 1;
-    [SerializeField] float dash = 2;
+
+    public override float GetMaxHP() => maxHp;
+    public float maxHp = 10;
+
+    public float damage = 1;
+    public float speed = 1;
+    public float dash = 2;
+
 
     [SerializeField] Box moveLock;
 
@@ -29,18 +42,16 @@ public class PlayerController : Entity
     [SerializeField] Weapon weapon;
     [SerializeField] List<Weapon> autoWeaponList = new List<Weapon>();
 
-    public float exp;
+    public float[] levelUpExp;
     public int level;
+    public float exp;
 
-    public Vector2 moveInput;
-    public Vector2 lastMoveInput;
-    public Vector2 mouseWorldPos;
-    public Vector2 toMouse;
-    public Quaternion toMouseRot;
     void Awake()
     {
-        if (GameManager.IsEditor) return;
-
+        if (GameManager.IsEditor)
+        {
+            return;
+        }
         instance = this;
         rigid = GetComponent<Rigidbody2D>();
         coll = GetComponent<CircleCollider2D>();
@@ -58,20 +69,20 @@ public class PlayerController : Entity
         {
             Key();
 
-            if (moveInput == Vector2.zero)
+            if (input.moveInput == Vector2.zero)
             {
-                grafic.rotation = Quaternion.Euler(0, 0, -Mathf.Atan2(toMouse.x, toMouse.y) * Mathf.Rad2Deg);
+                grafic.rotation = Quaternion.Euler(0, 0, -Mathf.Atan2(input.toMouse.x, input.toMouse.y) * Mathf.Rad2Deg);
             }
             else 
             {
-                lastMoveInput = moveInput;
+                input.lastMoveInput = input.moveInput;
                 
                 Move();
             }
             if (Input.GetMouseButtonDown(1))
             {
-                if (toMouse.magnitude <= dash) Dash(toMouse);
-                else Dash(toMouse.normalized * dash);
+                if (input.toMouse.magnitude <= dash) Dash(input.toMouse);
+                else Dash(input.toMouse.normalized * dash);
                 
             }
             WallCollide();
@@ -80,23 +91,21 @@ public class PlayerController : Entity
     }
     void Key()
     {
-        moveInput = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
-        mouseWorldPos = CameraController.instance.cam.ScreenToWorldPoint(Input.mousePosition);
-        toMouse = (mouseWorldPos - (Vector2)transform.position);
-        toMouseRot = Quaternion.Euler(0, 0, -Mathf.Atan2(toMouse.x, toMouse.y) * Mathf.Rad2Deg);
-
-        //weaponHolder.rotation = Quaternion.Euler(0, 0, -Mathf.Atan2(toMouse.x, toMouse.y) * Mathf.Rad2Deg);
+        input.moveInput = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
+        input.mouseWorldPos = CameraController.instance.cam.ScreenToWorldPoint(Input.mousePosition);
+        input.toMouse = (input.mouseWorldPos - (Vector2)transform.position);
+        input.toMouseRot = Quaternion.Euler(0, 0, -Mathf.Atan2(input.toMouse.x, input.toMouse.y) * Mathf.Rad2Deg);
     }
     void Move()
     {
-        transform.Translate(moveInput.normalized * speed * Time.deltaTime);
-        grafic.rotation = Quaternion.Euler(0, 0, -Mathf.Atan2(moveInput.x, moveInput.y) * Mathf.Rad2Deg);
+        transform.Translate(input.moveInput.normalized * speed * Time.deltaTime);
+        grafic.rotation = Quaternion.Euler(0, 0, -Mathf.Atan2(input.moveInput.x, input.moveInput.y) * Mathf.Rad2Deg);
     }
     void Dash(Vector2 move)
     {
-        grafic.rotation = Quaternion.Euler(0, 0, -Mathf.Atan2(toMouse.x, toMouse.y) * Mathf.Rad2Deg);
+        grafic.rotation = Quaternion.Euler(0, 0, -Mathf.Atan2(input.toMouse.x, input.toMouse.y) * Mathf.Rad2Deg);
         
-        foreach (RaycastHit2D hitInfo in Physics2D.CircleCastAll(transform.position, coll.radius, toMouse, toMouse.magnitude, Physics2D.GetLayerCollisionMask(LayerMask.NameToLayer("Player"))))
+        foreach (RaycastHit2D hitInfo in Physics2D.CircleCastAll(transform.position, coll.radius, input.toMouse, input.toMouse.magnitude, Physics2D.GetLayerCollisionMask(LayerMask.NameToLayer("Player"))))
         {
             switch (hitInfo.collider.gameObject.layer)
             {
@@ -129,9 +138,9 @@ public class PlayerController : Entity
     public void AddExp(float amount)
     {
         exp += amount;
-        for (int levelIndex = level + 1; levelIndex < data.levelUpExp.Length; levelIndex++)
+        for (int levelIndex = level + 1; levelIndex < levelUpExp.Length; levelIndex++)
         {
-            if (exp < data.levelUpExp[levelIndex]) break;
+            if (exp < levelUpExp[levelIndex]) break;
             
             LevelUp();
         }

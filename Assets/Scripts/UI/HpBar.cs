@@ -33,13 +33,7 @@ public class HpBar : MonoBehaviour
             {
                 transform.GetChild(i).gameObject.SetActive(true);
             }
-            slider.value = target.hp / target.EntityData.maxHp;
+            slider.value = target.hp / target.GetMaxHP();
         }
-    }
-    void OnValidate()
-    {
-        slider = GetComponent<Slider>();
-
-        Refresh();
     }
 }

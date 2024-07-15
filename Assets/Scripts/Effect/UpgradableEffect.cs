@@ -1,15 +1,28 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 
-public class UpgradableEffect : Effect
+
+
+public abstract class UpgradableEffect : Effect
 {
-    public EffectUpgradeData upgrade;
     public int level;
+    public abstract UpgradableEffect GetVariant(int level);
+    public abstract UpgradableEffect SetVariant(int level, UpgradableEffect value);
+    public abstract void AddVariant(UpgradableEffect value);
+    public abstract int GetVariantCount();
 
-    public void Upgrade()
+    public virtual void Upgrade()
     {
-        upgrade.variant[level + 1].Execute(time);
-        time = 0;
+        OnEnd();
+        UpgradableEffect effect = GetVariant(level + 1);
+        effect.gameObject.SetActive(true);
+        effect.Execute(time);
+        gameObject.SetActive(false);
+    }
+    public void Init()
+    {
+        while (GetVariantCount() - 1 < level)
+        {
+            AddVariant(null);
+        }
+        SetVariant(level, this);
     }
 }

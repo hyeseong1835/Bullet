@@ -2,24 +2,20 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum EntityState
-{
-    Disable, Enable
-}
 public abstract class Entity : MonoBehaviour
 {
-    public EntityState entityState = EntityState.Disable;
-    public abstract EntityData EntityData { get; }
+    public abstract float GetMaxHP();
     public float hp;
+    public float resistance = 1;
 
     public virtual void Heal(float healAmount)
     {
         hp += healAmount;
-        if (hp > EntityData.maxHp) hp = EntityData.maxHp;
+        if (hp > GetMaxHP()) hp = GetMaxHP();
     }
     public virtual void TakeDamage(float damage)
     {
-        hp -= damage;
+        hp -= damage * resistance;
 
         if (hp <= 0)
         {

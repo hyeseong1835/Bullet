@@ -1,12 +1,8 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class Shooter : Weapon
 {
-    static PlayerController player => PlayerController.instance;
+    static Player player => Player.instance;
     public ShooterData data;
     public override WeaponData WeaponData => data;
 
@@ -18,16 +14,38 @@ public class Shooter : Weapon
     {
         bullet = data.bulletPrefab.GetComponent<Bullet>();
         
-        if (bullet.BulletData.pool.holder == null) bullet.BulletData.pool.Init();
+        if (bullet.data.pool.holder == null) bullet.data.pool.Init();
     }
     protected override void Use()
     {
-        look.transform.rotation = player.toMouseRot;
+        look.transform.rotation = player.input.toMouseRot;
 
-        GameObject obj = bullet.BulletData.pool.Use();
+        GameObject obj = bullet.data.pool.Use();
         obj.transform.position = tip.position;
         obj.transform.rotation = tip.rotation;
-        obj.GetComponent<Bullet>().Initialize();
+
+        obj.GetComponent<Bullet>().Initialize(
+            (bullet) => {
+                transform.position += transform.up * bullet.data.speed * Time.deltaTime;
+
+                if (bullet.coll.ToBox().IsExitGame(transform.position))
+                {
+                    bullet.DeUse();
+                }
+            },
+            (bullet) => {
+                bullet.data.pool.DeUse(gameObject);
+            },
+            (bullet, coll) =>
+            {
+                Entity entity = coll.GetComponent<Entity>();
+                entity.TakeDamage(bullet.data.damage * player.damage);
+
+                bullet.DeUse();
+            },
+            null,
+            null
+        );            
     }
     void OnDrawGizmosSelected()
     {

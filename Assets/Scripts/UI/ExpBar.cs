@@ -3,7 +3,7 @@ using UnityEngine.UI;
 
 public class ExpBar : MonoBehaviour
 {
-    PlayerController player => PlayerController.instance;
+    Player player => Player.instance;
     [SerializeField] Slider slider;
     void Awake()
     {
@@ -19,23 +19,21 @@ public class ExpBar : MonoBehaviour
         {
             Debug.LogError("Player is null");
         }
+        else if (player.levelUpExp == null)
+        {
+            Debug.LogError("Player levelUpExp is null");
+        }
         else
         {
-            if (player.level + 1 >= player.data.levelUpExp.Length)
+            if (player.level + 1 >= player.levelUpExp.Length)
             {
                 slider.value = 1;
                 return;
             }
-            float under = player.data.levelUpExp[player.level];
-            float up = player.data.levelUpExp[player.level + 1];
+            float under = player.levelUpExp[player.level];
+            float up = player.levelUpExp[player.level + 1];
 
             slider.value = (player.exp - under) / (up - under);
         }
-    }
-    void OnValidate()
-    {
-        slider = GetComponent<Slider>();
-
-        Refresh();
     }
 }

@@ -17,11 +17,10 @@ public class InstantEnemy : Enemy
         set { spawnData = (InstantEnemySpawnData) value; } 
     }
 
-    public Weapon weapon;
-
     public float speed;
 
     Vector3 dir;
+
     void OnEnable()
     {
         if (spawnData == null) return;

@@ -11,8 +11,10 @@ public struct DropInfo
 
     public float ratio;
 }
-public abstract class EnemyData : EntityData
+public abstract class EnemyData : ScriptableObject
 {
+    public float maxHp;
+
     public List<DropInfo> drops = new List<DropInfo>();
     public float ratioMax;
     public float exp;

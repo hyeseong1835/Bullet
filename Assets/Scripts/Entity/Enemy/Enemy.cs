@@ -3,7 +3,13 @@ using UnityEngine;
 
 public abstract class Enemy : Entity
 {
-    public override EntityData EntityData => EnemyData;
+    public enum EnemyState
+    {
+        Disable, Enable
+    }
+    public EnemyState entityState = EnemyState.Disable;
+    
+    public override float GetMaxHP() => EnemyData.maxHp;
     public abstract EnemyData EnemyData { get; set; }
     public abstract EnemySpawnData EnemySpawnData { get; set; }
     public abstract Type EnemySpawnDataType { get; }
@@ -35,7 +41,7 @@ public abstract class Enemy : Entity
             }
             random -= drop.ratio;
         }
-        PlayerController.instance.AddExp(EnemyData.exp);
+        Player.instance.AddExp(EnemyData.exp);
     }
     protected override void OnDead()
     {

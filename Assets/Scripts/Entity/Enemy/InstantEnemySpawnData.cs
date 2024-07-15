@@ -5,6 +5,5 @@ using UnityEngine;
 public class InstantEnemySpawnData : EnemySpawnData
 {
     public override Type EditorType => typeof(InstantEnemyEditorGUI);
-    public Weapon weapon;
     public Vector2 startPos, endPos;
 }

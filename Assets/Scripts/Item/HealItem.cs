@@ -11,7 +11,7 @@ public class HealItem : Item
         set { data = (HealItemData)value; }
     }
 
-    PlayerController player => PlayerController.instance;
+    Player player => Player.instance;
 
 
     protected override void OnPickup() => player.Heal(data.healAmount);

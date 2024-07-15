@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Laser : Weapon
 {
-    static PlayerController player => PlayerController.instance;
+    static Player player => Player.instance;
     public LaserData data;
     public override WeaponData WeaponData => data;
 
@@ -14,7 +14,7 @@ public class Laser : Weapon
 
     protected override void Use()
     {
-        look.transform.rotation = player.toMouseRot;
+        look.transform.rotation = player.input.toMouseRot;
 
 
         RaycastHit2D[] hit = Physics2D.BoxCastAll(
@@ -29,7 +29,7 @@ public class Laser : Weapon
         foreach(RaycastHit2D info in hit)
         {
             Enemy enemy = info.collider.GetComponent<Enemy>();
-            enemy.TakeDamage(data.damage);
+            enemy.TakeDamage(data.damage * Player.instance.damage);
         }
         
 
