@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 using System.Collections.Generic;
 using System.IO;
 using Unity.VisualScripting;
@@ -106,3 +107,4 @@ public class InstantEnemyEditorGUI : EnemyEditorGUI
         Handles.color = Color.white;
     }
 }
+#endif

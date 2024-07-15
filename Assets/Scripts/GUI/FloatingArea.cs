@@ -1,8 +1,5 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
+#if UNITY_EDITOR
 using UnityEngine;
-using UnityEngine.UIElements;
 
 public class FloatingAreaManager
 {
@@ -81,3 +78,4 @@ public abstract class FloatingArea
 
     }
 }
+#endif

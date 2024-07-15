@@ -1,18 +1,9 @@
 using System;
-using UnityEditor;
 using UnityEngine;
 
-[Serializable]
-public struct SquareColor
-{
-    public Color face;
-    public Color outline;
-    public SquareColor(Color face, Color outline)
-    {
-        this.face = face;
-        this.outline = outline;
-    }
-}
+#if UNITY_EDITOR
+using UnityEditor;
+
 [CustomPropertyDrawer(typeof(SquareColor))]
 public class SquareColorDrawer : PropertyDrawer
 {
@@ -41,5 +32,18 @@ public class SquareColorDrawer : PropertyDrawer
         outlineColor.colorValue = EditorGUILayout.ColorField(outlineColor.colorValue);
 
         EditorGUILayout.EndHorizontal();
+    }
+}
+#endif
+
+[Serializable]
+public struct SquareColor
+{
+    public Color face;
+    public Color outline;
+    public SquareColor(Color face, Color outline)
+    {
+        this.face = face;
+        this.outline = outline;
     }
 }

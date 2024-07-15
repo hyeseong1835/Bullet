@@ -1,6 +1,6 @@
-using System.Collections;
-using System.Collections.Generic;
+#if UNITY_EDITOR
 using UnityEditor;
+#endif
 using UnityEngine;
 
 public enum GameState
@@ -38,6 +38,8 @@ public class GameManager : MonoBehaviour
     {
 #if UNITY_EDITOR
         if (EditorApplication.isPlaying) stage.Init();
+#else
+        stage.Init();
 #endif
     }
 
@@ -108,7 +110,9 @@ public class GameManager : MonoBehaviour
             if (state == GameState.Play || state == GameState.Pause)
             {
                 time += 1;
-                StageEditor.instance.Repaint();
+#if UNITY_EDITOR
+                StageEditor.instance?.Repaint();
+#endif
             }
         }
         if (Input.GetKeyDown(KeyCode.P))
@@ -130,7 +134,9 @@ public class GameManager : MonoBehaviour
             state = GameState.Play;
             mainPanel.SetActive(false);
             time = 0;
-            StageEditor.instance.Repaint();
+#if UNITY_EDITOR
+            StageEditor.instance?.Repaint();
+#endif
             stage.lastIndex = -1;
         }
     }
@@ -145,12 +151,16 @@ public class GameManager : MonoBehaviour
         {
             stage.lastIndex = -1;
             time = 0;
-            StageEditor.instance.Repaint();
+#if UNITY_EDITOR
+            StageEditor.instance?.Repaint();
+#endif
             return;
         }
         
         time += gameSpeed * Time.deltaTime;
-        StageEditor.instance.Repaint();
+#if UNITY_EDITOR
+        StageEditor.instance?.Repaint();
+#endif
     }
     void Pause()
     {

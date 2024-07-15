@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 using UnityEditor;
 
 public abstract class EnemyEditorGUI
@@ -19,3 +20,4 @@ public abstract class EnemyEditorGUI
     public virtual void DrawSameTimeEnemyDataGizmos(EditorEnemyData enemyData) { }
     public virtual void Render(PreviewRenderUtility renderer, EditorEnemyData enemyData) { }
 }
+#endif

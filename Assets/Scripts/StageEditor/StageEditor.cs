@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections;
+﻿#if UNITY_EDITOR
+using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Xml.Linq;
 using UnityEditor;
 using UnityEditor.Experimental;
 using UnityEngine;
@@ -1169,3 +1166,4 @@ public class StageEditor : EditorWindow
         return new Vector2(Mathf.Lerp(timeLineStart, timeLineEnd, timeRatio), timeLineY);
     }
 }
+#endif

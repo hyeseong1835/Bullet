@@ -1,6 +1,5 @@
+#if UNITY_EDITOR
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class TextPopupFloatingArea : FloatingArea
@@ -56,3 +55,4 @@ public class TextPopupFloatingArea : FloatingArea
         return GUI.skin.label.lineHeight * array.Length + 20;
     }
 }
+#endif

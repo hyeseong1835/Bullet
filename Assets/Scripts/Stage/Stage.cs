@@ -88,9 +88,9 @@ public class Stage : ScriptableObject
     public void Read(int startIndex, float curTime)
     {
 #if UNITY_EDITOR
-        StageEditor.data.RefreshStageArray();
-        StageEditor.data.SelectStage(this);
-        StageEditor.instance.Repaint();
+        StageEditor.data?.RefreshStageArray();
+        StageEditor.data?.SelectStage(this);
+        StageEditor.instance?.Repaint();
 #endif
         for (int i = startIndex; i < enemySpawnData.Length; i++)
         {
@@ -103,7 +103,7 @@ public class Stage : ScriptableObject
             }
 
 #if UNITY_EDITOR
-            StageEditor.data.SelectEnemyData(data);
+            StageEditor.data?.SelectEnemyData(data);
 #endif
             GameObject enemyObj = enemyPool[data.prefabTypeIndex][data.prefabIndex].Get();
 

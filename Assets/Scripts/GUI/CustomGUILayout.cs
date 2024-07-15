@@ -1,5 +1,5 @@
+#if UNITY_EDITOR
 using System;
-using System.Security.Cryptography;
 using UnityEditor;
 using UnityEngine;
 
@@ -62,3 +62,4 @@ public static class CustomGUILayout
         EditorGUILayout.EndHorizontal();
     }
 }
+#endif

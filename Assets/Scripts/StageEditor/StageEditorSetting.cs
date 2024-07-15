@@ -1,5 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
+#if UNITY_EDITOR
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "Setting", menuName = "StageEditor/Setting")]
@@ -52,3 +51,4 @@ public class StageEditorSetting : ScriptableObject
 
     public float timeMoveSnap = 0.5f;
 }
+#endif
