@@ -88,7 +88,8 @@ public class StageEditor : EditorWindow
     private void OnDisable()
     {
         Debug.Log("Disable");
-
+        
+        Apply();
         ClearPreview();
     }
 
@@ -165,7 +166,12 @@ public class StageEditor : EditorWindow
 
     #endregion
 
-
+    void Apply()
+    {
+        data.ApplyToStage();
+        EditorUtility.SetDirty(data);
+        EditorUtility.SetDirty(setting);
+    }
     void OnGUI()
     {
         #region Init
@@ -489,9 +495,7 @@ public class StageEditor : EditorWindow
 
             if (GUI.Button(rect, "Apply"))
             {
-                data.ApplyToStage();
-                EditorUtility.SetDirty(data);
-                EditorUtility.SetDirty(setting);
+                Apply();
             }
 
             void Draw()
@@ -533,6 +537,13 @@ public class StageEditor : EditorWindow
                     CustomGUILayout.BeginNewTab();
                     {
                         DrawSelectInfo();
+                    }
+                    CustomGUILayout.EndNewTab();
+
+                    CustomGUILayout.TitleHeaderLabel(title: "Preview Object");
+                    CustomGUILayout.BeginNewTab();
+                    {
+                        DrawPreviewObject();
                     }
                     CustomGUILayout.EndNewTab();
 
@@ -661,6 +672,33 @@ public class StageEditor : EditorWindow
                                 EditorGUILayout.TextField("Prefab Type", "None");
                             }
                             else EditorGUILayout.TextField("Prefab Type", data.selectedEnemyData.prefabType.Name);
+                        }
+                    }
+
+                    void DrawPreviewObject()
+                    {
+                        for (int categoryIndex = 0; categoryIndex < enemyEditorGUIDictionary.Count; categoryIndex++)
+                        {
+                            foreach (EnemyEditorGUI category in enemyEditorGUIDictionary.Values)
+                            {
+                                string categoryName = category.GetType().Name;
+                                CustomGUILayout.UnderBarTitleText(categoryName);
+
+                                if (category.instance.Count == 0)
+                                {
+                                    CustomGUILayout.WarningLabel("Empty List");
+                                }
+                                else
+                                {
+                                    foreach (EditorEnemyData key in category.instance.Keys)
+                                    {
+                                        EditorGUILayout.BeginHorizontal();
+                                        EditorGUILayout.ObjectField(key.spawnData, typeof(EnemySpawnData), true);
+                                        EditorGUILayout.ObjectField(category.instance[key], typeof(GameObject), true);
+                                        EditorGUILayout.EndHorizontal();
+                                    }
+                                }
+                            }
                         }
                     }
                 }
