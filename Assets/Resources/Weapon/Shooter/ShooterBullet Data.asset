@@ -9,16 +9,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 670b6a037a7801043ac956d52734c08c, type: 3}
+  m_Script: {fileID: 11500000, guid: b9e7b14e036d28040af516a8ea94f2a8, type: 3}
   m_Name: ShooterBullet Data
   m_EditorClassIdentifier: 
   pool:
     prefab: {fileID: 4026119069186307829, guid: 6c32088d52cab394db9e36aaf369b63e, type: 3}
-    holder: {fileID: 0}
-    destroyDelay: 5
+    destroyDelay: 0
     startCount: 0
-    stayCount: 5
-    pool: []
+    stayCount: 0
+    objects: []
     waitDestroy: []
-  damage: 1
-  speed: 5

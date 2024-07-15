@@ -49,6 +49,8 @@ MonoBehaviour:
   data: {fileID: 11400000, guid: c1b3633329d0e60489260e2745c5ebb3, type: 2}
   look: {fileID: 2664321884938356984}
   tip: {fileID: 8451197951581907350}
+  damage: 0
+  speed: 0
 --- !u!1 &1671753412672062617
 GameObject:
   m_ObjectHideFlags: 0
@@ -130,6 +132,8 @@ MonoBehaviour:
   data: {fileID: 11400000, guid: c1b3633329d0e60489260e2745c5ebb3, type: 2}
   look: {fileID: 8275753524351679568}
   tip: {fileID: 6071449371288408371}
+  damage: 0
+  speed: 0
 --- !u!1 &2254076498694633948
 GameObject:
   m_ObjectHideFlags: 0

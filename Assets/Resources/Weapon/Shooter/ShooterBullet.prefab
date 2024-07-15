@@ -45,13 +45,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 4026119069186307829}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9bddcc5887355814bbf891adeed6000b, type: 3}
+  m_Script: {fileID: 11500000, guid: b0c4e05831d388847ad1357ebc381e4d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rigid: {fileID: 724451257054834979}
-  coll: {fileID: -7032472724715554909}
-  bulletType: 0
   data: {fileID: 11400000, guid: 0fd8e71e07a98c146b7841e7778e5790, type: 2}
+  rigid: {fileID: 0}
+  coll: {fileID: 0}
 --- !u!212 &3530415081516201019
 SpriteRenderer:
   m_ObjectHideFlags: 0

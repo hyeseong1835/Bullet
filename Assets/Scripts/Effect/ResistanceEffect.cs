@@ -27,5 +27,6 @@ public class ResistanceEffect : UpgradableEffect
     public override void OnEnd()
     {
         player.resistance = 1;
+        gameObject.SetActive(false);
     }
 }

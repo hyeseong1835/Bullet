@@ -7,8 +7,8 @@ public class Bullet : MonoBehaviour
 {
     public BulletData data;
 
-    public Rigidbody2D rigid;
-    public Collider2D coll;
+    [HideInInspector] public Rigidbody2D rigid;
+    [HideInInspector] public Collider2D coll;
 
     Action<Bullet> updateEvent;
     Action<Bullet> deUseEvent;

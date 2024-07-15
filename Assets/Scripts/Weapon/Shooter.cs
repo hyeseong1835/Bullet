@@ -10,6 +10,9 @@ public class Shooter : Weapon
     [SerializeField] Transform tip;
     Bullet bullet;
 
+    public float damage;
+    public float speed;
+
     void Awake()
     {
         bullet = data.bulletPrefab.GetComponent<Bullet>();
@@ -26,7 +29,7 @@ public class Shooter : Weapon
 
         obj.GetComponent<Bullet>().Initialize(
             (bullet) => {
-                transform.position += transform.up * bullet.data.speed * Time.deltaTime;
+                transform.position += transform.up * speed * Time.deltaTime;
 
                 if (bullet.coll.ToBox().IsExitGame(transform.position))
                 {
@@ -39,7 +42,7 @@ public class Shooter : Weapon
             (bullet, coll) =>
             {
                 Entity entity = coll.GetComponent<Entity>();
-                entity.TakeDamage(bullet.data.damage * player.damage);
+                entity.TakeDamage(damage * player.damage);
 
                 bullet.DeUse();
             },
