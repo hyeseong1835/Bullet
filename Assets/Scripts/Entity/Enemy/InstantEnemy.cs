@@ -66,19 +66,17 @@ public class InstantEnemy : Enemy
                 DeUse();
             }
         }
-
-        /*
-        if (dir.x != 0) CheckOver(dir.x, transform.position.x, spawnData.endPos.x);
-        else CheckOver(dir.y, transform.position.y, spawnData.endPos.y);
-
-        void CheckOver(float dir, float cur, float end)
-        {
-            if ((dir > 0) ? cur > end : cur < end) Destroy(gameObject);
-        }
-        */
     }
     void DeUse()
     {
         GameManager.instance.stage.enemyPool[spawnData.prefabTypeIndex][spawnData.prefabIndex].DeUse(gameObject);
+    }
+    void OnTriggerEnter2D(Collider2D other)
+    {
+        Debug.Log($"Collide: {other.name}[{LayerMask.LayerToName(other.gameObject.layer)}]");
+        if (other.gameObject.layer == 10)
+        {
+            other.GetComponent<Player>().TakeDamage(data.collideDamage);
+        }
     }
 }

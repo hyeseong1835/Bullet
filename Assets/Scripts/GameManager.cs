@@ -18,6 +18,8 @@ public class GameManager : MonoBehaviour
     [SerializeField] GameObject mainPanel;
     public Stage stage;
 
+    [SerializeField] ResistanceEffect Resistance2Effect;
+
     void Awake()
     {
         instance = this;
@@ -49,6 +51,22 @@ public class GameManager : MonoBehaviour
                 case GameState.Play:
                 Play();
                 break;
+        }
+        DebugInput();
+    }
+    void DebugInput()
+    {
+        if (Input.GetKeyDown(KeyCode.F1))
+        {
+            if(Resistance2Effect.gameObject.activeInHierarchy)
+            {
+                Resistance2Effect.Stop();
+            }
+            else
+            {
+                Resistance2Effect.Execute(99999);
+            }
+            
         }
     }
     void Ready()

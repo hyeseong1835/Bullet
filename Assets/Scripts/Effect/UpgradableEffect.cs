@@ -13,9 +13,33 @@ public abstract class UpgradableEffect : Effect
     {
         OnEnd();
         UpgradableEffect effect = GetVariant(level + 1);
-        effect.gameObject.SetActive(true);
         effect.Execute(time);
         gameObject.SetActive(false);
+    }
+    public override void Execute(float time)
+    {
+        for (int i = GetVariantCount() - 1; i >= 0; i--)
+        {
+            UpgradableEffect variant = GetVariant(i);
+            if (variant.gameObject.activeInHierarchy)
+            {
+                if (i > level)
+                {
+                    break;
+                }
+                else if (i == level)
+                {
+                    time += variant.time;
+                    break;
+                }
+                else if (i < level)
+                {
+                    variant.Stop();
+                    break;
+                }
+            }
+        }
+        base.Execute(time);
     }
     public void Init()
     {

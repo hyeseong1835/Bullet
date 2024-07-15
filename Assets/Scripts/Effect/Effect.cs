@@ -30,13 +30,14 @@ public abstract class Effect : MonoBehaviour
     {
         this.time += time;
         maxTime = this.time;
-
+        gameObject.SetActive(true);
         OnStart();
     }
     public void Stop()
     {
         time = 0;
         OnEnd();
+        gameObject.SetActive(false);
     }
     public virtual void OnStart() { }
     public virtual void OnUpdate() { }

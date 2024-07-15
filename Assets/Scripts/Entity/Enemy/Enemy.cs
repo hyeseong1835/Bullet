@@ -48,8 +48,4 @@ public abstract class Enemy : Entity
         Drop();
         PoolHolder.instance.pools.Find((pool) => (pool.prefab.name == gameObject.name)).DeUse(gameObject);
     }
-    protected void OnValidate()
-    {
-        //gameObject.layer = LayerMask.NameToLayer("Enemy");
-    }
 }

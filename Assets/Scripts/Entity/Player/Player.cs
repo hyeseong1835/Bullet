@@ -32,8 +32,10 @@ public class Player : Entity
 
     public float damage = 1;
     public float speed = 1;
-    public float dash = 2;
 
+    public float dash = 2;
+    public float dashCoolTime = 0.5f;
+    public bool canDash = true;
 
     [SerializeField] Box moveLock;
 
@@ -79,7 +81,7 @@ public class Player : Entity
                 
                 Move();
             }
-            if (Input.GetMouseButtonDown(1))
+            if (canDash && Input.GetMouseButtonDown(1))
             {
                 if (input.toMouse.magnitude <= dash) Dash(input.toMouse);
                 else Dash(input.toMouse.normalized * dash);
@@ -103,6 +105,9 @@ public class Player : Entity
     }
     void Dash(Vector2 move)
     {
+        canDash = false;
+        Invoke(nameof(DashCoolDown), dashCoolTime);
+
         grafic.rotation = Quaternion.Euler(0, 0, -Mathf.Atan2(input.toMouse.x, input.toMouse.y) * Mathf.Rad2Deg);
         
         foreach (RaycastHit2D hitInfo in Physics2D.CircleCastAll(transform.position, coll.radius, input.toMouse, input.toMouse.magnitude, Physics2D.GetLayerCollisionMask(LayerMask.NameToLayer("Player"))))
@@ -116,6 +121,10 @@ public class Player : Entity
         }
         
         transform.Translate(move);
+    }
+    void DashCoolDown()
+    {
+        canDash = true;
     }
     void WallCollide()
     {
@@ -148,6 +157,12 @@ public class Player : Entity
     void LevelUp()
     {
         level++;
+        
+        maxHp *= 1.1f;
+        hp = maxHp;
+
+        damage *= 1.1f;
+        
         Debug.Log($"Level Up! ({level})");
     }
     void OnValidate()

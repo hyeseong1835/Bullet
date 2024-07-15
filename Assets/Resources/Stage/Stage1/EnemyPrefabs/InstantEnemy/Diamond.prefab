@@ -125,7 +125,8 @@ GameObject:
   m_Component:
   - component: {fileID: 6190976723722509557}
   - component: {fileID: -4634477571356202330}
-  - component: {fileID: 6198953502459008517}
+  - component: {fileID: -1857518030521445396}
+  - component: {fileID: 6317512063569534444}
   m_Layer: 12
   m_Name: Diamond
   m_TagString: Untagged
@@ -161,13 +162,40 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e40d3f8f3ef838242bfc7bc868f8b07a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  entityState: 0
   hp: 1
+  resistance: 1
+  entityState: 0
   data: {fileID: 11400000, guid: b882541f1f6a80e45bbd9f391b5cab1e, type: 2}
-  weapon: {fileID: 0}
   speed: 0.5
---- !u!58 &6198953502459008517
-CircleCollider2D:
+--- !u!50 &-1857518030521445396
+Rigidbody2D:
+  serializedVersion: 4
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5235914642448064442}
+  m_BodyType: 0
+  m_Simulated: 1
+  m_UseFullKinematicContacts: 0
+  m_UseAutoMass: 0
+  m_Mass: 1
+  m_LinearDrag: 0
+  m_AngularDrag: 0.05
+  m_GravityScale: 0
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_Interpolate: 0
+  m_SleepingMode: 0
+  m_CollisionDetection: 0
+  m_Constraints: 0
+--- !u!60 &6317512063569534444
+PolygonCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -199,8 +227,22 @@ CircleCollider2D:
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
-  serializedVersion: 2
-  m_Radius: 0.4
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0, y: 0}
+    oldSize: {x: 0, y: 0}
+    newSize: {x: 0, y: 0}
+    adaptiveTilingThreshold: 0
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  m_Points:
+    m_Paths:
+    - - {x: 0, y: 0.25}
+      - {x: -0.125, y: 0}
+      - {x: 0, y: -0.25}
+      - {x: 0.125, y: 0}
+  m_UseDelaunayMesh: 0
 --- !u!1 &5934374024779123840
 GameObject:
   m_ObjectHideFlags: 0
