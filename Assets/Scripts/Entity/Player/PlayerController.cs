@@ -24,6 +24,8 @@ public class PlayerController : Entity
 
     [SerializeField] Box moveLock;
 
+    [SerializeField] List<Effect> effects = new List<Effect>();
+
     [SerializeField] Weapon weapon;
     [SerializeField] List<Weapon> autoWeaponList = new List<Weapon>();
 
