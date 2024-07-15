@@ -27,7 +27,7 @@ public abstract class Item : MonoBehaviour
     {
         OnPickup();
 
-        Destroy(gameObject);
+        ItemData.pool.DeUse(gameObject);
     }
     protected abstract void OnPickup();
 }

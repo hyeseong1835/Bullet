@@ -45,8 +45,8 @@ public class Pool
     public int startCount;
     public int stayCount;
 
-    [HideInInspector] public List<GameObject> objects;
-    [HideInInspector] public List<WaitDestroyElement> waitDestroy;//-|
+    public List<GameObject> objects;
+    public List<WaitDestroyElement> waitDestroy;//-|
 
     [SerializeField] Action<GameObject> addEvent;
 
@@ -62,11 +62,11 @@ public class Pool
     {
         this.addEvent = addEvent;
 
-        if (holder == null)
-        {
-            holder = new GameObject(prefab.name).transform;
-            holder.SetParent(PoolHolder.instance.transform);
-        }
+        if (holder != null) UnityEngine.Object.Destroy(holder.gameObject);
+
+        holder = new GameObject(prefab.name).transform;
+        holder.SetParent(PoolHolder.instance.transform);
+
         if (objects == null) objects = new List<GameObject>();
         else if (objects.Count != 0)
         {
@@ -102,7 +102,7 @@ public class Pool
             GameObject obj = objects[i];
             if (obj == null)
             {
-                Debug.LogError("Pool has null element");
+                Debug.LogWarning($"Pool({prefab.name}) has null element({i})");
                 objects.RemoveAt(i);
                 continue;
             }

@@ -25,6 +25,8 @@ public class Player : Entity
 
     [HideInInspector] public Rigidbody2D rigid;
     [HideInInspector] public CircleCollider2D coll;
+
+    [SerializeField] ParticleSystem levelUpParticle;
     [SerializeField] Transform weaponHolder;
 
     public override float GetMaxHP() => maxHp;
@@ -154,7 +156,7 @@ public class Player : Entity
             LevelUp();
         }
     }
-    void LevelUp()
+    public void LevelUp()
     {
         level++;
         
@@ -162,8 +164,21 @@ public class Player : Entity
         hp = maxHp;
 
         damage *= 1.1f;
-        
+        levelUpParticle.Play();//
+
         Debug.Log($"Level Up! ({level})");
+    }
+    public void LevelDown()
+    {
+        level--;
+
+        maxHp /= 1.1f;
+
+        if (hp > maxHp) hp = maxHp;
+
+        damage /= 1.1f;
+
+        Debug.Log($"Level Down! ({level})");
     }
     void OnValidate()
     {

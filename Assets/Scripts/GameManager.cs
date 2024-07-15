@@ -11,6 +11,7 @@ public enum GameState
 public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
+    static Player player => Player.instance;
 
     public GameState state;
     public static bool IsEditor => instance.state == GameState.Editor;
@@ -84,6 +85,32 @@ public class GameManager : MonoBehaviour
                 Resistance2Effect.Execute(99999);
             }
         }
+        if (Input.GetKeyDown(KeyCode.F2))
+        {
+            if(player.level + 1 < player.levelUpExp.Length)
+            {
+                player.LevelUp();
+            }
+        }
+        if (Input.GetKeyDown(KeyCode.F3))
+        {
+            if (player.level - 1 >= 0)
+            {
+                player.LevelDown();
+            }
+        }
+        if (Input.GetKeyDown(KeyCode.F4))
+        {
+            player.hp = player.maxHp;
+        }
+        if (Input.GetKeyDown(KeyCode.F7))
+        {
+            if (state == GameState.Play || state == GameState.Pause)
+            {
+                time += 1;
+                StageEditor.instance.Repaint();
+            }
+        }
         if (Input.GetKeyDown(KeyCode.P))
         {
             if(gameSpeed == 0)
@@ -103,6 +130,7 @@ public class GameManager : MonoBehaviour
             state = GameState.Play;
             mainPanel.SetActive(false);
             time = 0;
+            StageEditor.instance.Repaint();
             stage.lastIndex = -1;
         }
     }
@@ -117,10 +145,12 @@ public class GameManager : MonoBehaviour
         {
             stage.lastIndex = -1;
             time = 0;
+            StageEditor.instance.Repaint();
             return;
         }
         
         time += gameSpeed * Time.deltaTime;
+        StageEditor.instance.Repaint();
     }
     void Pause()
     {

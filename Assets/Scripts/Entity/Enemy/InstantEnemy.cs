@@ -73,7 +73,6 @@ public class InstantEnemy : Enemy
     }
     void OnTriggerEnter2D(Collider2D other)
     {
-        Debug.Log($"Collide: {other.name}[{LayerMask.LayerToName(other.gameObject.layer)}]");
         if (other.gameObject.layer == 10)
         {
             other.GetComponent<Player>().TakeDamage(data.collideDamage);

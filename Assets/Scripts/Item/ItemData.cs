@@ -8,11 +8,17 @@ public class ItemData : ScriptableObject
 
     public Item Drop()
     {
-        if (pool.holder == null) pool.Init();
-
-        Item item = pool.Use().GetComponent<Item>();
-        item.ItemData = this;
+        if (pool.holder == null)
+        {
+            pool.Init(
+                (obj) => 
+                {
+                    Item item = obj.GetComponent<Item>();
+                    item.ItemData = this;
+                }
+            );
+        }
         
-        return item;
+        return pool.Use().GetComponent<Item>();
     }
 }

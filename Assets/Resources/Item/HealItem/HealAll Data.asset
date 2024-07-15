@@ -17,9 +17,6 @@ MonoBehaviour:
     destroyDelay: 0
     startCount: 0
     stayCount: 0
-    pool:
-    - {fileID: 0}
-    - {fileID: 0}
-    - {fileID: 0}
+    objects: []
     waitDestroy: []
   healAmount: 999
