@@ -4,22 +4,50 @@ using System.IO;
 using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
+using static UnityEngine.Rendering.DebugUI;
 
 public class InstantEnemyEditorGUI : EnemyEditorGUI
 {
     static Event e => UnityEngine.Event.current;
     Dictionary<EditorEnemyData, GameObject> instance = new Dictionary<EditorEnemyData, GameObject>();
 
+    public override void Refresh()
+    {
+        foreach (GameObject value in instance.Values)
+        {
+            Object.DestroyImmediate(value);
+        }
+        instance.Clear();
+    }
     public override void OnSelected(EditorEnemyData enemyData)
     {
-        GameObject obj = StageEditor.instance.previewRender.InstantiatePrefabInScene(enemyData.prefab);
-        instance.Add(enemyData, obj);
+        GameObject obj;
+        if (instance.TryGetValue(enemyData, out obj))
+        {
+            //Debug.LogWarning($"Can't Select (Key({enemyData.prefab.name}) already exist)");
+            if (obj != null) Object.DestroyImmediate(obj);
+
+            obj = StageEditor.instance.previewRender.InstantiatePrefabInScene(enemyData.prefab);
+            instance[enemyData] = obj;
+        }
+        else
+        {
+            obj = StageEditor.instance.previewRender.InstantiatePrefabInScene(enemyData.prefab);
+            instance.Add(enemyData, obj);
+        }
         obj.transform.position = ((InstantEnemySpawnData)(enemyData.spawnData)).startPos;
     }
     public override void OnDeSelected(EditorEnemyData enemyData)
     {
-        Object.DestroyImmediate(instance[enemyData]);
-        instance.Remove(enemyData);
+        if (instance.TryGetValue(enemyData, out GameObject obj) == false)
+        {
+            //Debug.LogWarning($"Can't DeSelect (Key({enemyData.prefab.name}) not found)");
+        }
+        else
+        {
+            Object.DestroyImmediate(obj);
+            instance.Remove(enemyData);
+        }
     }
 
     public override void Event()

@@ -93,6 +93,16 @@ public class StageEditor : EditorWindow
     }
 
     #endregion
+
+    #region EnemyEditorGUI
+
+    public void RefreshEnemyEditors()
+    {
+        foreach (EnemyEditorGUI editorGUI in enemyEditorGUIDictionary.Values)
+        {
+            editorGUI.Refresh();
+        }
+    }
     public EnemyEditorGUI GetEnemyEditor(EnemySpawnData spawnData) => GetEnemyEditor(spawnData.EditorType);
     public EnemyEditorGUI GetEnemyEditor(Type editorType)
     {
@@ -105,11 +115,14 @@ public class StageEditor : EditorWindow
         }
         return editorInstance;
     }
+
+    #endregion
+
     #region DrawPreview
 
     public void ClearPreview()
     {
-        data.SelectEnemyData(-1);
+        data.sameTimeEnemyList.Clear();
         previewRender.Cleanup();
     }
     public RenderTexture CreatePreviewTexture(Rect rect)
@@ -686,6 +699,11 @@ public class StageEditor : EditorWindow
                         //Refresh
                         if (GUI.Button(GUILayoutUtility.GetRect(setting.buttonWidth, setting.buttonHeight, GUILayout.ExpandWidth(false)).GetAddY(2), "Refresh"))
                         {
+                            RefreshEnemyEditors();
+                            enemyEditorGUIDictionary.Clear();
+
+                            PreviewInit();
+
                             data.RefreshStageArray();
                             data.RefreshTimeFoldout();
                             data.SelectEnemyData(-1);

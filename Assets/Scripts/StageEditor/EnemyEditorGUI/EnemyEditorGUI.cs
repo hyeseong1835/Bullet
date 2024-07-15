@@ -3,6 +3,7 @@ using UnityEditor;
 
 public abstract class EnemyEditorGUI
 {
+    public virtual void Refresh() { }
     public virtual void OnSelected(EditorEnemyData enemyData) { }
     public virtual void OnDeSelected(EditorEnemyData enemyData) { }
 
