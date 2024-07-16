@@ -111,6 +111,11 @@ public class StageEditor : EditorWindow
 
         data.RefreshStageArray();
         data.RefreshTimeFoldout();
+
+        selectRect = default;
+
+        floatingArea.area = null;
+        enemySpawnDataReNameFloatingAreaHeader = default;
     }
 
     #endregion
@@ -483,7 +488,14 @@ public class StageEditor : EditorWindow
             );
             GUILayout.BeginArea(area);
             {
-                fileViewerScroll = EditorGUILayout.BeginScrollView(new Vector2(0, fileViewerScroll), false, true, GUIStyle.none, GUI.skin.verticalScrollbar, GUIStyle.none).y;
+                fileViewerScroll = EditorGUILayout.BeginScrollView(
+                    new Vector2(0, fileViewerScroll), 
+                    false, 
+                    true, 
+                    GUIStyle.none, 
+                    GUI.skin.verticalScrollbar, 
+                    GUIStyle.none
+                ).y;
                 area.width -= 15;
                 {
                     EditorGUILayout.BeginHorizontal();
@@ -504,15 +516,20 @@ public class StageEditor : EditorWindow
             }
             GUILayout.EndArea();
 
-            Rect rect = new Rect();
-            rect.size = new Vector2(setting.buttonWidth, setting.buttonHeight);
-            rect.position = area.position + area.size - rect.size;
+            Rect applyButtonRect = new Rect();
+            applyButtonRect.size = new Vector2(setting.buttonWidth, setting.buttonHeight);
+            applyButtonRect.position = area.position + area.size - applyButtonRect.size;
 
-            if (GUI.Button(rect, "Apply"))
+            if (GUI.Button(applyButtonRect, "Apply"))
             {
                 Apply();
             }
 
+            if (GUI.Button(applyButtonRect.GetAddX(-applyButtonRect.width), "Refresh"))
+            {
+                Refresh();
+            }
+            
             void Draw()
             {
                 GUILayout.Label("File Viewer", EditorStyles.boldLabel);
@@ -531,7 +548,7 @@ public class StageEditor : EditorWindow
                     }
                     else floatingArea.Destroy();
                 }
-                DrawSpawnDataSelect();
+                DrawSpawnDataList();
 
 
 
@@ -541,8 +558,6 @@ public class StageEditor : EditorWindow
                 {
                     EditorGUILayout.ObjectField(data, typeof(StageEditorData), false);
                     EditorGUILayout.ObjectField(setting, typeof(StageEditorSetting), false);
-
-                    fileViewerScroll = EditorGUILayout.FloatField("FileViewerScroll", fileViewerScroll);
 
                     DrawSelectStage();
 
@@ -577,18 +592,53 @@ public class StageEditor : EditorWindow
                         CustomGUILayout.BeginNewTab();
                         {
                             CustomGUILayout.TitleHeaderLabel("Prefab");
-                            if (data.selectedStage.enemyPrefabs == null) CustomGUILayout.WarningLabel("data.selectedStage.enemyPrefabs is null");
-                            else if (data.selectedStage.enemyPrefabs.Length == 0) CustomGUILayout.WarningLabel("data.selectedStage.enemyPrefabs is Empty");
+                            if (data.selectedStage.enemyPrefabs == null) CustomGUILayout.WarningLabel("EnemyPrefabs is null");
+                            else if (data.selectedStage.enemyPrefabs.Length == 0) CustomGUILayout.WarningLabel("EnemyPrefabs is Empty");
                             else
                             {
-                                CustomGUILayout.BeginNewTab();
+                                foreach (GameObject prefab in data.selectedStage.enemyPrefabs)
                                 {
-                                    foreach (GameObject prefab in data.selectedStage.enemyPrefabs)
-                                    {
-                                        EditorGUILayout.ObjectField(prefab, typeof(GameObject), false);
-                                    }
+                                    EditorGUILayout.ObjectField(prefab, typeof(GameObject), false);
                                 }
-                                CustomGUILayout.EndNewTab();
+                            }
+
+                            CustomGUILayout.TitleHeaderLabel("Spawn Data");
+                            if (data.selectedStage.enemySpawnDataArray == null)
+                            {
+                                CustomGUILayout.WarningLabel("EnemySpawnDataArray is null");
+                            }
+                            else if (data.selectedStage.enemySpawnDataArray.Length == 0) CustomGUILayout.WarningLabel("EnemySpawnDataArray is Empty");
+                            else
+                            {
+                                float prevTime = -1;
+                                foreach (EnemySpawnData enemySpawnData in data.selectedStage.enemySpawnDataArray)
+                                {
+                                    Rect fieldRect = GUILayoutUtility.GetRect(
+                                        0,
+                                        EditorGUIUtility.singleLineHeight,
+                                        GUILayout.ExpandWidth(true)
+                                    );
+
+                                    //Time Label
+                                    Rect timeRect = fieldRect.GetSetWidth(setting.timeWidth);
+                                    if (enemySpawnData.spawnTime != prevTime)
+                                    {
+                                        EditorGUI.LabelField(
+                                            timeRect,
+                                            enemySpawnData.spawnTime.ToString("F1")
+                                        );
+                                        prevTime = enemySpawnData.spawnTime;
+                                    }
+
+                                    //Object Field
+                                    Rect objectRect = fieldRect.GetAddX(timeRect.width).GetAddWidth(-timeRect.width);
+                                    EditorGUI.ObjectField(
+                                        objectRect, 
+                                        enemySpawnData, 
+                                        typeof(EnemySpawnData), 
+                                        false
+                                    );
+                                }
                             }
                         }
                         CustomGUILayout.EndNewTab();
@@ -722,8 +772,6 @@ public class StageEditor : EditorWindow
 
                 void DrawStageSelect()     
                 {
-                    GUILayout.BeginHorizontal();
-                    {
                         if (data.stageArray == null)
                         {
                             CustomGUILayout.WarningLabel("StageArray is null");
@@ -750,16 +798,9 @@ public class StageEditor : EditorWindow
                                 data.SelectStage(stageSelectInput);
                             }
                         }
-                        
-                        if (GUI.Button(GUILayoutUtility.GetRect(setting.buttonWidth, setting.buttonHeight, GUILayout.ExpandWidth(false)).GetAddY(2), "Refresh"))
-                        {
-                            Refresh();
-                        }
-                    }
-                    GUILayout.EndHorizontal();
                 }
 
-                void DrawSpawnDataSelect() 
+                void DrawSpawnDataList() 
                 {
                     EditorGUILayout.Space(5);
                     EditorGUILayout.LabelField("Spawn Data", EditorStyles.boldLabel);
@@ -971,6 +1012,7 @@ public class StageEditor : EditorWindow
                 
                 #endregion
             }
+            
             void AddMenu(Rect rect, EditorEnemyData editorEnemyData)
             {
                 if (EventUtility.MouseDown(1) && rect.Contains(e.mousePosition))
@@ -978,7 +1020,7 @@ public class StageEditor : EditorWindow
                     e.Use();
                     GenericMenu menu = new GenericMenu();
 
-                    menu.AddItem(
+                    /*menu.AddItem(
                         new GUIContent("Rename"),
                         false,
                         () =>
@@ -1003,6 +1045,58 @@ public class StageEditor : EditorWindow
                             );
                             floatingArea.SetRect(enemySpawnDataReNameFloatingAreaHeader.GetAddY(-fileViewerScroll));
                         }
+                    );*/
+                    menu.AddItem(
+                        new GUIContent("Copy"),
+                        false,
+                        () =>
+                        {
+                            EnemySpawnData spawnData = editorEnemyData.spawnData.Copy();
+                            data.CreateEnemySpawnData(spawnData);
+
+                            EditorEnemyData copy = new EditorEnemyData(
+                                spawnData,
+                                editorEnemyData.prefab,
+                                editorEnemyData.prefabType
+                            );
+                            data.InsertToEditorEnemySpawnDataList(copy);
+                            Repaint();
+                            /*
+                            string GetNextPath(string target)
+                            {
+                                string noExtensionPath = targetPath.Substring(0, targetPath.Length - ".asset".Length);
+
+                                if (noExtensionPath[^1] == ')')
+                                {
+                                    string noNumberPath = noExtensionPath.Substring(
+                                        0, 
+                                        noExtensionPath.LastIndexOf('(')
+                                    );
+                                    //a (1).asset (11)
+                                    //0123456789
+                                    //noExtension: a (1) (5)
+                                    //             01234
+                                    //noNumber: a_ (2)
+                                    //          01
+
+                                    bool isNumber =
+                                        int.TryParse(
+                                            noExtensionPath.Substring(
+                                                noNumberPath.Length + 1,
+                                                noExtensionPath.Length - noNumberPath.Length - 2
+                                            ),
+                                            out int number
+                                        );
+                                    if (isNumber)
+                                    {
+                                        return $"{noNumberPath}({number + 1}).asset";
+                                    }
+                                    else return $"{noNumberPath}(_).asset";
+                                }
+                                else return $"{noExtensionPath}(Copy).asset";
+                            }
+                            */
+                        }
                     );
 
                     menu.AddItem(
@@ -1023,6 +1117,7 @@ public class StageEditor : EditorWindow
                     menu.ShowAsContext();
                 }
             }
+            
             void SelectEnemyData(int index)
             {
                 GUI.FocusControl(null);

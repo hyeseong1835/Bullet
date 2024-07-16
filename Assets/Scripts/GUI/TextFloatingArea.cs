@@ -9,7 +9,6 @@ public class TextFloatingArea : FloatingArea
     public string title;
     public Action<string> changeEvent;
     public Action<string> applyEvent;
-    public Rect textFieldRect = default;
 
     public TextFloatingArea(string text, Action<string> changeEvent = null, Action<string> applyEvent = null, string title = "")
     {
@@ -20,15 +19,11 @@ public class TextFloatingArea : FloatingArea
     }
     public override void EventListen(Event e)
     {
-        if (textFieldRect != default && EventUtility.MouseDown(0) && textFieldRect.Contains(e.mousePosition))
-        {
-            EditorGUI.FocusTextInControl("TextField");
-        }
         if (EventUtility.KeyDown(KeyCode.Return) && GUI.GetNameOfFocusedControl() == "TextField")
         {
             GUI.FocusControl(null);
             applyEvent(text);
-            manager.Destroy();
+            manager.area = null;
         }
     }
     public override void Draw()
@@ -39,9 +34,9 @@ public class TextFloatingArea : FloatingArea
 
             GUI.SetNextControlName("TextField");
             string input = GUILayout.TextField(text);
-            if (Event.current.type == EventType.Repaint)
+            if (GUI.GetNameOfFocusedControl() == "")
             {
-                textFieldRect = GUILayoutUtility.GetLastRect().GetAddPos(manager.rect.position);
+                EditorGUI.FocusTextInControl("TextField");
             }
             if (input != text)
             {

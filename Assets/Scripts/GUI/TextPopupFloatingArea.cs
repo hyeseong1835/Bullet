@@ -24,7 +24,7 @@ public class TextPopupFloatingArea : FloatingArea
                 {
                     selectEvent?.Invoke(i);
                     e.Use();
-                    manager.Destroy();
+                    manager.area = null;
                 }
             }
         }

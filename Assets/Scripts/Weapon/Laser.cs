@@ -38,7 +38,7 @@ public class Laser : Weapon
     IEnumerator Grafic()
     {
         grafic.SetActive(true);
-        yield return new WaitForSeconds(0.25f);
+        yield return new WaitForSeconds(0.1f);
         grafic.SetActive(false);
     }
 

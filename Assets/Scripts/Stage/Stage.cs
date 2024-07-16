@@ -8,13 +8,13 @@ public class Stage : ScriptableObject
 {
     public GameObject[] enemyPrefabs;
     public int[] enemyPrefabArrayCounts;
-    public EnemySpawnData[] enemySpawnData;
+
+    public EnemySpawnData[] enemySpawnDataArray;
 
     public Pool[][] enemyPool;
 
     public int lastIndex = -1;
     public float timeLength = 0;
-
 
     public void Init()
     {
@@ -45,9 +45,9 @@ public class Stage : ScriptableObject
         int result = 0;
         float prevTime = 0;
 
-        for (int i = startIndex; i < enemySpawnData.Length; i++)
+        for (int i = startIndex; i < enemySpawnDataArray.Length; i++)
         {
-            EnemySpawnData data = enemySpawnData[i];
+            EnemySpawnData data = enemySpawnDataArray[i];
             if (data.spawnTime != prevTime)
             {
                 if (time >= data.spawnTime)
@@ -66,9 +66,9 @@ public class Stage : ScriptableObject
     /// <returns></returns>
     public int FindBackIndex(float time, int startIndex = -1)
     {
-        if (startIndex == -1) startIndex = enemySpawnData.Length - 1;
+        if (startIndex == -1) startIndex = enemySpawnDataArray.Length - 1;
         
-        EnemySpawnData data = enemySpawnData[startIndex];
+        EnemySpawnData data = enemySpawnDataArray[startIndex];
         if (time < data.spawnTime)
         {
             return startIndex;
@@ -76,7 +76,7 @@ public class Stage : ScriptableObject
 
         for (int i = startIndex - 1; i >= 0; i--)
         {
-            data = enemySpawnData[i];
+            data = enemySpawnDataArray[i];
             if (time < data.spawnTime)
             {
                 return i + 1;
@@ -92,9 +92,9 @@ public class Stage : ScriptableObject
         StageEditor.data?.SelectStage(this);
         StageEditor.instance?.Repaint();
 #endif
-        for (int i = startIndex; i < enemySpawnData.Length; i++)
+        for (int i = startIndex; i < enemySpawnDataArray.Length; i++)
         {
-            EnemySpawnData data = enemySpawnData[i];
+            EnemySpawnData data = enemySpawnDataArray[i];
 
             if (data.spawnTime > curTime)
             {

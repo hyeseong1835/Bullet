@@ -20,6 +20,21 @@ public class EditorEnemyData
 
         prefab = SelectPrefab(spawnData.prefabIndex);
     }
+    public EditorEnemyData(EnemySpawnData spawnData, GameObject prefab, Type prefabType)
+    {
+        this.spawnData = spawnData;
+        this.prefabType = prefabType;
+
+        this.prefab = prefab;
+    }
+    public EditorEnemyData Copy()
+    {
+        return new EditorEnemyData(
+            spawnData.Copy(),
+            prefab,
+            prefabType
+        );
+    }
     public void Apply()
     {
         StageEditor.data.RefreshPrefabList();

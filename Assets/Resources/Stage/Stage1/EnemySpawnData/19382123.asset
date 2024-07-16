@@ -9,10 +9,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 72707a419bef5a144a8467c4489e64dc, type: 3}
-  m_Name: Data
+  m_Script: {fileID: 11500000, guid: c19460cbbd9821a4b80e2a5542f2f2d0, type: 3}
+  m_Name: 19382123
   m_EditorClassIdentifier: 
-  previewPos: {x: 592.9, y: 543.376}
-  cellSize: 47
-  inspectorLinePosX: 245
-  fileViewerLinePosX: 342
+  prefabIndex: 1
+  prefabTypeIndex: 0
+  spawnTime: 4
+  startPos: {x: 2, y: 2}
+  endPos: {x: -2, y: 0}

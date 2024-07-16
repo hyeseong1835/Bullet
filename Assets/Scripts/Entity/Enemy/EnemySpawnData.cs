@@ -10,4 +10,6 @@ public abstract class EnemySpawnData : ScriptableObject
     public int prefabIndex = -1;
     public int prefabTypeIndex = -1;
     public float spawnTime;
+
+    public abstract EnemySpawnData Copy();
 }

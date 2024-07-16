@@ -8,4 +8,16 @@ public class InstantEnemySpawnData : EnemySpawnData
     public override Type EditorType => typeof(InstantEnemyEditorGUI);
 #endif
     public Vector2 startPos, endPos;
+
+    public override EnemySpawnData Copy()
+    {
+        InstantEnemySpawnData copy = CreateInstance<InstantEnemySpawnData>();
+        copy.prefabIndex = prefabIndex;
+        copy.prefabTypeIndex = prefabTypeIndex;
+        copy.spawnTime = spawnTime;
+        copy.startPos = startPos;
+        copy.endPos = endPos;
+
+        return copy;
+    }
 }

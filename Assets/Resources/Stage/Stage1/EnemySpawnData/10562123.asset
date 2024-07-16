@@ -10,11 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c19460cbbd9821a4b80e2a5542f2f2d0, type: 3}
-  m_Name: InstantEnemy SpawnData 5
+  m_Name: 10562123
   m_EditorClassIdentifier: 
   prefabIndex: 0
   prefabTypeIndex: 0
-  spawnTime: 5
-  weapon: {fileID: 0}
-  startPos: {x: 2, y: 3}
-  endPos: {x: -2, y: 0}
+  spawnTime: 7
+  startPos: {x: -3, y: 2}
+  endPos: {x: 3, y: 2}

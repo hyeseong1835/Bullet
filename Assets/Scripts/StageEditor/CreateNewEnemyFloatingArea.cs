@@ -10,7 +10,7 @@ public class CreateNewEnemyFloatingArea : FloatingArea
     Rect createButtonRect = default;
     
     FloatingAreaManager _manager;
-    string name = "";
+    //string name = "";
 
     GameObject selectPrefab;
     int arrayIndex = -1;
@@ -42,7 +42,7 @@ public class CreateNewEnemyFloatingArea : FloatingArea
                 e.Use();
             }
             else if (createButtonRect != default 
-                && name != ""
+                //&& name != ""
                 && selectPrefab != null
                 && createButtonRect.Contains(e.mousePosition))
             {
@@ -77,7 +77,7 @@ public class CreateNewEnemyFloatingArea : FloatingArea
                             arrayIndex = i1;
                             elementIndex = i2;
                             selectPrefab = StageEditor.data.prefabLists[i1][i2];
-                            _manager.Destroy();
+                            _manager.area = null;
                         }
                     )
                 );
@@ -85,7 +85,7 @@ public class CreateNewEnemyFloatingArea : FloatingArea
             else
             {
                 enemyTypePopupRect = default;
-                _manager.Destroy();
+                _manager.area = null;
             }
         }
         void Create()
@@ -100,15 +100,13 @@ public class CreateNewEnemyFloatingArea : FloatingArea
                 spawnData.spawnTime = StageEditor.data.selectedEnemyData.spawnData.spawnTime;
                 StageEditor.data.timeFoldout[spawnData.spawnTime] = true;
             }
-            AssetDatabase.CreateAsset(
-                spawnData,
-                $"{StageEditor.data.GetStageDirectoryPath(StageEditor.data.selectedStage)}/EnemySpawnData/{name}.asset"
-            );
+            
+            StageEditor.data.CreateEnemySpawnData(spawnData);
 
             EditorEnemyData editorEnemyData = new EditorEnemyData(spawnData, prefabType);
             StageEditor.data.InsertToEditorEnemySpawnDataList(editorEnemyData);
             StageEditor.instance.Repaint();
-            manager.Destroy();
+            manager.area = null;
         }
     }
 
@@ -120,8 +118,8 @@ public class CreateNewEnemyFloatingArea : FloatingArea
             
             DrawNameField();
             DrawEnemyTypePopup();
-            if (name != ""
-                && selectPrefab != null
+            if (//name != "" && 
+                selectPrefab != null
             )
             {
                 DrawCreateButton();
@@ -134,10 +132,10 @@ public class CreateNewEnemyFloatingArea : FloatingArea
         void DrawNameField()
         {
             GUI.SetNextControlName("NameField");
-            name = EditorGUILayout.TextField(
-                "Name", 
-                name
-            );
+            //name = EditorGUILayout.TextField(
+              //  "Name", 
+                //name
+            //);
             
             if (Event.current.type == EventType.Repaint)
             {

@@ -129,7 +129,7 @@ public class StageEditorData : ScriptableObject
     {
         ApplyPrefabListToStageEnemyPrefabs();
         ApplyEnemySpawnData();
-        foreach (EnemySpawnData data in selectedStage.enemySpawnData)
+        foreach (EnemySpawnData data in selectedStage.enemySpawnDataArray)
         {
             EditorUtility.SetDirty(data);
         }
@@ -149,21 +149,8 @@ public class StageEditorData : ScriptableObject
 
     public void ApplyPrefabListToStageEnemyPrefabs()
     {
-        selectedStage.enemyPrefabArrayCounts = prefabLists.Select((list) => list.Count).ToArray();
-        selectedStage.enemyPrefabs = GetAllPrefabArray();
-    }
-    public List<GameObject> GetAllPrefabList()
-    {
-        List<GameObject> result = new List<GameObject>();
-        foreach (List<GameObject> list in prefabLists)
-        {
-            result.AddRange(list);
-        }
-        return result;
-    }
-    public GameObject[] GetAllPrefabArray()
-    {
-        return GetAllPrefabList().ToArray();
+        selectedStage.enemyPrefabArrayCounts = prefabLists.GetCounts();
+        selectedStage.enemyPrefabs = prefabLists.ToSingleArray();
     }
     public List<GameObject> GetPrefabList(EnemySpawnData enemyData) => GetPrefabList(enemyData.GetType());
     public List<GameObject> GetPrefabList(Type spawnDataType)
@@ -238,6 +225,28 @@ public class StageEditorData : ScriptableObject
     
     #region EnemySpawnData
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="spawnData"></param>
+    /// <returns>path</returns>
+    public string CreateEnemySpawnData(EnemySpawnData spawnData)
+    {
+        string stageDirectoryPath = GetStageDirectoryPath(selectedStage);
+        
+        bool isExist;
+        string path;
+        do
+        {
+            int random = UnityEngine.Random.Range(10000000, 99999999);
+            path = $"{stageDirectoryPath}/EnemySpawnData/{random}.asset";
+            isExist = Directory.Exists(path);
+        }
+        while (isExist);
+
+        AssetDatabase.CreateAsset(spawnData, path);
+        return path;
+    }
     /*
     public int SelectEnemyData(EditorEnemyData data)
     {
@@ -368,9 +377,9 @@ public class StageEditorData : ScriptableObject
     }
     public void ApplyEnemySpawnData()
     {
-        //RefreshEnemySpawnDataList();
+        RefreshEnemySpawnDataList();
         
-        //selectedStage.enemySpawnData = enemyList.Select((enemy) => enemy.spawnData).ToArray();
+        selectedStage.enemySpawnDataArray = editorEnemySpawnDataList.Select((enemy) => enemy.spawnData).ToArray();
     }
 
     #endregion
