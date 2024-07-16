@@ -25,7 +25,7 @@ public class StageEditor : EditorWindow
     FloatingAreaManager floatingArea;
     public Dictionary<Type, EnemyEditorGUI> enemyEditorGUIDictionary = new Dictionary<Type, EnemyEditorGUI>();
 
-    public float enemyScroll;
+    public float fileViewerScroll;
 
     enum HoldType { None, Preview, FileViewerLine, InspectorLine }
     HoldType hold = HoldType.None;
@@ -36,6 +36,8 @@ public class StageEditor : EditorWindow
     public PreviewRenderUtility previewRender = null;
 
     Rect selectRect = default;
+
+    Rect enemySpawnDataReNameFloatingAreaHeader = default;
 
     #region Event
 
@@ -83,6 +85,8 @@ public class StageEditor : EditorWindow
         floatingArea = new FloatingAreaManager();
 
         PreviewInit();
+
+        Refresh();
     }
 
     private void OnDisable()
@@ -91,6 +95,22 @@ public class StageEditor : EditorWindow
         
         Apply();
         ClearPreview();
+    }
+    public void Apply()
+    {
+        data.ApplyToStage();
+        EditorUtility.SetDirty(data);
+        EditorUtility.SetDirty(setting);
+    }
+    public void Refresh()
+    {
+        RefreshEnemyEditors();
+        enemyEditorGUIDictionary.Clear();
+
+        PreviewInit();
+
+        data.RefreshStageArray();
+        data.RefreshTimeFoldout();
     }
 
     #endregion
@@ -166,12 +186,7 @@ public class StageEditor : EditorWindow
 
     #endregion
 
-    void Apply()
-    {
-        data.ApplyToStage();
-        EditorUtility.SetDirty(data);
-        EditorUtility.SetDirty(setting);
-    }
+    
     void OnGUI()
     {
         #region Init
@@ -468,7 +483,7 @@ public class StageEditor : EditorWindow
             );
             GUILayout.BeginArea(area);
             {
-                enemyScroll = EditorGUILayout.BeginScrollView(new Vector2(0, enemyScroll), false, true, GUIStyle.none, GUI.skin.verticalScrollbar, GUIStyle.none).y;
+                fileViewerScroll = EditorGUILayout.BeginScrollView(new Vector2(0, fileViewerScroll), false, true, GUIStyle.none, GUI.skin.verticalScrollbar, GUIStyle.none).y;
                 area.width -= 15;
                 {
                     EditorGUILayout.BeginHorizontal();
@@ -506,7 +521,7 @@ public class StageEditor : EditorWindow
 
                 DrawStageSelect();
                 bool createButtonDown = GUILayout.Button("Create");
-                if (e.type == EventType.Repaint) floatingArea.SetRect(GUILayoutUtility.GetLastRect().GetAddPos(area.position.GetAddY(5 - enemyScroll)));
+                if (e.type == EventType.Repaint) floatingArea.SetRect(GUILayoutUtility.GetLastRect().GetAddPos(area.position.GetAddY(5 - fileViewerScroll)));
 
                 if (createButtonDown)
                 {
@@ -526,6 +541,8 @@ public class StageEditor : EditorWindow
                 {
                     EditorGUILayout.ObjectField(data, typeof(StageEditorData), false);
                     EditorGUILayout.ObjectField(setting, typeof(StageEditorSetting), false);
+
+                    fileViewerScroll = EditorGUILayout.FloatField("FileViewerScroll", fileViewerScroll);
 
                     DrawSelectStage();
 
@@ -703,7 +720,7 @@ public class StageEditor : EditorWindow
                     }
                 }
 
-                void DrawStageSelect()      
+                void DrawStageSelect()     
                 {
                     GUILayout.BeginHorizontal();
                     {
@@ -733,18 +750,10 @@ public class StageEditor : EditorWindow
                                 data.SelectStage(stageSelectInput);
                             }
                         }
-
-                        //Refresh
+                        
                         if (GUI.Button(GUILayoutUtility.GetRect(setting.buttonWidth, setting.buttonHeight, GUILayout.ExpandWidth(false)).GetAddY(2), "Refresh"))
                         {
-                            RefreshEnemyEditors();
-                            enemyEditorGUIDictionary.Clear();
-
-                            PreviewInit();
-
-                            data.RefreshStageArray();
-                            data.RefreshTimeFoldout();
-                            data.SelectEnemyData(-1);
+                            Refresh();
                         }
                     }
                     GUILayout.EndHorizontal();
@@ -815,6 +824,10 @@ public class StageEditor : EditorWindow
                     }
                     if (foldout == false) LateCloseHeader();
 
+                    if (enemySpawnDataReNameFloatingAreaHeader != default && e.type == EventType.Repaint)
+                    {
+                        floatingArea.SetRect(enemySpawnDataReNameFloatingAreaHeader.GetAddY( -fileViewerScroll));
+                    }
 
                     void HidedSelect()
                     {
@@ -861,34 +874,17 @@ public class StageEditor : EditorWindow
 
                         //Object Field
                         Rect objectRect = fieldRect.GetAddX(timeRect.width).GetAddWidth(-(timeRect.width + setting.buttonWidth));
-                        if (EventUtility.MouseDown(1) && objectRect.Contains(e.mousePosition))
-                        {
-                            e.Use();
-                            GenericMenu menu = new GenericMenu();
-                            menu.AddItem(
-                                new GUIContent("Delete"),
-                                false,
-                                () =>
-                                {
-                                    AssetDatabase.DeleteAsset(
-                                        AssetDatabase.GetAssetPath(
-                                            data.editorEnemySpawnDataList[i].spawnData
-                                        )
-                                    );
-                                    data.editorEnemySpawnDataList.RemoveAt(i);
-                                    Repaint();
-                                }
-                            );
-                            menu.ShowAsContext();
-                        }
-                        EditorGUI.ObjectField(
+                        AddMenu(
                             objectRect, 
+                            data.editorEnemySpawnDataList[i]
+                        );
+                        EditorGUI.ObjectField(
+                            objectRect,
                             "",
                             enemyData.spawnData,
                             typeof(EnemySpawnData),
                             false
                         );
-
 
                         //Select Button
                         Rect selectButtonRect = objectRect.GetAddX(objectRect.width).GetSetWidth(setting.buttonWidth);
@@ -922,21 +918,11 @@ public class StageEditor : EditorWindow
                         Rect timeRect = fieldRect.GetSetWidth(setting.timeWidth);
 
                         //Object Field
-                        Rect objectRect = fieldRect.GetAddX(timeRect.width).GetAddWidth(-(timeRect.width + setting.buttonWidth));
-                        if (EventUtility.MouseDown(1) && objectRect.Contains(e.mousePosition))
-                        {
-                            e.Use();
-                            GenericMenu menu = new GenericMenu();
-                            menu.AddItem(
-                                new GUIContent("Delete"),
-                                false,
-                                () =>
-                                {
-                                    data.editorEnemySpawnDataList.RemoveAt(i);
-                                    Repaint();
-                                }
-                            );
-                        }
+                        Rect objectRect = fieldRect.GetAddX(timeRect.width).GetAddWidth(enemySpawnDataReNameFloatingAreaHeader.height - (timeRect.width + setting.buttonWidth));
+                        AddMenu(
+                            objectRect,
+                            data.editorEnemySpawnDataList[i]
+                        );
                         EditorGUI.ObjectField(
                             objectRect,
                             "",
@@ -985,7 +971,58 @@ public class StageEditor : EditorWindow
                 
                 #endregion
             }
-            
+            void AddMenu(Rect rect, EditorEnemyData editorEnemyData)
+            {
+                if (EventUtility.MouseDown(1) && rect.Contains(e.mousePosition))
+                {
+                    e.Use();
+                    GenericMenu menu = new GenericMenu();
+
+                    menu.AddItem(
+                        new GUIContent("Rename"),
+                        false,
+                        () =>
+                        {
+                            enemySpawnDataReNameFloatingAreaHeader = rect.AddPos(area.position);
+                            floatingArea.Create(
+                                new TextFloatingArea(
+                                    editorEnemyData.spawnData.name,
+
+                                    applyEvent: (name) => {
+                                        AssetDatabase.RenameAsset(
+                                            AssetDatabase.GetAssetPath(
+                                                editorEnemyData.spawnData
+                                            ),
+                                            name
+                                        );
+                                        Repaint();
+                                        enemySpawnDataReNameFloatingAreaHeader = default;
+                                    },
+                                    title: "Rename"
+                                )
+                            );
+                            floatingArea.SetRect(enemySpawnDataReNameFloatingAreaHeader.GetAddY(-fileViewerScroll));
+                        }
+                    );
+
+                    menu.AddItem(
+                        new GUIContent("Delete"),
+                        false,
+                        () =>
+                        {
+                            AssetDatabase.DeleteAsset(
+                                AssetDatabase.GetAssetPath(
+                                    editorEnemyData.spawnData
+                                )
+                            );
+                            data.editorEnemySpawnDataList.Remove(editorEnemyData);
+                            Repaint();
+                        }
+                    );
+
+                    menu.ShowAsContext();
+                }
+            }
             void SelectEnemyData(int index)
             {
                 GUI.FocusControl(null);

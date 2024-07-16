@@ -2,9 +2,22 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
+using static RectUtility;
 
 public static class RectUtility
 {
+    public enum Anchor
+    {
+        TopLeft,
+        TopCenter,
+        TopRight,
+        MiddleLeft,
+        MiddleCenter,
+        MiddleRight,
+        BottomLeft,
+        BottomCenter,
+        BottomRight
+    }
     public static Vector2 GetCenter(this Rect rect) => rect.position + 0.5f * rect.size;
 
     #region Set
@@ -79,10 +92,29 @@ public static class RectUtility
     public static Rect GetAddX(this Rect rect, float x) => rect.AddX(x);
     public static Rect GetAddY(this Rect rect, float y) => rect.AddY(y);
 
-    public static Rect AddSize(ref this Rect rect, Vector2 size)
+    public static Rect AddSize(ref this Rect rect, Vector2 size, Anchor anchor = Anchor.TopLeft)
     {
-        rect.size += size;
-        return rect;
+        switch (anchor)
+        {
+            case Anchor.TopLeft:
+                return new Rect(
+                    rect.position,
+                    rect.size + size
+                );
+            case Anchor.TopCenter:
+                return new Rect(
+                    rect.position.GetAddX(-0.5f * size.x),
+                    rect.size + size
+                );
+            case Anchor.MiddleCenter:
+                return new Rect(
+                    rect.position - 0.5f * size,
+                    rect.size + size
+                );
+            default:
+                Debug.LogError("Not implemented");
+                return default;
+        }
     }
     public static Rect AddWidth(ref this Rect rect, float width)
     {
@@ -94,7 +126,7 @@ public static class RectUtility
         rect.height += height;
         return rect;
     }
-    public static Rect GetAddSize(this Rect rect, Vector2 size) => rect.AddSize(size);
+    public static Rect GetAddSize(this Rect rect, Vector2 size, Anchor anchor = Anchor.TopLeft) => rect.AddSize(size, anchor);
     public static Rect GetAddWidth(this Rect rect, float width) => rect.AddWidth(width);
     public static Rect GetAddHeight(this Rect rect, float height) => rect.AddHeight(height);
 

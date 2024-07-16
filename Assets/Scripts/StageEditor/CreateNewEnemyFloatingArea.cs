@@ -90,13 +90,16 @@ public class CreateNewEnemyFloatingArea : FloatingArea
         }
         void Create()
         {
-            Debug.Log($"Create: {arrayIndex}/{elementIndex}");
             Type prefabType = StageEditor.data.prefabTypeList[arrayIndex];
 
             EnemySpawnData spawnData = (EnemySpawnData)ScriptableObject.CreateInstance(prefabType);
             spawnData.prefabTypeIndex = arrayIndex;
             spawnData.prefabIndex = elementIndex;
-
+            if (StageEditor.data.selectedEnemyData != null)
+            {
+                spawnData.spawnTime = StageEditor.data.selectedEnemyData.spawnData.spawnTime;
+                StageEditor.data.timeFoldout[spawnData.spawnTime] = true;
+            }
             AssetDatabase.CreateAsset(
                 spawnData,
                 $"{StageEditor.data.GetStageDirectoryPath(StageEditor.data.selectedStage)}/EnemySpawnData/{name}.asset"
@@ -104,7 +107,7 @@ public class CreateNewEnemyFloatingArea : FloatingArea
 
             EditorEnemyData editorEnemyData = new EditorEnemyData(spawnData, prefabType);
             StageEditor.data.InsertToEditorEnemySpawnDataList(editorEnemyData);
-
+            StageEditor.instance.Repaint();
             manager.Destroy();
         }
     }
