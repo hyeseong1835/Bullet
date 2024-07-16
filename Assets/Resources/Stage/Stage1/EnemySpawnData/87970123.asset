@@ -14,6 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   prefabIndex: 0
   prefabTypeIndex: 0
-  spawnTime: 0
-  startPos: {x: 0, y: 0}
-  endPos: {x: 0, y: 0}
+  spawnTime: 1
+  startPos: {x: 2, y: 6}
+  endPos: {x: -2, y: -1}

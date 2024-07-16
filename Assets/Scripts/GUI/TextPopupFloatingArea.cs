@@ -20,7 +20,7 @@ public class TextPopupFloatingArea : FloatingArea
         {
             for (int i = 0; rects != null && i < rects.Length; i++)
             {
-                if (rects[i].GetAddPos(manager.rect.position).Contains(e.mousePosition))
+                if (rects[i].AddPos(manager.rect.position).Contains(e.mousePosition))
                 {
                     selectEvent?.Invoke(i);
                     e.Use();

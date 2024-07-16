@@ -153,7 +153,7 @@ public class StageEditor : EditorWindow
     }
     public RenderTexture CreatePreviewTexture(Rect rect)
     {
-        previewRender.camera.transform.position = ((Vector3)StageEditor.ScreenToWorldPoint(rect.GetCenter())).GetSetZ(-10);
+        previewRender.camera.transform.position = VectorUtility.SetZ(((Vector3)StageEditor.ScreenToWorldPoint(rect.GetPivotPos(Anchor.MiddleCenter))), -10);
         previewRender.camera.orthographicSize = 0.5f * (rect.height / data.cellSize);
 
         previewRender.BeginPreview(rect, GUIStyle.none);
@@ -525,7 +525,7 @@ public class StageEditor : EditorWindow
                 Apply();
             }
 
-            if (GUI.Button(applyButtonRect.GetAddX(-applyButtonRect.width), "Refresh"))
+            if (GUI.Button(applyButtonRect.AddX(-applyButtonRect.width), "Refresh"))
             {
                 Refresh();
             }
@@ -538,7 +538,7 @@ public class StageEditor : EditorWindow
 
                 DrawStageSelect();
                 bool createButtonDown = GUILayout.Button("Create");
-                if (e.type == EventType.Repaint) floatingArea.SetRect(GUILayoutUtility.GetLastRect().GetAddPos(area.position.GetAddY(5 - fileViewerScroll)));
+                if (e.type == EventType.Repaint) floatingArea.SetRect(GUILayoutUtility.GetLastRect().AddPos(area.position.AddY(5 - fileViewerScroll)));
 
                 if (createButtonDown)
                 {
@@ -620,7 +620,7 @@ public class StageEditor : EditorWindow
                                     );
 
                                     //Time Label
-                                    Rect timeRect = fieldRect.GetSetWidth(setting.timeWidth);
+                                    Rect timeRect = fieldRect.SetWidth(setting.timeWidth);
                                     if (enemySpawnData.spawnTime != prevTime)
                                     {
                                         EditorGUI.LabelField(
@@ -631,7 +631,7 @@ public class StageEditor : EditorWindow
                                     }
 
                                     //Object Field
-                                    Rect objectRect = fieldRect.GetAddX(timeRect.width).GetAddWidth(-timeRect.width);
+                                    Rect objectRect = RectUtility.AddWidth(fieldRect.AddX(timeRect.width), -timeRect.width);
                                     EditorGUI.ObjectField(
                                         objectRect, 
                                         enemySpawnData, 
@@ -639,6 +639,7 @@ public class StageEditor : EditorWindow
                                         false
                                     );
                                 }
+                                
                             }
                         }
                         CustomGUILayout.EndNewTab();
@@ -867,13 +868,13 @@ public class StageEditor : EditorWindow
 
                     if (enemySpawnDataReNameFloatingAreaHeader != default && e.type == EventType.Repaint)
                     {
-                        floatingArea.SetRect(enemySpawnDataReNameFloatingAreaHeader.GetAddY( -fileViewerScroll));
+                        floatingArea.SetRect(enemySpawnDataReNameFloatingAreaHeader.AddY( -fileViewerScroll));
                     }
 
                     void HidedSelect()
                     {
-                        Vector2 p1 = headerRect.position.GetAddY(headerRect.height);
-                        Vector2 p2 = p1.GetAddX(headerRect.width);
+                        Vector2 p1 = headerRect.position.AddY(headerRect.height);
+                        Vector2 p2 = p1.AddX(headerRect.width);
                         Handles.color = setting.selectHideInHeaderColor;
                         Handles.DrawLine(p1, p2);
                     }
@@ -885,15 +886,15 @@ public class StageEditor : EditorWindow
                     {
                         if (elementCount > 0)
                         {
-                            Vector2 p1 = headerRect.position.GetAddY(headerRect.height);
-                            Vector2 p2 = p1.GetAddX(headerRect.width);
+                            Vector2 p1 = headerRect.position.AddY(headerRect.height);
+                            Vector2 p2 = p1.AddX(headerRect.width);
                             Handles.color = Color.white;
                             Handles.DrawLine(p1, p2);
 
                             EditorGUILayout.Space(5);
                         }
                     }
-                    void OpenHeader(EditorEnemyData enemyData, int i)
+                    void OpenHeader(EditorEnemyData editorEnemyData, int i)
                     {
                         EditorGUILayout.Space(5);
 
@@ -904,17 +905,17 @@ public class StageEditor : EditorWindow
                         );
 
                         //Time Label
-                        Rect timeRect = fieldRect.GetSetWidth(setting.timeWidth);
-                        EditorGUI.LabelField(timeRect, enemyData.spawnData.spawnTime.ToString("F1"));
+                        Rect timeRect = fieldRect.SetWidth(setting.timeWidth);
+                        EditorGUI.LabelField(timeRect, editorEnemyData.spawnData.spawnTime.ToString("F1"));
 
                         if (EventUtility.MouseDown(0) && timeRect.Contains(e.mousePosition))
                         {
-                            data.timeFoldout[enemyData.spawnData.spawnTime] = !foldout;
+                            data.timeFoldout[editorEnemyData.spawnData.spawnTime] = !foldout;
                             Repaint();
                         }
 
                         //Object Field
-                        Rect objectRect = fieldRect.GetAddX(timeRect.width).GetAddWidth(-(timeRect.width + setting.buttonWidth));
+                        Rect objectRect = RectUtility.AddWidth(fieldRect.AddX(timeRect.width), -(timeRect.width + setting.buttonWidth));
                         AddMenu(
                             objectRect, 
                             data.editorEnemySpawnDataList[i]
@@ -922,22 +923,21 @@ public class StageEditor : EditorWindow
                         EditorGUI.ObjectField(
                             objectRect,
                             "",
-                            enemyData.spawnData,
+                            editorEnemyData.spawnData,
                             typeof(EnemySpawnData),
                             false
                         );
+                        DrawMarker(objectRect, editorEnemyData);
 
                         //Select Button
-                        Rect selectButtonRect = objectRect.GetAddX(objectRect.width).GetSetWidth(setting.buttonWidth);
+                        Rect selectButtonRect = objectRect.AddX(objectRect.width).SetWidth(setting.buttonWidth);
                         if (GUI.Button(selectButtonRect, "Select"))
                         {
                             SelectEnemyData(i);
                         }
 
-                        ShowHasData(enemyData, objectRect);
-
                         headerRect = objectRect;
-                        if (enemyData == data.selectedEnemyData)
+                        if (editorEnemyData == data.selectedEnemyData)
                         {
                             selectRect = headerRect;
                         }
@@ -947,7 +947,7 @@ public class StageEditor : EditorWindow
                         OpenHeader(enemyData, i);
                     }
 
-                    void OpenElement(EditorEnemyData enemyData, int i)
+                    void OpenElement(EditorEnemyData editorEnemyData, int i)
                     {
                         Rect fieldRect = GUILayoutUtility.GetRect(
                             area.width,
@@ -956,10 +956,10 @@ public class StageEditor : EditorWindow
                         );
 
                         //Time Label
-                        Rect timeRect = fieldRect.GetSetWidth(setting.timeWidth);
+                        Rect timeRect = fieldRect.SetWidth(setting.timeWidth);
 
                         //Object Field
-                        Rect objectRect = fieldRect.GetAddX(timeRect.width).GetAddWidth(enemySpawnDataReNameFloatingAreaHeader.height - (timeRect.width + setting.buttonWidth));
+                        Rect objectRect = RectUtility.AddWidth(fieldRect.AddX(timeRect.width), enemySpawnDataReNameFloatingAreaHeader.height - (timeRect.width + setting.buttonWidth));
                         AddMenu(
                             objectRect,
                             data.editorEnemySpawnDataList[i]
@@ -967,24 +967,22 @@ public class StageEditor : EditorWindow
                         EditorGUI.ObjectField(
                             objectRect,
                             "",
-                            enemyData.spawnData,
+                            editorEnemyData.spawnData,
                             typeof(EnemySpawnData),
                             false
                         );
-
+                        DrawMarker(objectRect, editorEnemyData);
 
                         //Select Button
-                        Rect selectButtonRect = objectRect.GetAddX(objectRect.width).GetSetWidth(setting.buttonWidth);
+                        Rect selectButtonRect = objectRect.AddX(objectRect.width).SetWidth(setting.buttonWidth);
                         if (GUI.Button(selectButtonRect, "Select"))
                         {
                             SelectEnemyData(i);
                         }
 
-                        ShowHasData(enemyData, objectRect);
-
-                        if (enemyData == data.selectedEnemyData)
+                        if (editorEnemyData == data.selectedEnemyData)
                         {
-                            selectRect = headerRect.GetSetY(objectRect.y);
+                            selectRect = RectUtility.SetY(headerRect, objectRect.y);
                         }
                     }
                     void CloseElement(EditorEnemyData enemyData, int i)
@@ -995,18 +993,32 @@ public class StageEditor : EditorWindow
                             isSelectHideByHeader = true;
                         }
                     }
-
-                    void ShowHasData(EditorEnemyData enemyData, Rect objectRect)
+                    void DrawMarker(Rect objectRect, EditorEnemyData editorEnemyData)
                     {
-                        if (enemyData.unSafeEditorGUI != null)
-                        {
-                            Rect E = objectRect.GetAddX(objectRect.width - objectRect.height).GetSetWidth(objectRect.height);
-                            CustomGUI.DrawSquare(E, setting.hasEditorBackGroundColor);
+                        Rect r1 = new Rect();
+                        r1 = r1.SetSize(objectRect.height - 3, objectRect.height - 3);
+                        r1 = r1.SetPos(objectRect.GetPivotPos(Anchor.TopRight) + new Vector2(-r1.width, 1.5f));
 
-                            EditorStyles.boldLabel.alignment = TextAnchor.MiddleCenter;
-                            GUI.Label(E, " E", EditorStyles.boldLabel);
-                            EditorStyles.boldLabel.alignment = TextAnchor.MiddleLeft;
+                        Rect r2 = r1.AddX(-r1.width);
+
+                        CustomGUI.DrawSquare(r2.SetWidth(r2.width * 2), setting.hasEditorBackGroundColor);
+                        
+                        GUIStyle textStyle = new GUIStyle(EditorStyles.boldLabel);
+                        EditorStyles.boldLabel.alignment = TextAnchor.MiddleCenter;
+                        {
+                            //Editor
+                            if (editorEnemyData.unSafeEditorGUI == null) textStyle.normal.textColor = Color.gray;
+                            else textStyle.normal.textColor = Color.white;
+
+                            GUI.Label(r1, " E", textStyle);
+
+                            //Prefab
+                            if (editorEnemyData.prefab == null) textStyle.normal.textColor = Color.red;
+                            else textStyle.normal.textColor = Color.white;
+
+                            GUI.Label(r2, " P", textStyle);
                         }
+                        EditorStyles.boldLabel.alignment = TextAnchor.MiddleLeft;
                     }
                 }
                 
@@ -1208,8 +1220,9 @@ public class StageEditor : EditorWindow
             if (data.selectedEnemyData != null)
             {
                 DrawEnemyGizmos();
-                DrawTimeLine();
             }
+            DrawTimeLine();
+            
             void DrawEnemyGizmos()
             {
                 foreach(EditorEnemyData editorEnemyData in data.sameTimeEnemyList)
@@ -1246,8 +1259,8 @@ public class StageEditor : EditorWindow
                     Vector2 playTimeLineScreenPos = GetTimeScreenPos(GameManager.instance.time);
                     Handles.color = Color.green;
                     Handles.DrawLine(
-                        playTimeLineScreenPos.GetAddY(setting.timeLengthFieldOffsetY),
-                        playTimeLineScreenPos.GetAddY(-setting.timeLengthFieldOffsetY)
+                        playTimeLineScreenPos.AddY(setting.timeLengthFieldOffsetY),
+                        playTimeLineScreenPos.AddY(-setting.timeLengthFieldOffsetY)
                     );
                     Handles.color = Color.white;
                 }
@@ -1261,10 +1274,13 @@ public class StageEditor : EditorWindow
                         setting.enemySpawnTimeColor
                     );
                 }
-                DrawTimeLineMarker(
-                    data.selectedEnemyData.spawnData.spawnTime,
-                    setting.selectEnemySpawnTimeColor
-                );
+                if (data.selectedEnemyData != null)
+                {
+                    DrawTimeLineMarker(
+                        data.selectedEnemyData.spawnData.spawnTime,
+                        setting.selectEnemySpawnTimeColor
+                    );
+                }
 
                 void DrawTimeLineMarker(float time, SquareColor color)
                 {
@@ -1335,11 +1351,11 @@ public class StageEditor : EditorWindow
     }
     public static Vector2 WorldToScreenPos(Vector2 worldPos)
     {
-        return data.previewPos + worldPos.GetMultiplyY(-1) * data.cellSize;
+        return data.previewPos + VectorUtility.MultiplyY(worldPos, -1) * data.cellSize;
     }
     public static Vector2 ScreenToWorldPoint(Vector2 screenPos)
     {
-        return ((screenPos - data.previewPos) / data.cellSize).GetMultiplyY(-1);
+        return VectorUtility.MultiplyY(((screenPos - data.previewPos) / data.cellSize), -1);
     }
     public static Vector2 GetTimeScreenPos(float time)
     {

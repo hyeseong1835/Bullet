@@ -70,7 +70,7 @@ public class CategoryObjectFloatingArea : FloatingArea
                     EditorGUILayout.ObjectField(array[elementIndex], typeof(UnityEngine.Object), true);
                     if (Event.current.type == EventType.Repaint)
                     {
-                        objectRectArray[index++] = GUILayoutUtility.GetLastRect().GetAddPos(manager.rect.position);
+                        objectRectArray[index++] = GUILayoutUtility.GetLastRect().AddPos(manager.rect.position);
                     }
                     height += EditorGUIUtility.singleLineHeight;
                 }

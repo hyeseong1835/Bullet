@@ -139,7 +139,7 @@ public class CreateNewEnemyFloatingArea : FloatingArea
             
             if (Event.current.type == EventType.Repaint)
             {
-                nameFieldRect = GUILayoutUtility.GetLastRect().GetAddPos(manager.rect.position);
+                nameFieldRect = GUILayoutUtility.GetLastRect().AddPos(manager.rect.position);
             }
         }
         void DrawEnemyTypePopup()
@@ -152,7 +152,7 @@ public class CreateNewEnemyFloatingArea : FloatingArea
             );
             if (Event.current.type == EventType.Repaint)
             {
-                enemyTypePopupRect = GUILayoutUtility.GetLastRect().GetAddPos(manager.rect.position);
+                enemyTypePopupRect = GUILayoutUtility.GetLastRect().AddPos(manager.rect.position);
                 _manager.SetRect(enemyTypePopupRect);
             }
         }
@@ -166,7 +166,7 @@ public class CreateNewEnemyFloatingArea : FloatingArea
 
             if (Event.current.type == EventType.Repaint)
             {
-                createButtonRect = GUILayoutUtility.GetLastRect().GetAddPos(manager.rect.position);
+                createButtonRect = GUILayoutUtility.GetLastRect().AddPos(manager.rect.position);
             }
         }
     }

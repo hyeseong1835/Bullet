@@ -28,7 +28,7 @@ public class TextFloatingArea : FloatingArea
     }
     public override void Draw()
     {
-        GUILayout.BeginArea(manager.rect.GetAddSize(-Vector2.one * 5, RectUtility.Anchor.MiddleCenter));
+        GUILayout.BeginArea(manager.rect.AddSize(-Vector2.one * 5, Anchor.MiddleCenter));
         {
             if (title != "") CustomGUILayout.UnderBarTitleText(title);
 

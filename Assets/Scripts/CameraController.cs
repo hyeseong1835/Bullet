@@ -41,7 +41,7 @@ public class CameraController : MonoBehaviour, IOnScreenResizedReceiver
             viewSize = new Vector2(Win.screenHeight / Win.windowRatio, Win.screenHeight);
         }
         else viewSize = new Vector2(Win.screenWidth, Win.screenWidth * Win.windowRatio);
-        cam.transform.position = cam.transform.position.GetSetY(0.5f * viewSize.y);
+        cam.transform.position = VectorUtility.SetY(cam.transform.position, 0.5f * viewSize.y);
         cam.orthographicSize = 0.5f * viewSize.y;
     }
 }

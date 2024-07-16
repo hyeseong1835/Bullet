@@ -1,134 +1,130 @@
-using System.Collections;
-using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
-using UnityEngine.UIElements;
-using static RectUtility;
 
+public enum Anchor
+{
+    TopLeft,
+    TopCenter,
+    TopRight,
+    MiddleLeft,
+    MiddleCenter,
+    MiddleRight,
+    BottomLeft,
+    BottomCenter,
+    BottomRight
+}
 public static class RectUtility
 {
-    public enum Anchor
+    public static Vector2 GetOffset(Anchor anchor)
     {
-        TopLeft,
-        TopCenter,
-        TopRight,
-        MiddleLeft,
-        MiddleCenter,
-        MiddleRight,
-        BottomLeft,
-        BottomCenter,
-        BottomRight
+        switch (anchor)
+        {
+            case Anchor.TopLeft: return new Vector2(0, 0);
+            case Anchor.TopCenter: return new Vector2(0.5f, 0);
+            case Anchor.TopRight: return new Vector2(1, 0);
+            case Anchor.MiddleLeft: return new Vector2(0, 0.5f);
+            case Anchor.MiddleCenter: return new Vector2(0.5f, 0.5f);
+            case Anchor.MiddleRight: return new Vector2(1, 0.5f);
+            case Anchor.BottomLeft: return new Vector2(0, 1);
+            case Anchor.BottomCenter: return new Vector2(0.5f, 1);
+            case Anchor.BottomRight: return new Vector2(1, 1);
+            default: Debug.LogError("Not implemented"); return default;
+        }
     }
-    public static Vector2 GetCenter(this Rect rect) => rect.position + 0.5f * rect.size;
-
-    #region Set
+    public static Vector2 GetPivotPos(this Rect rect, Anchor pivot)
+    {
+        return rect.position + GetOffset(pivot) * rect.size;
+    }
 
     #region Position
-    public static Rect SetPos(ref this Rect rect, Vector2 position)
+
+    public static Rect SetPos(this Rect rect, float x, float y) => SetPos(rect, new Vector2(x, y));
+    public static Rect SetPos(this Rect rect, Vector2 position)
     {
         rect.position = position;
         return rect;
     }
-    public static Rect SetX(ref this Rect rect, float x)
+    public static Rect SetX(this Rect rect, float x)
     {
         rect.x = x;
         return rect;
     }
-    public static Rect SetY(ref this Rect rect, float y)
+    public static Rect SetY(this Rect rect, float y)
     {
         rect.y = y;
         return rect;
     }
 
-    public static Rect GetSetPos(this Rect rect, Vector2 position) => rect.SetPos(position);
-    public static Rect GetSetX(this Rect rect, float x) => rect.SetX(x);
-    public static Rect GetSetY(this Rect rect, float y) => rect.SetY(y);
-
     #endregion
 
     #region Size
-    public static Rect SetSize(ref this Rect rect, Vector2 size)
+
+    public static Rect SetSize(this Rect rect, float x, float y, Anchor anchor = Anchor.TopLeft) => SetSize(rect, new Vector2(x, y), anchor);
+    public static Rect SetSize(this Rect rect, Vector2 size, Anchor anchor = Anchor.TopLeft)
     {
+        rect.position = rect.position + (rect.size - size) * GetOffset(anchor);
         rect.size = size;
+
         return rect;
     }
-    public static Rect SetWidth(ref this Rect rect, float width)
+    public static Rect SetWidth(this Rect rect, float width, float alignment = 0)
     {
+        rect.position = rect.position.AddX((rect.width - width) * alignment);
         rect.width = width;
+
         return rect;
     }
-    public static Rect SetHeight(ref this Rect rect, float height)
+    public static Rect SetHeight(this Rect rect, float height, float alignment = 0)
     {
+        rect.position = rect.position.AddY((rect.height - height) * alignment);
         rect.height = height;
+
         return rect;
     }
 
-    public static Rect GetSetSize(this Rect rect, Vector2 size) => rect.SetSize(size);
-    public static Rect GetSetWidth(this Rect rect, float width) => rect.SetWidth(width);
-    public static Rect GetSetHeight(this Rect rect, float height) => rect.SetHeight(height);
-
     #endregion
 
-    #endregion
 
-    #region Add
 
-    public static Rect AddPos(ref this Rect rect, Vector2 position)
+    public static Rect AddPos(this Rect rect, float x, float y) => rect.AddPos(new Vector2(x, y));
+    public static Rect AddPos(this Rect rect, Vector2 position)
     {
         rect.position += position;
         return rect;
     }
-    public static Rect AddX(ref this Rect rect, float x)
+
+    public static Rect AddX(this Rect rect, Rect add) => rect.AddX(add.x);
+    public static Rect AddX(this Rect rect, float x)
     {
         rect.x += x;
         return rect;
     }
-    public static Rect AddY(ref this Rect rect, float y)
+
+    public static Rect AddY(this Rect rect, Rect add) => rect.AddY(add.y);
+    public static Rect AddY(this Rect rect, float y)
     {
         rect.y += y;
         return rect;
     }
 
-    public static Rect GetAddPos(this Rect rect, Vector2 position) => rect.AddPos(position);
-    public static Rect GetAddX(this Rect rect, float x) => rect.AddX(x);
-    public static Rect GetAddY(this Rect rect, float y) => rect.AddY(y);
-
-    public static Rect AddSize(ref this Rect rect, Vector2 size, Anchor anchor = Anchor.TopLeft)
+    public static Rect AddSize(this Rect rect, Rect add, Anchor anchor = Anchor.TopLeft) => rect.AddSize(add.size, anchor);
+    public static Rect AddSize(this Rect rect, Vector2 size, Anchor anchor = Anchor.TopLeft)
     {
-        switch (anchor)
-        {
-            case Anchor.TopLeft:
-                return new Rect(
-                    rect.position,
-                    rect.size + size
-                );
-            case Anchor.TopCenter:
-                return new Rect(
-                    rect.position.GetAddX(-0.5f * size.x),
-                    rect.size + size
-                );
-            case Anchor.MiddleCenter:
-                return new Rect(
-                    rect.position - 0.5f * size,
-                    rect.size + size
-                );
-            default:
-                Debug.LogError("Not implemented");
-                return default;
-        }
+        return rect.AddSize(size).AddPos(GetOffset(anchor) * rect.size);
     }
-    public static Rect AddWidth(ref this Rect rect, float width)
+
+    public static Rect AddWidth(this Rect rect, Rect add) => rect.AddWidth(add.width);
+    public static Rect AddWidth(this Rect rect, float width, float alignment = 0)
     {
         rect.width += width;
+        rect.position = rect.position.AddX(-width * alignment);
         return rect;
     }
-    public static Rect AddHeight(ref this Rect rect, float height)
+
+    public static Rect AddHeight(this Rect rect, Rect add) => rect.AddHeight(add.height);
+    public static Rect AddHeight(this Rect rect, float height)
     {
         rect.height += height;
         return rect;
     }
-    public static Rect GetAddSize(this Rect rect, Vector2 size, Anchor anchor = Anchor.TopLeft) => rect.AddSize(size, anchor);
-    public static Rect GetAddWidth(this Rect rect, float width) => rect.AddWidth(width);
-    public static Rect GetAddHeight(this Rect rect, float height) => rect.AddHeight(height);
-
-    #endregion
 }
