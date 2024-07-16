@@ -27,7 +27,11 @@ public class Stage : ScriptableObject
 
             for (int poolIndex = 0; poolIndex < count; poolIndex++)
             {
-                Pool pool = new Pool(enemyPrefabs[startIndex + poolIndex], 1, 0, 0);
+                Pool pool = new Pool(
+                    enemyPrefabs[startIndex + poolIndex], 
+                    0, 
+                    0
+                );
                 pool.Init();
                 poolArray[poolIndex] = pool;
             }
@@ -105,11 +109,12 @@ public class Stage : ScriptableObject
 #if UNITY_EDITOR
             StageEditor.data?.SelectEnemyData(data);
 #endif
-            GameObject enemyObj = enemyPool[data.prefabTypeIndex][data.prefabIndex].Get();
+            Pool pool = enemyPool[data.prefabTypeIndex][data.prefabIndex];
+            GameObject enemyObj = pool.Get();
 
             Enemy enemy = enemyObj.GetComponent<Enemy>();
             enemy.EnemySpawnData = data;
-            enemyObj.SetActive(true);
+            pool.Use();
         }
     }
 }

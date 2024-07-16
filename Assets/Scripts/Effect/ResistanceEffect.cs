@@ -3,7 +3,7 @@ using System.Collections.Generic;
 public class ResistanceEffect : UpgradableEffect
 {
     static Player player => Player.instance;
-    static List<ResistanceEffect> variant;
+    static List<ResistanceEffect> variant = new List<ResistanceEffect>();
     public override int GetVariantCount() => variant.Count;
     public override UpgradableEffect GetVariant(int level) => variant[level];
     public override UpgradableEffect SetVariant(int level, UpgradableEffect value) => variant[level] = (ResistanceEffect)value;

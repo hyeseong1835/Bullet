@@ -1,61 +1,33 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Xml.Linq;
 using UnityEngine;
 
 [Serializable]
-public class WaitDestroyElement
-{
-    PoolHolder coroutineRunner => PoolHolder.instance;
-
-    public GameObject obj;
-    
-    Coroutine destroyCoroutine;
-
-    public WaitDestroyElement(Pool pool, GameObject obj)
-    {
-        this.obj = obj;
-        
-        destroyCoroutine = coroutineRunner.StartCoroutine(DelayDestroy(pool, pool.destroyDelay));
-    }
-    IEnumerator DelayDestroy(Pool pool, float delay)
-    {
-        yield return new WaitForSeconds(delay);
-
-        UnityEngine.Object.Destroy(obj);
-        pool.waitDestroy.Remove(this);
-    }
-    public void CancelDestroy(Pool pool)
-    {
-        coroutineRunner.StopCoroutine(destroyCoroutine);
-        pool.objects.Add(obj);
-        pool.waitDestroy.Remove(this);
-    }
-}
-[Serializable]
 public class Pool
 {
-    public int count { get { return objects.Count; } }
-
     public GameObject prefab;
 
     public Transform holder { get; private set; }
-    public float destroyDelay;
-    
-    public int startCount;
-    public int stayCount;
 
+    public int maxDisableCount;
+    public int startCount;
+
+    /// <summary>
+    /// 앞: 활성화된 오브젝트 // 뒤: 비활성화된 오브젝트
+    /// </summary>
     public List<GameObject> objects;
-    public List<WaitDestroyElement> waitDestroy;//-|
 
     [SerializeField] Action<GameObject> addEvent;
 
-    public Pool(GameObject prefab, float destroyDelay, int startCount, int stayCount)
+    public Pool(GameObject prefab, int maxDisableCount, int startCount)
     {
         this.prefab = prefab;
-        this.destroyDelay = destroyDelay;
+
         this.startCount = startCount;
-        this.stayCount = stayCount;
+
+        this.maxDisableCount = maxDisableCount;
     }
 
     public void Init(Action<GameObject> addEvent = null)
@@ -77,81 +49,78 @@ public class Pool
             objects.Clear();
         }
 
-        if (waitDestroy == null) waitDestroy = new List<WaitDestroyElement>();
-        else if (waitDestroy.Count != 0)
-        {
-            foreach (WaitDestroyElement element in waitDestroy)
-            { 
-                if (element.obj != null) UnityEngine.Object.Destroy(element.obj);
-            }
-            waitDestroy.Clear();
-        }
-        
         for (int i = 0; i < startCount; i++)
         {
-            Add().SetActive(false);
+            Add();
         }
 
         PoolHolder.instance.pools.Add(this);
     }
+    /// <summary>
+    /// 활성화는 항상 Use를 이용해서 하기
+    /// </summary>
+    /// <returns>비활성화된 오브젝트</returns>
     public GameObject Get()
     {
-        //비활성화 오브젝트 찾기
-        for (int i = objects.Count - 1; i >= 0; i--)
+        if (objects.Count == 0)
         {
-            GameObject obj = objects[i];
-            if (obj == null)
-            {
-                Debug.LogWarning($"Pool({prefab.name}) has null element({i})");
-                objects.RemoveAt(i);
-                continue;
-            }
-            if (obj.activeInHierarchy == false)
-            {
-                return obj;
-            }
+            return Add();
         }
-        //파괴 예정 오브젝트가 있을 때
-        if (waitDestroy.Count > 0)
+
+        GameObject obj = objects[^1];
+
+        if (obj == null)
         {
-            WaitDestroyElement element = waitDestroy[^1];
-            GameObject obj = element.obj;
-            if (obj == null)
-            {
-                Debug.LogWarning("WaitDestroy has null element");
-                waitDestroy.RemoveAt(waitDestroy.Count - 1);
-                return Use();
-            }
-            element.CancelDestroy(this);
+            Debug.LogWarning($"Pool({prefab.name}) has null element({objects.Count - 1})");
+
+            objects.RemoveAt(objects.Count - 1);
+            return Get();
+        }
+
+        if (obj.activeInHierarchy)
+        {
+            return Add();
+        }
+        else
+        {
             return obj;
         }
-        //모두 사용 중일 때
-        return Add();
     }
     public GameObject Use()
     {
-        GameObject obj = Get();
+        if (objects.Count == 0) return Use(0, Get());
+        else return Use(objects.Count - 1, Get());
+    }
+
+    public GameObject Use(GameObject obj) => Use(objects.LastIndexOf(obj), obj);
+    public GameObject Use(int index) => Use(index, objects[index]);
+    public GameObject Use(int index, GameObject obj)
+    {
+        objects.RemoveAt(index);
+        objects.Insert(0, obj);
+
         obj.SetActive(true);
         return obj;
     }
     public GameObject DeUse(GameObject obj)
     {
-        //초과 상태일 때
-        if (count > stayCount)
-        {
-            waitDestroy.Add(new WaitDestroyElement(this, obj));
-            objects.Remove(obj);
+        obj.SetActive(false);
+        objects.Remove(obj);
+        objects.Add(obj);
 
-            obj.SetActive(false);
+        return obj;
 
-            return null;//?
-        }
-        else
-        {
-            obj.SetActive(false);
+        objects.Remove(obj);
+        UnityEngine.Object.Destroy(obj);
+        return null;
+    }
+    public GameObject DeUse(GameObject obj, int index)
+    {
+        obj.SetActive(false);
+        objects.RemoveAt(index);
+        objects.Add(obj);
 
-            return obj;
-        }
+        return obj;
     }
     public GameObject Add()
     {
@@ -160,7 +129,8 @@ public class Pool
         obj.SetActive(false);
 
         objects.Add(obj);
-        if (addEvent != null) addEvent(obj);
+        addEvent?.Invoke(obj);
+        
         return obj;
     }
 }
