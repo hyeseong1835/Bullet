@@ -9,7 +9,7 @@ public abstract class Item : MonoBehaviour
 
     protected void OnEnable()
     {
-        if (new Box(Vector2.one * 1.5f, Vector2.zero).IsContactGame(transform.position, out Vector2 contact, out Direction dir))
+        if (new Box(Vector2.one * 1.5f, Vector2.zero).IsContactGame(transform.position, out Vector2 contact))
         {
             transform.position = contact;
         }
@@ -23,15 +23,12 @@ public abstract class Item : MonoBehaviour
     {
         transform.Translate(velocity * Time.deltaTime);
 
-        if (new Box(Vector2.one * 0.25f, Vector2.zero).IsContactGame(transform.position, out Vector2 contact, out bool isTop, out bool isRight))
+        if (new Box(Vector2.one * 0.25f, Vector2.zero).IsContactGame(transform.position, out Vector2 contact, out int horizontal, out int vertical))
         {
             transform.position = contact;
 
-            if (isTop) velocity.y = -Mathf.Abs(velocity.y);
-            else velocity.y = Mathf.Abs(velocity.y);
-
-            if (isRight) velocity.x = -Mathf.Abs(velocity.x);
-            else velocity.x = Mathf.Abs(velocity.x);
+            if (horizontal != 0) velocity.x = -horizontal * Mathf.Abs(velocity.x);
+            if (vertical != 0) velocity.y = -vertical * Mathf.Abs(velocity.y);
         }
     }
     public void OnTriggerEnter2D(Collider2D collision)

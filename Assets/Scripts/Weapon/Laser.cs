@@ -1,18 +1,21 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class Laser : Weapon
 {
     static Player player => Player.instance;
     
-    public GameObject laser;
     public Transform tip;
+    public GameObject laser;
 
     public float damage;
     public float width;
 
+    protected void Update()
+    {
+        transform.rotation = player.input.toMouseRot;
+    }
     protected override void Use()
     {
         RaycastHit2D[] hit = Physics2D.BoxCastAll(

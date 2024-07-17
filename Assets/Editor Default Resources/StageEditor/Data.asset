@@ -14,5 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   previewPos: {x: 48.80002, y: 491.37598}
   cellSize: 41
-  inspectorLinePosX: 273.8
-  fileViewerLinePosX: 273.8
+  inspectorLinePosX: 120.3
+  fileViewerLinePosX: 120.3

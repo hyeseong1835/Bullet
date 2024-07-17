@@ -1,10 +1,6 @@
 using System;
 using UnityEngine;
 
-public enum Direction
-{
-    None, Up, Down, Right, Left, UpRight, UpLeft, DownRight, DownLeft
-}
 [Serializable]
 public struct Box
 {
@@ -162,7 +158,6 @@ public struct Box
             )
         );
     }
-    
     /// <param name="pos">box의 WorldPosition</param>
     /// <param name="top">위 기준선</param>
     /// <param name="bottom">아래 기준선</param>
@@ -170,61 +165,32 @@ public struct Box
     /// <param name="left">좌측 기준선</param>
     /// <param name="contact"></param>
     /// <returns>Box가 기준선에 접하거나 그 밖일 때 true를 반환합니다. // false일 때 contact = pos</returns>
-    public bool IsContact(Vector2 pos, float top, float bottom, float right, float left, out Vector2 contact, out Direction dir)
-    {
-        dir = Direction.None;
-
-        if (IsContactTop(pos.y, top, out contact.y))
-        {
-            dir = Direction.Up;
-        }
-        else if (IsContactBottom(pos.y, bottom, out contact.y))
-        {
-            dir = Direction.Down;
-        }
-        if (IsContactRight(pos.x, right, out contact.x))
-        {
-            if (dir == Direction.Up) dir = Direction.UpRight;
-            else if (dir == Direction.Down) dir = Direction.DownRight;
-        }
-        else if (IsContactLeft(pos.x, left, out contact.x))
-        {
-            if (dir == Direction.Up) dir = Direction.UpLeft;
-            else if (dir == Direction.Down) dir = Direction.DownLeft;
-        }
-        return dir != Direction.None;
-    }
-    /// <param name="pos">box의 WorldPosition</param>
-    /// <param name="top">위 기준선</param>
-    /// <param name="bottom">아래 기준선</param>
-    /// <param name="right">우측 기준선</param>
-    /// <param name="left">좌측 기준선</param>
-    /// <param name="contact"></param>
-    /// <returns>Box가 기준선에 접하거나 그 밖일 때 true를 반환합니다. // false일 때 contact = pos</returns>
-    public bool IsContact(Vector2 pos, float top, float bottom, float right, float left, out Vector2 contact, out bool isTop, out bool isRight)
+    public bool IsContact(Vector2 pos, float top, float bottom, float right, float left, out Vector2 contact, out int horizontal, out int vertical)
     {
         bool result = false;
-        isTop = false;
-        isRight = false;
+        horizontal = 0;
+        vertical = 0;
 
         if (IsContactTop(pos.y, top, out contact.y))
         {
             result = true;
-            isTop = true;
+            vertical = 1;
         }
         else if (IsContactBottom(pos.y, bottom, out contact.y))
         {
             result = true;
+            vertical = -1;
         }
 
         if (IsContactRight(pos.x, right, out contact.x))
         {
             result = true;
-            isRight = true;
+            horizontal = 1;
         }
         else if (IsContactLeft(pos.x, left, out contact.x))
         {
             result = true;
+            horizontal = -1;
         }
         return result;
     }
@@ -281,16 +247,9 @@ public struct Box
         return IsContact(pos, Win.gameUp, Win.gameDown, Win.gameRight, Win.gameLeft, out contact);
     }
 
-    /// <param name="pos">box의 WorldPosition</param>
-    /// <returns>Box가 게임 외곽선에 접하거나 그 밖일 때 true를 반환합니다. // false일 때 contact = pos</returns>
-    public bool IsContactGame(Vector2 pos, out Vector2 contact, out Direction dir)
+    public bool IsContactGame(Vector2 pos, out Vector2 contact, out int horizontal, out int vertical)
     {
-        return IsContact(pos, Win.gameUp, Win.gameDown, Win.gameRight, Win.gameLeft, out contact, out dir);
-    }
-
-    public bool IsContactGame(Vector2 pos, out Vector2 contact, out bool isTop, out bool isRight)
-    {
-        return IsContact(pos, Win.gameUp, Win.gameDown, Win.gameRight, Win.gameLeft, out contact, out isTop, out isRight);
+        return IsContact(pos, Win.gameUp, Win.gameDown, Win.gameRight, Win.gameLeft, out contact, out horizontal, out vertical);
     }
     #endregion
 
