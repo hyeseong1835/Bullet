@@ -4,19 +4,10 @@ using UnityEngine;
 
 public abstract class Weapon : MonoBehaviour
 {
-    public GameObject UI;
-    
+    public Sprite UI;
+
     public bool canUse = true;
     public float cooltime;
-
-    protected void OnEnable()
-    {
-        UI.SetActive(true);
-    }
-    protected void OnDisable()
-    {
-        UI?.SetActive(false);
-    }
 
     public virtual bool TryUse()
     {

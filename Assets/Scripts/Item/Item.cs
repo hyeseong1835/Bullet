@@ -37,7 +37,9 @@ public abstract class Item : MonoBehaviour
 
         ItemData.pool.DeUse(gameObject);
     }
+    
     protected abstract void OnPickup();
+
     protected void OnDrawGizmos()
     {
         Gizmos.color = Color.green;

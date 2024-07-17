@@ -77,10 +77,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3f7a374fb84698d40a42a88f504ccd39, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  UI: {fileID: 21300000, guid: fb2fe43d978b4ef43bdad4eea9c7b0c3, type: 3}
   canUse: 1
-  data: {fileID: 11400000, guid: 215b4c94d352075499669c8b14b13ddb, type: 2}
+  cooltime: 0
   look: {fileID: 1278509754670674251}
   tip: {fileID: 5648400103011303262}
+  bulletPrefab: {fileID: 0}
+  damage: 0
+  speed: 0
 --- !u!1 &7067925851655723061
 GameObject:
   m_ObjectHideFlags: 0

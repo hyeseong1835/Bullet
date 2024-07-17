@@ -1,8 +1,7 @@
 using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
+using UnityEngine.UI;
 
-[ExecuteAlways]
 [RequireComponent(typeof(Rigidbody2D), typeof(CircleCollider2D))]
 public class Player : Entity
 {
@@ -15,21 +14,25 @@ public class Player : Entity
         public Vector2 toMouse;
         public Quaternion toMouseRot;
     }
-    public InputData input = new InputData();
 
-    public static Player instance;
-
-    [SerializeField] Transform grafic;
+    public static Player instance { get; private set; }
 
     static GameManager Game => GameManager.instance;
+    public override float GetMaxHP() => maxHp;
+
 
     [HideInInspector] public Rigidbody2D rigid;
     [HideInInspector] public CircleCollider2D coll;
+    [HideInInspector] public Transform weaponHolder;
+    Transform look;
+    Transform effect;
+    ParticleSystem levelUpParticle;
 
-    [SerializeField] ParticleSystem levelUpParticle;
-    [SerializeField] Transform weaponHolder;
 
-    public override float GetMaxHP() => maxHp;
+    [Header("Object")]
+    public Image weaponUI;
+
+    [Header("Stat")]
     public float maxHp = 10;
 
     public float damage = 1;
@@ -38,45 +41,40 @@ public class Player : Entity
     public float dash = 2;
     public float dashCoolTime = 0.5f;
     public bool canDash = true;
-
     [SerializeField] Box moveLock;
 
+    [Header("Data")]
     [SerializeField] List<Effect> effects = new List<Effect>();
 
     [SerializeField] Weapon weapon;
-    
     [SerializeField] List<Weapon> weaponList = new List<Weapon>();
 
+    public InputData input = new InputData();
+
+    [Header("EXP")]
     public float[] levelUpExp;
     public int level;
     public float exp;
 
     void Awake()
     {
-        if (GameManager.IsEditor)
-        {
-            return;
-        }
         instance = this;
         rigid = GetComponent<Rigidbody2D>();
         coll = GetComponent<CircleCollider2D>();
+        weaponHolder = transform.Find("WeaponHolder");
+        look = transform.Find("Look");
+        effect = transform.Find("Effect");
+        levelUpParticle = effect.Find("LevelUp").GetComponent<ParticleSystem>();
     }
     void Update()
     {
-        if (GameManager.IsEditor)
-        {
-            gameObject.layer = LayerMask.NameToLayer("Player");
-
-            return;
-        }
-
         if (Game.state == GameState.Play)
         {
             Key();
 
             if (input.moveInput == Vector2.zero)
             {
-                grafic.rotation = Quaternion.Euler(0, 0, -Mathf.Atan2(input.toMouse.x, input.toMouse.y) * Mathf.Rad2Deg);
+                look.rotation = Quaternion.Euler(0, 0, -Mathf.Atan2(input.toMouse.x, input.toMouse.y) * Mathf.Rad2Deg);
             }
             else 
             {
@@ -104,14 +102,14 @@ public class Player : Entity
     void Move()
     {
         transform.Translate(GameManager.instance.gameSpeed * input.moveInput.normalized * speed * Time.deltaTime);
-        grafic.rotation = Quaternion.Euler(0, 0, -Mathf.Atan2(input.moveInput.x, input.moveInput.y) * Mathf.Rad2Deg);
+        look.rotation = Quaternion.Euler(0, 0, -Mathf.Atan2(input.moveInput.x, input.moveInput.y) * Mathf.Rad2Deg);
     }
     void Dash(Vector2 move)
     {
         canDash = false;
         Invoke(nameof(DashCoolDown), dashCoolTime);
 
-        grafic.rotation = Quaternion.Euler(0, 0, -Mathf.Atan2(input.toMouse.x, input.toMouse.y) * Mathf.Rad2Deg);
+        look.rotation = Quaternion.Euler(0, 0, -Mathf.Atan2(input.toMouse.x, input.toMouse.y) * Mathf.Rad2Deg);
         
         foreach (RaycastHit2D hitInfo in Physics2D.CircleCastAll(transform.position, coll.radius, input.toMouse, input.toMouse.magnitude, Physics2D.GetLayerCollisionMask(LayerMask.NameToLayer("Player"))))
         {

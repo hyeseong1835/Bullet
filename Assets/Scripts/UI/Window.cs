@@ -82,8 +82,8 @@ public class Window : MonoBehaviour
     void MatchCanvas()
     {
         float scale;
-        if (isDriveHeight) scale = WindowHeight / scaleFactor;
-        else scale = WindowWidth * screenRatio / scaleFactor;
+        if (isDriveHeight) scale = WindowHeight / scaleFactor / screenHeight;
+        else scale = WindowWidth * screenRatio / scaleFactor / screenHeight;
 
         canvasScaler.scaleFactor = scale;
 
