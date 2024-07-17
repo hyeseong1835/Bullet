@@ -31,10 +31,9 @@ public abstract class Enemy : Entity
                 }
                 if (drop.items != null)
                 {
-                    foreach (ItemData dropables in drop.items)
+                    foreach (ItemData itemData in drop.items)
                     {
-                        Item instance = dropables.Drop();
-                        instance.transform.position = transform.position;
+                        Item instance = itemData.Drop(transform.position);
                     }
                 }
                 break;

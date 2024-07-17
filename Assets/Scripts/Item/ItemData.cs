@@ -6,7 +6,7 @@ public class ItemData : ScriptableObject
 {
     public Pool pool;
 
-    public Item Drop()
+    public Item Drop(Vector2 pos)
     {
         if (pool.holder == null)
         {
@@ -18,7 +18,9 @@ public class ItemData : ScriptableObject
                 }
             );
         }
-        
-        return pool.Use().GetComponent<Item>();
+        Item item = pool.Get().GetComponent<Item>();
+        item.transform.position = pos;
+        pool.Use(pool.objects.Count - 1, item.gameObject);
+        return item;
     }
 }

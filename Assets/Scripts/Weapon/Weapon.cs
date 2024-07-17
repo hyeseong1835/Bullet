@@ -4,14 +4,25 @@ using UnityEngine;
 
 public abstract class Weapon : MonoBehaviour
 {
-    public abstract WeaponData WeaponData { get; }
-    public bool canUse = true;
+    public GameObject UI;
     
+    public bool canUse = true;
+    public float cooltime;
+
+    protected void OnEnable()
+    {
+        UI.SetActive(true);
+    }
+    protected void OnDisable()
+    {
+        UI?.SetActive(false);
+    }
+
     public virtual bool TryUse()
     {
         if (canUse)
         {
-            StartCoroutine(CoolTime(WeaponData.cooltime));
+            StartCoroutine(CoolTime(cooltime));
             Use();
             return true;
         }

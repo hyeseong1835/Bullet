@@ -44,7 +44,8 @@ public class Player : Entity
     [SerializeField] List<Effect> effects = new List<Effect>();
 
     [SerializeField] Weapon weapon;
-    [SerializeField] List<Weapon> autoWeaponList = new List<Weapon>();
+    
+    [SerializeField] List<Weapon> weaponList = new List<Weapon>();
 
     public float[] levelUpExp;
     public int level;
@@ -130,7 +131,7 @@ public class Player : Entity
     }
     void WallCollide()
     {
-        Vector3 contact;
+        Vector2 contact;
         if (moveLock.IsContactGame(transform.position, out contact)) transform.position = contact;
     }
     void UseWeapon()
@@ -140,10 +141,6 @@ public class Player : Entity
             if (weapon == null) return;
 
             weapon.TryUse();
-        }
-        foreach (Weapon autoWeapon in autoWeaponList)
-        {
-            autoWeapon.TryUse();
         }
     }
     public void AddExp(float amount)

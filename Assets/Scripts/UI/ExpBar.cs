@@ -17,7 +17,7 @@ public class ExpBar : MonoBehaviour
     {
         if (player == null)
         {
-            Debug.LogError("Player is null");
+            //Debug.LogError("Player is null");
         }
         else if (player.levelUpExp == null)
         {

@@ -3,19 +3,19 @@ using UnityEngine;
 public class Shooter : Weapon
 {
     static Player player => Player.instance;
-    public ShooterData data;
-    public override WeaponData WeaponData => data;
 
     [SerializeField] Transform look;
     [SerializeField] Transform tip;
+    
     Bullet bullet;
+    public GameObject bulletPrefab;
 
     public float damage;
     public float speed;
 
     void Awake()
     {
-        bullet = data.bulletPrefab.GetComponent<Bullet>();
+        bullet = bulletPrefab.GetComponent<Bullet>();
         
         if (bullet.data.pool.holder == null) bullet.data.pool.Init();
     }

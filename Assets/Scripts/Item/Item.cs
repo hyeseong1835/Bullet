@@ -1,26 +1,37 @@
 using UnityEngine;
 
-[ExecuteAlways]
 [RequireComponent(typeof(Rigidbody2D), typeof(CircleCollider2D))]
 public abstract class Item : MonoBehaviour
 {
     public abstract ItemData ItemData { get; set; }
 
-    void Start()
+    public Vector2 velocity = Vector2.zero;
+
+    protected void OnEnable()
+    {
+        if (new Box(Vector2.one * 1.5f, Vector2.zero).IsContactGame(transform.position, out Vector2 contact, out Direction dir))
+        {
+            transform.position = contact;
+        }
+        velocity = (Player.instance.transform.position - transform.position).normalized;
+    }
+    protected void Start()
     {
         if (ItemData.pool.holder == null) ItemData.pool.Init();
     }
-    void Update()
+    protected void Update()
     {
-        if (GameManager.IsEditor)
+        transform.Translate(velocity * Time.deltaTime);
+
+        if (new Box(Vector2.one * 0.25f, Vector2.zero).IsContactGame(transform.position, out Vector2 contact, out bool isTop, out bool isRight))
         {
-            gameObject.layer = LayerMask.NameToLayer("Item");
+            transform.position = contact;
 
-            Rigidbody2D rigid = GetComponent<Rigidbody2D>();
-            rigid.bodyType = RigidbodyType2D.Kinematic;
+            if (isTop) velocity.y = -Mathf.Abs(velocity.y);
+            else velocity.y = Mathf.Abs(velocity.y);
 
-            CircleCollider2D collider = GetComponent<CircleCollider2D>();
-            collider.isTrigger = true;
+            if (isRight) velocity.x = -Mathf.Abs(velocity.x);
+            else velocity.x = Mathf.Abs(velocity.x);
         }
     }
     public void OnTriggerEnter2D(Collider2D collision)
@@ -30,4 +41,14 @@ public abstract class Item : MonoBehaviour
         ItemData.pool.DeUse(gameObject);
     }
     protected abstract void OnPickup();
+    protected void OnDrawGizmos()
+    {
+        Gizmos.color = Color.green;
+        CustomGizmos.DrawVector(
+            transform.position, 
+            velocity, 
+            45 * Mathf.Deg2Rad, 
+            0.25f
+        );
+    }
 }
