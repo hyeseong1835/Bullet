@@ -1,67 +1,63 @@
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
+using System;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.UIElements;
 
-public interface IOnWindowValidateReceiver
-{
-    void OnWindowValidate();
-}
-public interface IOnScreenResizedReceiver
-{
-    public void OnScreenResized();
-}
 [ExecuteAlways]
 public class Window : MonoBehaviour
 {
     public static Window instance;
-    public Canvas windowCanvas;
-    public RectTransform screenRect;
-    public RectTransform gameRect;
-    
-    public CanvasScaler canvasScaler;
+    public Canvas windowCanvas { get; private set; }
+    public CanvasScaler canvasScaler { get; private set; }
+    public RectTransform screenRect { get; private set; }
+    public RectTransform gameRect { get; private set; }
+
 
     public static int WindowHeight => Screen.height;
     public static int WindowWidth => Screen.width;
     /// <summary>
     /// Height / Width
     /// </summary>
-    public float windowRatio;
+    public float windowRatio { get; private set; }
 
     public Vector2 ScreenSize => new Vector2(screenWidth, screenHeight);
-    public float screenHeight = 5;
-    public float screenWidth = 4;
-    public float screenRatio;
-    public float screenUp;
-    public float screenDown;
-    public float screenRight;
-    public float screenLeft;
-
     public Vector2Int GameSize => new Vector2Int(gameWidth, gameHeight);
-    public int gameHeight = 5;
-    public int gameWidth = 2;
-    public float gameRatio; 
-    public float gameUp;
-    public float gameDown;
-    public float gameRight;
-    public float gameLeft;
-
 
     public float scaleFactor = 1024;
+    public float pixelPerUnit { get; private set; }
+    public bool isDriveHeight { get; private set; }
+    
+    [Header("Screen")]
+    public float screenHeight = 5;
+    public float screenWidth = 4;
+    public float screenRatio { get; private set; }
+    public float screenUp { get; private set; }
+    public float screenDown { get; private set; }
+    public float screenRight { get; private set; }
+    public float screenLeft { get; private set; }
 
-    public float pixelPerUnit;
+    [Header("Game")]
+    public int gameHeight = 5;
+    public int gameWidth = 2;
+    public float gameRatio { get; private set; }
+    public float gameTop { get; private set; }
+    public float gameBottom { get; private set; }
+    public float gameRight { get; private set; }
+    public float gameLeft { get; private set; }
 
-    public bool isDriveHeight;
+    [HideInInspector] public Action onScreenResized;
+    [HideInInspector] public Action onWindowValidate;
 
-    public List<IOnScreenResizedReceiver> onScreenResizedRecieverList = new List<IOnScreenResizedReceiver>();
     float prevWindowHeight;
     float prevWindowWidth;
 
     void Set()
     {
         instance = this;
+
+        if (windowCanvas == null) windowCanvas = GetComponent<Canvas>();
+        if (canvasScaler == null) canvasScaler = GetComponent<CanvasScaler>();
+        if (screenRect == null) screenRect = transform.Find("Screen").GetComponent<RectTransform>();
+        if (gameRect == null) gameRect = transform.Find("Game").GetComponent<RectTransform>();
 
         screenRatio = screenHeight / screenWidth;
         screenUp = screenHeight;
@@ -70,8 +66,8 @@ public class Window : MonoBehaviour
         screenLeft = -0.5f * screenWidth;
 
         gameRatio = (float)gameHeight / gameWidth;
-        gameUp = gameHeight;
-        gameDown = 0;
+        gameTop = gameHeight;
+        gameBottom = 0;
         gameRight = 0.5f * gameWidth;
         gameLeft = -0.5f * gameWidth;
     }
@@ -102,13 +98,7 @@ public class Window : MonoBehaviour
             Refresh();
             MatchCanvas();
 
-            if (onScreenResizedRecieverList != null)
-            {
-                foreach (IOnScreenResizedReceiver receiver in onScreenResizedRecieverList)
-                {
-                    receiver.OnScreenResized();
-                }
-            }
+            onScreenResized?.Invoke();
 
             prevWindowHeight = WindowHeight;
             prevWindowWidth = WindowWidth;
@@ -127,12 +117,6 @@ public class Window : MonoBehaviour
         Set();
         Refresh();
 
-        var onWindowValidaterecieverIt = FindObjectsOfType<MonoBehaviour>()
-                                                   .OfType<IOnWindowValidateReceiver>();
-
-        foreach (IOnWindowValidateReceiver receiver in onWindowValidaterecieverIt)
-        {
-            receiver.OnWindowValidate();
-        }
+        onWindowValidate?.Invoke();
     }
 }

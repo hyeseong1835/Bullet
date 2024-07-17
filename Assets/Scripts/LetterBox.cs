@@ -1,18 +1,18 @@
 using UnityEngine;
 
 [ExecuteAlways]
-public class LetterBox : MonoBehaviour, IOnScreenResizedReceiver
+public class LetterBox : MonoBehaviour
 {
     public GameObject top, right, left;
     static Window Win => Window.instance;
 
     void OnEnable()
     {
-        Win.onScreenResizedRecieverList.Add(this);
+        Win.onScreenResized += OnScreenResized;
     }
     void OnDisable()
     {
-        Win.onScreenResizedRecieverList.Remove(this);
+        Win.onScreenResized -= OnScreenResized;
     }
     void Refresh()
     {

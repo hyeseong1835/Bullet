@@ -2,7 +2,7 @@ using UnityEngine;
 
 [ExecuteAlways]
 [RequireComponent(typeof(Camera))]
-public class CameraController : MonoBehaviour, IOnScreenResizedReceiver
+public class CameraController : MonoBehaviour
 {
     public static CameraController instance;
     static Window Win => Window.instance;
@@ -18,18 +18,13 @@ public class CameraController : MonoBehaviour, IOnScreenResizedReceiver
 
     void OnEnable()
     {
-        Win.onScreenResizedRecieverList.Add(this);
+        Win.onScreenResized += OnScreenResized;
     }
     void OnDisable()
     {
-        Win.onScreenResizedRecieverList.Remove(this);
+        Win.onScreenResized -= OnScreenResized;
     }
 
-    void OnDrawGizmos()
-    {
-        Gizmos.color = Color.white;
-        Gizmos.DrawWireCube(new Vector2(0, 0.5f * Win.screenHeight), new Vector2(2, Win.screenHeight));
-    }
     void OnValidate()
     {
         instance = this;

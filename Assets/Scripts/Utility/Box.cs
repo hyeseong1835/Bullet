@@ -199,10 +199,10 @@ public struct Box
     #region ContactGame
 
     /// <returns>Box가 게임 외곽선에 접하거나 그 위일 때 true를 반환합니다.</returns>
-    public bool IsContactGameTop(float x) => IsContactTop(x, Win.gameUp);
+    public bool IsContactGameTop(float x) => IsContactTop(x, Win.gameTop);
 
     /// <returns>Box가 게임 외곽선에 접하거나 그 아래일 때 true를 반환합니다.</returns>
-    public bool IsContactGameBottom(float x) => IsContactBottom(x, Win.gameDown);
+    public bool IsContactGameBottom(float x) => IsContactBottom(x, Win.gameBottom);
 
     /// <returns>Box가 게임 외곽선에 접하거나 그보다 오른쪽일 때 true를 반환합니다.</returns>
     public bool IsContactGameRight(float y) => IsContactRight(y, Win.gameRight);
@@ -226,11 +226,11 @@ public struct Box
 
     /// <param name="x">box의 X 좌표</param>
     /// <returns>Box가 게임 외곽선에 접하거나 그 위일 때 true를 반환합니다.</returns>
-    public bool IsContactGameTop(float x, out float contact) => IsContactTop(x, Win.gameUp, out contact);
+    public bool IsContactGameTop(float x, out float contact) => IsContactTop(x, Win.gameTop, out contact);
 
     /// <param name="x">box의 X 좌표</param>
     /// <returns>Box가 게임 외곽선에 접하거나 그 아래일 때 true를 반환합니다.</returns>
-    public bool IsContactGameBottom(float x, out float contact) => IsContactBottom(x, Win.gameDown, out contact);
+    public bool IsContactGameBottom(float x, out float contact) => IsContactBottom(x, Win.gameBottom, out contact);
 
     /// <param name="y">box의 Y 좌표</param>
     /// <returns>Box가 게임 외곽선에 접하거나 그보다 오른쪽일 때 true를 반환합니다.</returns>
@@ -244,12 +244,12 @@ public struct Box
     /// <returns>Box가 게임 외곽선에 접하거나 그 밖일 때 true를 반환합니다. // false일 때 contact = pos</returns>
     public bool IsContactGame(Vector2 pos, out Vector2 contact)
     {
-        return IsContact(pos, Win.gameUp, Win.gameDown, Win.gameRight, Win.gameLeft, out contact);
+        return IsContact(pos, Win.gameTop, Win.gameBottom, Win.gameRight, Win.gameLeft, out contact);
     }
 
     public bool IsContactGame(Vector2 pos, out Vector2 contact, out int horizontal, out int vertical)
     {
-        return IsContact(pos, Win.gameUp, Win.gameDown, Win.gameRight, Win.gameLeft, out contact, out horizontal, out vertical);
+        return IsContact(pos, Win.gameTop, Win.gameBottom, Win.gameRight, Win.gameLeft, out contact, out horizontal, out vertical);
     }
     #endregion
 
@@ -381,10 +381,10 @@ public struct Box
     #region ExitGame
 
     /// <returns>Box가 게임 외곽선에 접하거나 그 위일 때 true를 반환합니다.</returns>
-    public bool IsExitGameTop(float x) => IsExitTop(x, Win.gameUp);
+    public bool IsExitGameTop(float x) => IsExitTop(x, Win.gameTop);
 
     /// <returns>Box가 게임 외곽선에 접하거나 그 위일 때 true를 반환합니다.</returns>
-    public bool IsExitGameBottom(float x) => IsExitBottom(x, Win.gameDown);
+    public bool IsExitGameBottom(float x) => IsExitBottom(x, Win.gameBottom);
     
     /// <returns>Box가 게임 외곽선에 접하거나 그보다 오른쪽일 때 true를 반환합니다.</returns>
     public bool IsExitGameRight(float y) => IsExitRight(y, Win.gameRight);
