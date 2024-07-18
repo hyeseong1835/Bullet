@@ -28,12 +28,14 @@ public class Player : Entity
     Transform effect;
     ParticleSystem levelUpParticle;
 
+    [Header("Object")]
+    public Image weaponUI;
+    public Image weaponFrame;
+    [SerializeField] protected ParticleSystem weaponUIBreakParticle;
+
     [SerializeField] GameObject level1Grafic;
     [SerializeField] GameObject level2Grafic;
     [SerializeField] GameObject level3Grafic;
-
-    [Header("Object")]
-    public Image weaponUI;
 
     [Header("Stat")]
     public float maxHp = 10;
@@ -89,7 +91,25 @@ public class Player : Entity
             {
                 if (input.toMouse.magnitude <= dash) Dash(input.toMouse);
                 else Dash(input.toMouse.normalized * dash);
-                
+            }
+            if (weapon != null)
+            {
+                if(Input.GetKey(KeyCode.Q))
+                {
+                    weaponFrame.fillAmount -= Time.deltaTime / 3;
+                    if (weaponFrame.fillAmount <= 0)
+                    {
+                        WeaponBreak();
+                    }
+                }
+                else
+                {
+                    if (weaponFrame.fillAmount < 1)
+                    {
+                        weaponFrame.fillAmount += Time.deltaTime / 3 * 3;
+                    }
+                    else weaponFrame.fillAmount = 1;
+                }
             }
             WallCollide();
             UseWeapon();
@@ -126,10 +146,7 @@ public class Player : Entity
         
         transform.Translate(move);
     }
-    void DashCoolDown()
-    {
-        canDash = true;
-    }
+    void DashCoolDown() => canDash = true;
     void WallCollide()
     {
         Vector2 contact;
@@ -187,6 +204,15 @@ public class Player : Entity
         damage /= 1.1f;
 
         Debug.Log($"Level Down! ({level})");
+    }
+    void WeaponBreak()
+    {
+        ParticleSystem.ShapeModule shape = weaponUIBreakParticle.shape;
+        shape.texture = weaponUI.sprite.texture;
+
+        weaponUIBreakParticle.Play();
+        weaponUI.sprite = null;
+        weapon = null;
     }
     void OnValidate()
     {

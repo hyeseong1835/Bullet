@@ -62,3 +62,6 @@ TagManager:
   - name: LetterBox
     uniqueID: 977789023
     locked: 0
+  - name: Effect
+    uniqueID: 4201473259
+    locked: 0
