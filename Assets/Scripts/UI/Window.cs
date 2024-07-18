@@ -56,8 +56,8 @@ public class Window : MonoBehaviour
 
         if (windowCanvas == null) windowCanvas = GetComponent<Canvas>();
         if (canvasScaler == null) canvasScaler = GetComponent<CanvasScaler>();
-        if (screenRect == null) screenRect = transform.Find("Screen").GetComponent<RectTransform>();
-        if (gameRect == null) gameRect = transform.Find("Game").GetComponent<RectTransform>();
+        if (screenRect == null) screenRect = transform.Find("Screen Canvas").GetComponent<RectTransform>();
+        if (gameRect == null) gameRect = transform.Find("Game Canvas").GetComponent<RectTransform>();
 
         screenRatio = screenHeight / screenWidth;
         screenUp = screenHeight;
@@ -85,7 +85,7 @@ public class Window : MonoBehaviour
 
         float factor = pixelPerUnit / scale;
 
-        screenRect.anchoredPosition = new Vector2(0, 0.5f * screenHeight) * factor;
+        screenRect.anchoredPosition = new Vector2(0, 0.5f * screenHeight) * factor;//
         screenRect.sizeDelta = new Vector2(screenWidth, screenHeight) * factor;
 
         gameRect.anchoredPosition = new Vector2(0, 0.5f * gameHeight) * factor;

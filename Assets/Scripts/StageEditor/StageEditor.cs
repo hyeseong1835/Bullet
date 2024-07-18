@@ -205,7 +205,7 @@ public class StageEditor : EditorWindow
 
         RefreshPreviewRect();
         
-        if(previewRect.width != 0)
+        if(data.selectedStage != null && previewRect.width != 0)
         {
             DrawPreview();
         }

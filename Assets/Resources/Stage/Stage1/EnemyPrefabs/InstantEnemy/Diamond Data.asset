@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: cb4a2d180a04b2a49b0b91d15046a43c, type: 3}
-  m_Name: Enemy Data
+  m_Name: Diamond Data
   m_EditorClassIdentifier: 
   maxHp: 1
   drops:
@@ -20,6 +20,8 @@ MonoBehaviour:
     ratio: 1
   - prefabs: []
     items: []
-    ratio: 1
-  ratioMax: 2
+    ratio: 9
+  ratioMax: 10
   exp: 5
+  collideDamage: 1
+  speed: 3

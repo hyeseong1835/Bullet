@@ -1,5 +1,4 @@
 using System;
-using System.Runtime.Serialization.Formatters;
 using UnityEngine;
 
 public class InstantEnemy : Enemy
@@ -17,8 +16,6 @@ public class InstantEnemy : Enemy
         set { spawnData = (InstantEnemySpawnData) value; } 
     }
 
-    public float speed;
-
     Vector3 dir;
 
     void OnEnable()
@@ -27,7 +24,7 @@ public class InstantEnemy : Enemy
 
         hp = data.maxHp;
         transform.position = spawnData.startPos;
-        dir = spawnData.endPos - spawnData.startPos;
+        dir = (spawnData.endPos - spawnData.startPos).normalized;
     }
     void Start()
     {
@@ -35,7 +32,7 @@ public class InstantEnemy : Enemy
     }
     void Update()
     {
-        transform.position += GameManager.instance.gameSpeed * dir * speed * Time.deltaTime;
+        transform.position += GameManager.instance.gameSpeed * dir * data.speed * Time.deltaTime;
         
         if (spawnData.endPos.x < spawnData.startPos.x)
         {

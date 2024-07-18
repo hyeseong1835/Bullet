@@ -4,4 +4,5 @@ using UnityEngine;
 public class InstantEnemyData : EnemyData
 {
     public float collideDamage = 1;
+    public float speed;
 }

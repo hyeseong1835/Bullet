@@ -61,6 +61,7 @@ public class GameManager : MonoBehaviour
                     break;
                 }
                 Play();
+                DebugInput();
                 break;
 
             case GameState.Pause:
@@ -72,7 +73,6 @@ public class GameManager : MonoBehaviour
                 Pause();
                 break;
         }
-        DebugInput();
     }
     void DebugInput()
     {
@@ -127,18 +127,19 @@ public class GameManager : MonoBehaviour
             }
         }
     }
+    public void StartButtonDown()
+    {
+        state = GameState.Play;
+        mainPanel.SetActive(false);
+        time = 0;
+#if UNITY_EDITOR
+        StageEditor.instance?.Repaint();
+#endif
+        stage.lastIndex = -1;
+    }
     void Ready()
     {
-        if (Input.anyKeyDown)
-        {
-            state = GameState.Play;
-            mainPanel.SetActive(false);
-            time = 0;
-#if UNITY_EDITOR
-            StageEditor.instance?.Repaint();
-#endif
-            stage.lastIndex = -1;
-        }
+
     }
     void Play()
     {
