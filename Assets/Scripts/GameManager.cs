@@ -132,10 +132,10 @@ public class GameManager : MonoBehaviour
         state = GameState.Play;
         mainPanel.SetActive(false);
         time = 0;
+        stage.lastIndex = -1;
 #if UNITY_EDITOR
         StageEditor.instance?.Repaint();
 #endif
-        stage.lastIndex = -1;
     }
     void Ready()
     {

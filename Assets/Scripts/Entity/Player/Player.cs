@@ -62,7 +62,7 @@ public class Player : Entity
     public float exp;
 
     float weaponBreakTime = 1;
-
+    bool canWeaponBreak;
     void Awake()
     {
         instance = this;
@@ -96,12 +96,21 @@ public class Player : Entity
             }
             if (weapon != null)
             {
-                if(Input.GetKey(KeyCode.Q))
+                if (Input.GetKey(KeyCode.Q))
                 {
                     weaponFrame.fillAmount -= Time.deltaTime / weaponBreakTime;
                     if (weaponFrame.fillAmount <= 0)
                     {
-                        WeaponBreak();
+                        if (canWeaponBreak)
+                        {
+                            weaponFrame.fillAmount = 0;
+                            WeaponBreak();
+                            canWeaponBreak = false;
+                        }
+                        else
+                        {
+                            weaponFrame.fillAmount = 0;
+                        }
                     }
                 }
                 else
@@ -110,7 +119,11 @@ public class Player : Entity
                     {
                         weaponFrame.fillAmount += Time.deltaTime / weaponBreakTime * 3;
                     }
-                    else weaponFrame.fillAmount = 1;
+                    else
+                    {
+                        weaponFrame.fillAmount = 1;
+                        canWeaponBreak = true;
+                    }
                 }
             }
             WallCollide();
