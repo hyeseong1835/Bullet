@@ -23,11 +23,14 @@ public class Player : Entity
 
     [HideInInspector] public Rigidbody2D rigid;
     [HideInInspector] public CircleCollider2D coll;
-    [HideInInspector] public Transform weaponHolder;
+    public static Transform weaponHolder { get; private set; }
     Transform look;
     Transform effect;
     ParticleSystem levelUpParticle;
 
+    [SerializeField] GameObject level1Grafic;
+    [SerializeField] GameObject level2Grafic;
+    [SerializeField] GameObject level3Grafic;
 
     [Header("Object")]
     public Image weaponUI;
@@ -154,7 +157,17 @@ public class Player : Entity
     public void LevelUp()
     {
         level++;
-        
+        switch (level)
+        {
+            case 2:
+                level1Grafic.SetActive(false);
+                level2Grafic.SetActive(true);
+                break;
+            case 4:
+                level2Grafic.SetActive(false);
+                level3Grafic.SetActive(true);
+                break;
+        }
         maxHp *= 1.1f;
         hp = maxHp;
 
