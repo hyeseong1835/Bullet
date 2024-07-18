@@ -7067,7 +7067,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_UiScaleMode: 0
   m_ReferencePixelsPerUnit: 100
-  m_ScaleFactor: 2.16
+  m_ScaleFactor: 0.708
   m_ReferenceResolution: {x: 800, y: 600}
   m_ScreenMatchMode: 0
   m_MatchWidthOrHeight: 0
@@ -7194,8 +7194,8 @@ Transform:
   m_GameObject: {fileID: 416056629}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -3.7222223, y: 2.5, z: 0}
-  m_LocalScale: {x: 1.4444447, y: 5, z: 1}
+  m_LocalPosition: {x: -3.1631355, y: 2.5, z: 0}
+  m_LocalScale: {x: 0.3262713, y: 5, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 109920614}
@@ -7412,8 +7412,8 @@ Transform:
   m_GameObject: {fileID: 442859288}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 3.7222223, y: 2.5, z: 0}
-  m_LocalScale: {x: 1.4444447, y: 5, z: 1}
+  m_LocalPosition: {x: 3.1631355, y: 2.5, z: 0}
+  m_LocalScale: {x: 0.3262713, y: 5, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 109920614}
@@ -8098,7 +8098,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cam: {fileID: 519420031}
-  viewSize: {x: 8.888889, y: 5}
+  viewSize: {x: 6.6525426, y: 5}
 --- !u!1 &529629833
 GameObject:
   m_ObjectHideFlags: 0
@@ -9881,6 +9881,7 @@ MonoBehaviour:
   rigid: {fileID: 975585800}
   coll: {fileID: 975585799}
   weaponUI: {fileID: 2067037220}
+  weaponFrame: {fileID: 1829995072}
   weaponUIBreakParticle: {fileID: 61785383}
   level1Grafic: {fileID: 347535189}
   level2Grafic: {fileID: 132970588}

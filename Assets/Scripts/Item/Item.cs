@@ -34,8 +34,6 @@ public abstract class Item : MonoBehaviour
     public void OnTriggerEnter2D(Collider2D collision)
     {
         OnPickup();
-
-        ItemData.pool.DeUse(gameObject);
     }
     
     protected abstract void OnPickup();

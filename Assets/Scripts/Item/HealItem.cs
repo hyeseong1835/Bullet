@@ -5,8 +5,8 @@ using UnityEngine;
 public class HealItem : Item
 {
     public HealItemData data;
-    public override ItemData ItemData 
-    { 
+    public override ItemData ItemData
+    {
         get => data;
         set { data = (HealItemData)value; }
     }
@@ -14,5 +14,9 @@ public class HealItem : Item
     Player player => Player.instance;
 
 
-    protected override void OnPickup() => player.Heal(data.healAmount);
+    protected override void OnPickup()
+    {
+        player.Heal(data.healAmount);
+        ItemData.pool.DeUse(gameObject);
+    }
 }

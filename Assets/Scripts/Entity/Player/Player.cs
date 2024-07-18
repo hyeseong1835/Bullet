@@ -51,7 +51,7 @@ public class Player : Entity
     [Header("Data")]
     [SerializeField] List<Effect> effects = new List<Effect>();
 
-    [SerializeField] Weapon weapon;
+    public Weapon weapon;
     [SerializeField] List<Weapon> weaponList = new List<Weapon>();
 
     public InputData input = new InputData();
@@ -60,6 +60,8 @@ public class Player : Entity
     public float[] levelUpExp;
     public int level;
     public float exp;
+
+    float weaponBreakTime = 1;
 
     void Awake()
     {
@@ -96,7 +98,7 @@ public class Player : Entity
             {
                 if(Input.GetKey(KeyCode.Q))
                 {
-                    weaponFrame.fillAmount -= Time.deltaTime / 3;
+                    weaponFrame.fillAmount -= Time.deltaTime / weaponBreakTime;
                     if (weaponFrame.fillAmount <= 0)
                     {
                         WeaponBreak();
@@ -106,7 +108,7 @@ public class Player : Entity
                 {
                     if (weaponFrame.fillAmount < 1)
                     {
-                        weaponFrame.fillAmount += Time.deltaTime / 3 * 3;
+                        weaponFrame.fillAmount += Time.deltaTime / weaponBreakTime * 3;
                     }
                     else weaponFrame.fillAmount = 1;
                 }
@@ -208,11 +210,11 @@ public class Player : Entity
     void WeaponBreak()
     {
         ParticleSystem.ShapeModule shape = weaponUIBreakParticle.shape;
-        shape.texture = weaponUI.sprite.texture;
+        shape.texture = weaponUI.sprite?.texture ?? Texture2D.whiteTexture;
 
         weaponUIBreakParticle.Play();
         weaponUI.sprite = null;
-        weapon = null;
+        Destroy(weapon.gameObject);
     }
     void OnValidate()
     {

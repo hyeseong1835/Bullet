@@ -11,7 +11,14 @@ public class Laser : Weapon
 
     public float damage;
     public float width;
-
+    protected void Start()
+    {
+        laser.transform.parent = null;
+    }
+    protected void OnDestroy()
+    {
+        Destroy(laser);
+    }
     protected void Update()
     {
         transform.rotation = player.input.toMouseRot;
@@ -42,7 +49,7 @@ public class Laser : Weapon
         laser.transform.rotation = player.input.toMouseRot;
         
         yield return new WaitForSeconds(0.1f);
-        laser.SetActive(false);
+        laser?.SetActive(false);
     }
 
     private void OnDrawGizmosSelected()

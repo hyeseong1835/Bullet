@@ -19,7 +19,8 @@ MonoBehaviour:
     - {fileID: 11400000, guid: f88871e3d8e93a047ad0533bbd7fba55, type: 2}
     ratio: 1
   - prefabs: []
-    items: []
+    items:
+    - {fileID: 11400000, guid: 308f5bc7387ab70409d5b930f803947c, type: 2}
     ratio: 9
   ratioMax: 10
   exp: 5

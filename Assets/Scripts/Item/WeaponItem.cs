@@ -12,7 +12,15 @@ public class WeaponItem : Item
 
     protected override void OnPickup()
     {
-        Weapon weaponInstance = Instantiate(data.weaponPrefab, Player.weaponHolder).GetComponent<Weapon>();
+        if (Player.instance.weapon == null)
+        {
+            Weapon weaponInstance = Instantiate(data.weaponPrefab, Player.weaponHolder).GetComponent<Weapon>();
+            Player.instance.weapon = weaponInstance;
+            Player.instance.weaponUI.sprite = weaponInstance.UI;
+
+
+            ItemData.pool.DeUse(gameObject);
+        }
 
     }
 }
