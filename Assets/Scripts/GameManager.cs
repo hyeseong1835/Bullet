@@ -21,12 +21,20 @@ public class GameManager : MonoBehaviour
     [SerializeField] GameObject mainPanel;
     [SerializeField] TextMeshProUGUI timeText;
     public Stage stage;
-
-    [SerializeField] ResistanceEffect Resistance2Effect;
+    
     public float gameSpeed = 1;
     public float time = -1;
 
     int eventIndex = 0;
+
+    [Header("Debug")]
+    //F1
+    [SerializeField] ResistanceEffect Resistance2Effect;
+    //F5
+    [SerializeField] WeaponItemData[] weaponItemData;
+    //F6
+    [SerializeField] ItemData[] activeItem;
+
 
     void Awake()
     {
@@ -60,13 +68,7 @@ public class GameManager : MonoBehaviour
                 break;
 
             case GameState.Play:
-                if (Input.GetKeyDown(KeyCode.F1)) Debug_Resist2();
-                if (Input.GetKeyDown(KeyCode.F2)) Debug_LevelUp();
-                if (Input.GetKeyDown(KeyCode.F3)) Debug_LevelDown();
-                if (Input.GetKeyDown(KeyCode.F4)) Debug_Heal();
-                if (Input.GetKeyDown(KeyCode.F7)) Debug_TimeMove();
-
-                if (Input.GetKeyDown(KeyCode.P)) Debug_StopToggle();
+                
 
                 Play();
                 break;
@@ -104,6 +106,26 @@ public class GameManager : MonoBehaviour
     void Debug_Heal()
     {
         player.hp = player.maxHp;
+    }
+    void Debug_SpawnWeapon()
+    {
+        if (weaponItemData.Length == 0) return;
+        
+        int random = Random.Range(0, weaponItemData.Length);
+        weaponItemData[random].Drop(
+            new Vector2(0, 2.5f),
+            new Vector2(0, 0)
+        );
+    }
+    void Debug_SpawnActiveItem()
+    {
+        if (activeItem.Length == 0) return;
+
+        int random = Random.Range(0, activeItem.Length);
+        activeItem[random].Drop(
+            new Vector2(0, 2.5f),
+            new Vector2(0, 0)
+        );
     }
     void Debug_TimeMove()
     {
@@ -161,6 +183,16 @@ public class GameManager : MonoBehaviour
 #if UNITY_EDITOR
         StageEditor.instance?.Repaint();
 #endif
+
+        if (Input.GetKeyDown(KeyCode.F1)) Debug_Resist2();
+        if (Input.GetKeyDown(KeyCode.F2)) Debug_LevelUp();
+        if (Input.GetKeyDown(KeyCode.F3)) Debug_LevelDown();
+        if (Input.GetKeyDown(KeyCode.F4)) Debug_Heal();
+        if (Input.GetKeyDown(KeyCode.F5)) Debug_SpawnWeapon();
+        if (Input.GetKeyDown(KeyCode.F6)) Debug_SpawnActiveItem();
+        if (Input.GetKeyDown(KeyCode.F7)) Debug_TimeMove();
+
+        if (Input.GetKeyDown(KeyCode.P)) Debug_StopToggle();
     }
     void Pause()
     {

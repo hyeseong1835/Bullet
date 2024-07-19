@@ -64,6 +64,8 @@ public class StageEditor : EditorWindow
     {
         Debug.Log("Quit");
 
+        if (instance == null) return true;
+
         data.SelectEnemyData(-1);
 
         instance = null;

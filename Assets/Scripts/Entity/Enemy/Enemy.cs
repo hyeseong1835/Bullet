@@ -14,7 +14,7 @@ public abstract class Enemy : Entity
     public abstract EnemySpawnData EnemySpawnData { get; set; }
     public abstract Type EnemySpawnDataType { get; }
 
-    protected void Drop()
+    protected virtual void Drop()
     {
         float random = UnityEngine.Random.Range(0, EnemyData.ratioMax);
         foreach (DropInfo drop in EnemyData.drops)
@@ -33,7 +33,7 @@ public abstract class Enemy : Entity
                 {
                     foreach (ItemData itemData in drop.items)
                     {
-                        Item instance = itemData.Drop(transform.position);
+                        Item instance = itemData.Drop(transform.position, GetDropDir());
                     }
                 }
                 break;
@@ -42,6 +42,7 @@ public abstract class Enemy : Entity
         }
         Player.instance.AddExp(EnemyData.exp);
     }
+    protected virtual Vector2 GetDropDir() => UnityEngine.Random.insideUnitCircle.normalized;
     protected override void OnDead()
     {
         Drop();

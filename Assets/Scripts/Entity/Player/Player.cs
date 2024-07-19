@@ -53,7 +53,6 @@ public class Player : Entity
     [Header("Data")]
     public Weapon defaultWeapon;
     public Weapon weapon;
-    [SerializeField] List<Weapon> weaponList = new List<Weapon>();
 
     public InputData input = new InputData();
 
@@ -220,6 +219,7 @@ public class Player : Entity
     
     public void GetWeapon(Weapon weapon)
     {
+        Debug.Log($"Get Weapon! {weapon.data.prefab.name}[{weapon.data.level}]");
         defaultWeapon.gameObject.SetActive(false);
 
         this.weapon = weapon;

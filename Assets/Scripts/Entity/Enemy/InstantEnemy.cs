@@ -68,6 +68,7 @@ public class InstantEnemy : Enemy
     {
         GameManager.instance.stage.enemyPool[spawnData.prefabTypeIndex][spawnData.prefabIndex].DeUse(gameObject);
     }
+    protected override Vector2 GetDropDir() => dir;
     void OnTriggerEnter2D(Collider2D other)
     {
         if (other.gameObject.layer == 10)

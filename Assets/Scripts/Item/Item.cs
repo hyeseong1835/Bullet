@@ -13,7 +13,6 @@ public abstract class Item : MonoBehaviour
         {
             transform.position = contact;
         }
-        velocity = (Player.instance.transform.position - transform.position).normalized;
     }
     protected void Start()
     {

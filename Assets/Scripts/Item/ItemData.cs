@@ -6,7 +6,7 @@ public class ItemData : ScriptableObject
 {
     public Pool pool;
 
-    public Item Drop(Vector2 pos)
+    public Item Drop(Vector2 pos, Vector2 velocity)
     {
         if (pool.holder == null)
         {
@@ -20,6 +20,7 @@ public class ItemData : ScriptableObject
         }
         Item item = pool.Get().GetComponent<Item>();
         item.transform.position = pos;
+        item.velocity = velocity;
         pool.Use(pool.objects.Count - 1, item.gameObject);
         return item;
     }
