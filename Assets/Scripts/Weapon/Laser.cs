@@ -16,6 +16,7 @@ public class Laser : Weapon
     protected void Start()
     {
         laser = Instantiate(laserPrefab);
+        laser.SetActive(false);
     }
     protected void OnDestroy()
     {

@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 2252819536391700565}
   - component: {fileID: 4236583990731441353}
   m_Layer: 10
-  m_Name: Laser 1
+  m_Name: Laser 2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -46,10 +46,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1f97b5e15956fd64f9e5b9416684d898, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  data: {fileID: 11400000, guid: 50c700b5216c359469689ddd3e38299f, type: 2}
+  data: {fileID: 11400000, guid: 993678a602ed0824ea9a28d783b7e2eb, type: 2}
   cooltime: 1
   tip: {fileID: 2792558832575340715}
-  laserPrefab: {fileID: 5630565458787259537, guid: 08795dada32d8e84bafe6d76d2072a09, type: 3}
+  laserPrefab: {fileID: 5630565458787259537, guid: a012b9e4561975942882dada69cdc2fe, type: 3}
   laserShowTime: 0.1
   damage: 10
   width: 0.1

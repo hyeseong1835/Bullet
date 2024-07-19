@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c6473b79c5d5fd9418244b9c8431bb72, type: 3}
-  m_Name: Laser 1 Data
+  m_Name: Laser 0 Data
   m_EditorClassIdentifier: 
-  prefab: {fileID: 3474360992011919182, guid: 31f5376b4e0925d41b8ee5e4f89421fc, type: 3}
-  UI: {fileID: 21300000, guid: 379b156f4a2308141a1fab10f3276131, type: 3}
+  prefab: {fileID: 3474360992011919182, guid: 1f03b58dd91e9ee4b879c69912673b0b, type: 3}
+  UI: {fileID: 21300000, guid: 233527c69ddc7654d8cfc62f38f82130, type: 3}
   upgrade: {fileID: 11400000, guid: 68efbd29b275e69449c21a6969827e1d, type: 2}
-  level: 1
+  level: 0

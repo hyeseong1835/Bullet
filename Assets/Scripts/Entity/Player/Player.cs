@@ -227,6 +227,7 @@ public class Player : Entity
     }
     public void UpgradeWeapon()
     {
+        Debug.Log($"Upgrade Weapon! {weapon.data.upgrade.data[weapon.data.level + 1].prefab.name}[{weapon.data.level + 1}]");
         GameObject weaponObj = Instantiate(
             weapon.data.upgrade.data[weapon.data.level + 1].prefab, 
             weaponHolder
