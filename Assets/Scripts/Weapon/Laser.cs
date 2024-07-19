@@ -23,7 +23,7 @@ public class Laser : Weapon
     {
         transform.rotation = player.input.toMouseRot;
     }
-    protected override void Use()
+    public override void Use()
     {
         RaycastHit2D[] hit = Physics2D.BoxCastAll(
             tip.position,

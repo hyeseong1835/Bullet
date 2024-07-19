@@ -6,36 +6,39 @@ using UnityEngine.UI;
 
 public abstract class Effect : MonoBehaviour
 {
+    public Image timeFill;
+
     public float maxTime = 1;
     public float time;
-    protected Action endEvent;
-    public Image timeFill;
 
     protected void Update()
     {
-        if (time > 0)
+        if (maxTime == -1 || Time()) OnUpdate();
+        else Stop();
+    }
+    bool Time()
+    {
+        if (time != 0)
         {
-            time -= Time.deltaTime;
+            time -= GameManager.deltaTime;
+            if (time < 0) time = 0;
             timeFill.fillAmount = time / maxTime;
-
-            if (time <= 0)
-            {
-                OnEnd();
-                return;
-            }
         }
-        OnUpdate();
+
+        return time != 0;
     }
     public virtual void Execute(float time)
     {
-        this.time += time;
-        maxTime = this.time;
+        this.time = time;
+        if (maxTime < this.time) maxTime = this.time;
+
         gameObject.SetActive(true);
         OnStart();
     }
     public void Stop()
     {
         time = 0;
+        maxTime = -1;
         OnEnd();
         gameObject.SetActive(false);
     }

@@ -1,4 +1,5 @@
 #if UNITY_EDITOR
+using TMPro;
 using UnityEditor;
 #endif
 using UnityEngine;
@@ -15,13 +16,17 @@ public class GameManager : MonoBehaviour
 
     public GameState state;
     public static bool IsEditor => instance.state == GameState.Editor;
+    public static float deltaTime => instance.gameSpeed * Time.deltaTime;
 
     [SerializeField] GameObject mainPanel;
+    [SerializeField] TextMeshProUGUI timeText;
     public Stage stage;
 
     [SerializeField] ResistanceEffect Resistance2Effect;
     public float gameSpeed = 1;
     public float time = -1;
+
+    int eventIndex = 0;
 
     void Awake()
     {
@@ -55,78 +60,70 @@ public class GameManager : MonoBehaviour
                 break;
 
             case GameState.Play:
-                if (gameSpeed == 0)
-                {
-                    state = GameState.Pause;
-                    break;
-                }
+                if (Input.GetKeyDown(KeyCode.F1)) Debug_Resist2();
+                if (Input.GetKeyDown(KeyCode.F2)) Debug_LevelUp();
+                if (Input.GetKeyDown(KeyCode.F3)) Debug_LevelDown();
+                if (Input.GetKeyDown(KeyCode.F4)) Debug_Heal();
+                if (Input.GetKeyDown(KeyCode.F7)) Debug_TimeMove();
+
+                if (Input.GetKeyDown(KeyCode.P)) Debug_StopToggle();
+
                 Play();
-                DebugInput();
                 break;
 
             case GameState.Pause:
-                if (gameSpeed != 0)
-                {
-                    state = GameState.Play;
-                    break;
-                }
                 Pause();
                 break;
         }
     }
-    void DebugInput()
+    void Debug_Resist2()
     {
-        if (Input.GetKeyDown(KeyCode.F1))
+        if (Resistance2Effect.gameObject.activeInHierarchy)
         {
-            if(Resistance2Effect.gameObject.activeInHierarchy)
-            {
-                Resistance2Effect.Stop();
-            }
-            else
-            {
-                Resistance2Effect.Execute(99999);
-            }
+            Resistance2Effect.Stop();
         }
-        if (Input.GetKeyDown(KeyCode.F2))
+        else
         {
-            if(player.level + 1 < player.levelUpExp.Length)
-            {
-                player.LevelUp();
-            }
-        }
-        if (Input.GetKeyDown(KeyCode.F3))
-        {
-            if (player.level - 1 >= 0)
-            {
-                player.LevelDown();
-            }
-        }
-        if (Input.GetKeyDown(KeyCode.F4))
-        {
-            player.hp = player.maxHp;
-        }
-        if (Input.GetKeyDown(KeyCode.F7))
-        {
-            if (state == GameState.Play || state == GameState.Pause)
-            {
-                time += 1;
-#if UNITY_EDITOR
-                StageEditor.instance?.Repaint();
-#endif
-            }
-        }
-        if (Input.GetKeyDown(KeyCode.P))
-        {
-            if(gameSpeed == 0)
-            {
-                gameSpeed = 1;
-            }
-            else
-            {
-                gameSpeed = 0;
-            }
+            Resistance2Effect.Execute(99999);
         }
     }
+    void Debug_LevelUp()
+    {
+        if (player.level + 1 < player.levelUpExp.Length)
+        {
+            player.LevelUp();
+        }
+    }
+    void Debug_LevelDown()
+    {
+        if (player.level - 1 >= 0)
+        {
+            player.LevelDown();
+        }
+    }
+    void Debug_Heal()
+    {
+        player.hp = player.maxHp;
+    }
+    void Debug_TimeMove()
+    {
+        time += 1;
+#if UNITY_EDITOR
+        StageEditor.instance?.Repaint();
+#endif
+    }
+    void Debug_StopToggle()
+    {
+        if (gameSpeed == 0)
+        {
+            gameSpeed = 1;
+        }
+        else
+        {
+            gameSpeed = 0;
+        }
+    }
+
     public void StartButtonDown()
     {
         state = GameState.Play;
@@ -145,6 +142,7 @@ public class GameManager : MonoBehaviour
     {
         stage.Read(
             stage.lastIndex + 1,
+            ref eventIndex,
             time
         );
 
@@ -158,7 +156,8 @@ public class GameManager : MonoBehaviour
             return;
         }
         
-        time += gameSpeed * Time.deltaTime;
+        time += deltaTime;
+        timeText.text = time.ToString("F1");
 #if UNITY_EDITOR
         StageEditor.instance?.Repaint();
 #endif
@@ -166,6 +165,11 @@ public class GameManager : MonoBehaviour
     void Pause()
     {
 
+    }
+
+    public static void StartBoss()
+    {
+        Debug.Log("Start Boss");
     }
     void OnValidate()
     {

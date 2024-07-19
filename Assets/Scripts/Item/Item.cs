@@ -21,7 +21,7 @@ public abstract class Item : MonoBehaviour
     }
     protected void Update()
     {
-        transform.Translate(velocity * Time.deltaTime);
+        transform.Translate(velocity * GameManager.deltaTime);
 
         if (new Box(Vector2.one * 0.25f, Vector2.zero).IsContactGame(transform.position, out Vector2 contact, out int horizontal, out int vertical))
         {
@@ -33,10 +33,16 @@ public abstract class Item : MonoBehaviour
     }
     public void OnTriggerEnter2D(Collider2D collision)
     {
-        OnPickup();
+        if (OnPickup())
+        {
+            ItemData.pool.DeUse(gameObject);
+        }
     }
-    
-    protected abstract void OnPickup();
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <returns>아이템의 사용 여부(<see langword="true"/> 아이템을 사용함)</returns>
+    protected abstract bool OnPickup();
 
     protected void OnDrawGizmos()
     {

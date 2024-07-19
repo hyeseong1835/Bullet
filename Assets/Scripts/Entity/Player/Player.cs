@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -43,14 +44,14 @@ public class Player : Entity
     public float damage = 1;
     public float speed = 1;
 
-    public float dash = 2;
-    public float dashCoolTime = 0.5f;
-    public bool canDash = true;
+    bool canUse = true;
+    
     [SerializeField] Box moveLock;
 
     [Header("Data")]
     [SerializeField] List<Effect> effects = new List<Effect>();
 
+    public Weapon defaultWeapon;
     public Weapon weapon;
     [SerializeField] List<Weapon> weaponList = new List<Weapon>();
 
@@ -62,7 +63,8 @@ public class Player : Entity
     public float exp;
 
     float weaponBreakTime = 1;
-    bool canWeaponBreak;
+    bool canWeaponBreak = true;
+
     void Awake()
     {
         instance = this;
@@ -88,45 +90,10 @@ public class Player : Entity
                 input.lastMoveInput = input.moveInput;
                 
                 Move();
+                WallCollide();
             }
-            if (canDash && Input.GetMouseButtonDown(1))
-            {
-                if (input.toMouse.magnitude <= dash) Dash(input.toMouse);
-                else Dash(input.toMouse.normalized * dash);
-            }
-            if (weapon != null)
-            {
-                if (Input.GetKey(KeyCode.Q))
-                {
-                    weaponFrame.fillAmount -= Time.deltaTime / weaponBreakTime;
-                    if (weaponFrame.fillAmount <= 0)
-                    {
-                        if (canWeaponBreak)
-                        {
-                            weaponFrame.fillAmount = 0;
-                            WeaponBreak();
-                            canWeaponBreak = false;
-                        }
-                        else
-                        {
-                            weaponFrame.fillAmount = 0;
-                        }
-                    }
-                }
-                else
-                {
-                    if (weaponFrame.fillAmount < 1)
-                    {
-                        weaponFrame.fillAmount += Time.deltaTime / weaponBreakTime * 3;
-                    }
-                    else
-                    {
-                        weaponFrame.fillAmount = 1;
-                        canWeaponBreak = true;
-                    }
-                }
-            }
-            WallCollide();
+
+            DestroyWeaponKey();
             UseWeapon();
         }
     }
@@ -139,29 +106,9 @@ public class Player : Entity
     }
     void Move()
     {
-        transform.Translate(GameManager.instance.gameSpeed * input.moveInput.normalized * speed * Time.deltaTime);
+        transform.Translate(input.moveInput.normalized * speed * Time.deltaTime);
         look.rotation = Quaternion.Euler(0, 0, -Mathf.Atan2(input.moveInput.x, input.moveInput.y) * Mathf.Rad2Deg);
     }
-    void Dash(Vector2 move)
-    {
-        canDash = false;
-        Invoke(nameof(DashCoolDown), dashCoolTime);
-
-        look.rotation = Quaternion.Euler(0, 0, -Mathf.Atan2(input.toMouse.x, input.toMouse.y) * Mathf.Rad2Deg);
-        
-        foreach (RaycastHit2D hitInfo in Physics2D.CircleCastAll(transform.position, coll.radius, input.toMouse, input.toMouse.magnitude, Physics2D.GetLayerCollisionMask(LayerMask.NameToLayer("Player"))))
-        {
-            switch (hitInfo.collider.gameObject.layer)
-            {
-                case 20:
-                    hitInfo.collider.GetComponent<Item>().OnTriggerEnter2D(coll);
-                    break;
-            }    
-        }
-        
-        transform.Translate(move);
-    }
-    void DashCoolDown() => canDash = true;
     void WallCollide()
     {
         Vector2 contact;
@@ -172,8 +119,51 @@ public class Player : Entity
         if (Input.GetMouseButton(0))
         {
             if (weapon == null) return;
+            
+            if (canUse)
+            { 
+                weapon.Use();
+                if (weapon.cooltime != -1) StartCoroutine(WeaponUseCoolTime(weapon.cooltime));
+            }
+        }
+    }
+    void DestroyWeaponKey()
+    {
+        if (weapon == null || weapon == defaultWeapon)
+        {
+            weaponFrame.fillAmount = 0;
+            return;
+        }
 
-            weapon.TryUse();
+        if (Input.GetKey(KeyCode.Q))
+        {
+            if (weaponFrame.fillAmount != 0)
+            {
+                weaponFrame.fillAmount -= Time.deltaTime / weaponBreakTime;
+                if (weaponFrame.fillAmount < 0) weaponFrame.fillAmount = 0;
+            }
+
+            if (canWeaponBreak)
+            {
+                if (weaponFrame.fillAmount == 0)
+                {
+                    WeaponBreak();
+                    canWeaponBreak = false;
+                }
+            }
+        }
+        else
+        {
+            if (weaponFrame.fillAmount != 1)
+            {
+                weaponFrame.fillAmount += Time.deltaTime / weaponBreakTime * 3;
+                if (weaponFrame.fillAmount > 1) weaponFrame.fillAmount = 1;
+            }
+
+            if (weaponFrame.fillAmount == 1)
+            {
+                canWeaponBreak = true;
+            }
         }
     }
     public void AddExp(float amount)
@@ -220,14 +210,47 @@ public class Player : Entity
 
         Debug.Log($"Level Down! ({level})");
     }
+    
+    public void GetWeapon(Weapon weapon)
+    {
+        defaultWeapon.gameObject.SetActive(false);
+
+        this.weapon = weapon;
+        weaponUI.sprite = weapon.data.UI;
+    }
+    public void UpgradeWeapon()
+    {
+        GameObject weaponObj = Instantiate(
+            weapon.data.upgrade.data[weapon.data.level + 1].prefab, 
+            weaponHolder
+        );
+        Weapon weaponInstance = (Weapon)weaponObj.GetComponent(weapon.GetType());
+
+        Destroy(weapon.gameObject);
+        weapon = weaponInstance;
+        weaponUI.sprite = weapon.data.UI;
+    }
     void WeaponBreak()
     {
         ParticleSystem.ShapeModule shape = weaponUIBreakParticle.shape;
-        shape.texture = weaponUI.sprite?.texture ?? Texture2D.whiteTexture;
+        shape.texture = weaponUI.sprite.texture;
 
         weaponUIBreakParticle.Play();
-        weaponUI.sprite = null;
         Destroy(weapon.gameObject);
+
+        weapon = defaultWeapon;
+        weaponUI.sprite = defaultWeapon.data.UI;
+
+        defaultWeapon.gameObject.SetActive(true);
+    }
+
+    IEnumerator WeaponUseCoolTime(float time)
+    {
+        canUse = false;
+
+        yield return new WaitForSeconds(time);
+
+        canUse = true;
     }
     void OnValidate()
     {

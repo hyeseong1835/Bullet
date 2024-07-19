@@ -1,6 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 
 public class WeaponItem : Item
 {
@@ -12,15 +9,26 @@ public class WeaponItem : Item
 
     protected override void OnPickup()
     {
-        if (Player.instance.weapon == null)
+        if (Player.instance.weapon == Player.instance.defaultWeapon) //기본 무기
         {
-            Weapon weaponInstance = Instantiate(data.weaponPrefab, Player.weaponHolder).GetComponent<Weapon>();
-            Player.instance.weapon = weaponInstance;
-            Player.instance.weaponUI.sprite = weaponInstance.UI;
-
-
-            ItemData.pool.DeUse(gameObject);
+            Weapon weaponInstance = Instantiate(data.upgrade.data[0].prefab, Player.weaponHolder).GetComponent<Weapon>();
+            Player.instance.GetWeapon(weaponInstance);
         }
+        else if (data.upgrade == null) //업그레이드 하지 않는 무기
+        {
+            return;
+        }
+        else if (data.upgrade == Player.instance.weapon.data.upgrade) //동일한 종류의 무기
+        {
+            int nextLevel = Player.instance.weapon.data.level + 1;
+            if (nextLevel >= data.upgrade.data.Length) //최대 레벨
+            {
+                return;
+            }
+            else Player.instance.UpgradeWeapon(); //업그레이드!
+        }
+        else return; //다른 종류의 무기
 
+        ItemData.pool.DeUse(gameObject); //아이템 사용
     }
 }

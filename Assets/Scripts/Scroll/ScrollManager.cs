@@ -1,13 +1,9 @@
-using System.Collections.Generic;
-using System.Linq;
-using UnityEditor;
 using UnityEngine;
 
 public interface IScroll
 {
     public void Scroll(float scroll);
 }
-[ExecuteAlways]
 public class ScrollManager : MonoBehaviour
 {
     public static ScrollManager instance;
@@ -16,29 +12,17 @@ public class ScrollManager : MonoBehaviour
 
     public float speed = 1;
 
-    void Awake()
-    {
-
-    }
     void Update()
     {
-#if UNITY_EDITOR
-        if (EditorApplication.isPlaying == false)
+        if (GameManager.IsEditor)
         {
             transform.position = Vector3.zero;
 
             SetScrollLayerArray();
+            return;
         }
-        else 
-        {
-#endif
-
-            Scroll(speed * Time.deltaTime);
-
-#if UNITY_EDITOR
-        }
-#endif
-
+     
+        Scroll(speed * GameManager.deltaTime);
     }
     public void Scroll(float scroll)
     {

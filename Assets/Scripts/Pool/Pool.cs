@@ -17,9 +17,9 @@ public class Pool
     /// <summary>
     /// 앞: 활성화된 오브젝트 // 뒤: 비활성화된 오브젝트
     /// </summary>
-    public List<GameObject> objects;
+    public List<GameObject> objects { get; private set; }
 
-    [SerializeField] Action<GameObject> addEvent;
+    Action<GameObject> addEvent;
 
     public Pool(GameObject prefab, int maxDisableCount, int startCount)
     {
@@ -62,36 +62,30 @@ public class Pool
     /// <returns>비활성화된 오브젝트</returns>
     public GameObject Get()
     {
-        if (objects.Count == 0)
+        for (int i = objects.Count - 1; i >= 0; i--)
         {
-            return Add();
+            GameObject obj = objects[i];
+            if (obj == null)
+            {
+                Debug.LogWarning($"Pool({prefab.name}) has null element({objects.Count - 1})");
+
+                objects.RemoveAt(objects.Count - 1);
+                continue;
+            }
+
+            if (obj.activeInHierarchy == false)
+            {
+                return obj;
+            }
         }
 
-        GameObject obj = objects[^1];
-
-        if (obj == null)
-        {
-            Debug.LogWarning($"Pool({prefab.name}) has null element({objects.Count - 1})");
-
-            objects.RemoveAt(objects.Count - 1);
-            return Get();
-        }
-
-        if (obj.activeInHierarchy)
-        {
-            return Add();
-        }
-        else
-        {
-            return obj;
-        }
+        return Add();
     }
     public GameObject Use()
     {
-        if (objects.Count == 0) return Use(0, Get());
-        else return Use(objects.Count - 1, Get());
+        GameObject obj = Get();
+        return Use(objects.Count - 1, obj);
     }
-
     public GameObject Use(GameObject obj) => Use(objects.LastIndexOf(obj), obj);
     public GameObject Use(int index) => Use(index, objects[index]);
     public GameObject Use(int index, GameObject obj)
@@ -109,10 +103,6 @@ public class Pool
         objects.Add(obj);
 
         return obj;
-
-        objects.Remove(obj);
-        UnityEngine.Object.Destroy(obj);
-        return null;
     }
     public GameObject DeUse(GameObject obj, int index)
     {

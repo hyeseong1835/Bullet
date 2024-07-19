@@ -4,6 +4,9 @@ using System.Reflection;
 using System;
 using UnityEditorInternal;
 
+/// <summary>
+/// <see href="https://www.reddit.com/r/Unity3D/comments/59pywj/extracting_meshes_from_fbx_files/">WaterfordSS: [Extracting Meshes from FBX Files]</see>
+/// </summary>
 [CustomEditor(typeof(MeshRenderer)), CanEditMultipleObjects]
 public class MeshRendererInspector : Editor
 {

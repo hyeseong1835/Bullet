@@ -8,6 +8,7 @@ using UnityEngine.UI;
 public class HpBar : MonoBehaviour
 {
     public Entity target;
+    [SerializeField] GameObject grafic;
     Slider slider;
 
     void Awake()
@@ -22,17 +23,11 @@ public class HpBar : MonoBehaviour
     {
         if (target == null)
         {
-            for (int i = 0; i < transform.childCount; i++)
-            {
-                transform.GetChild(i).gameObject.SetActive(false);
-            }
+            grafic.SetActive(false);
         }
         else
         {
-            for (int i = 0; i < transform.childCount; i++)
-            {
-                transform.GetChild(i).gameObject.SetActive(true);
-            }
+            grafic.SetActive(true);
             slider.value = target.hp / target.GetMaxHP();
         }
     }

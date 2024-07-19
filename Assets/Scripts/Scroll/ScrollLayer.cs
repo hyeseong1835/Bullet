@@ -1,7 +1,5 @@
-using UnityEditor;
 using UnityEngine;
 
-[ExecuteAlways]
 public class ScrollLayer : MonoBehaviour
 {
     ScrollManager scrollManager => ScrollManager.instance;
@@ -16,22 +14,6 @@ public class ScrollLayer : MonoBehaviour
 
         SetObjArray();
     }
-    void Update()
-    {
-#if UNITY_EDITOR
-        if (EditorApplication.isPlaying == false)
-        {
-            transform.position = Vector3.zero;
-            if (scrollManager == null) ScrollManager.instance = transform.parent.GetComponent<ScrollManager>();
-            SetObjArray();
-            if (speed < 0)
-            {
-                speed = 0;
-                Debug.LogWarning("Speed cannot be less than 0");
-            }
-        }
-#endif
-    }
     public void Scroll(float scroll)
     {
         foreach (IScroll obj in objArray)
@@ -42,6 +24,17 @@ public class ScrollLayer : MonoBehaviour
     public void OnTransformChildrenChanged()
     {
         SetObjArray();
+    }
+    void OnValidate()
+    {
+        transform.position = Vector3.zero;
+        if (scrollManager == null) ScrollManager.instance = transform.parent.GetComponent<ScrollManager>();
+        SetObjArray();
+        if (speed < 0)
+        {
+            speed = 0;
+            Debug.LogWarning("Speed cannot be less than 0");
+        }
     }
     void SetObjArray()
     {

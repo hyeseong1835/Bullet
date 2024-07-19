@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
-using UnityEditor;
 using UnityEngine;
 
 [ExecuteAlways]
@@ -14,18 +13,6 @@ public class ScrollGroup : MonoBehaviour, IScroll
 
     public float height;
 
-    void Update()
-    {
-#if UNITY_EDITOR
-        if (EditorApplication.isPlaying == false)
-        {
-            transform.position = Vector3.zero;
-            if (layer == null) layer = transform.parent.GetComponent<ScrollLayer>();
-
-            SetElementArray();
-        }
-#endif
-    }
     public void Scroll(float scroll)
     {
         bottomElement.transform.position -= Vector3.up * scroll;
@@ -100,6 +87,13 @@ public class ScrollGroup : MonoBehaviour, IScroll
                 );
         }
 
+    }
+    void OnValidate()
+    {
+        transform.position = Vector3.zero;
+        if (layer == null) layer = transform.parent.GetComponent<ScrollLayer>();
+
+        SetElementArray();
     }
     void OnDrawGizmosSelected()
     {

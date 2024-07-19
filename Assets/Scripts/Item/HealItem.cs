@@ -14,9 +14,9 @@ public class HealItem : Item
     Player player => Player.instance;
 
 
-    protected override void OnPickup()
+    protected override bool OnPickup()
     {
         player.Heal(data.healAmount);
-        ItemData.pool.DeUse(gameObject);
+        return true;
     }
 }

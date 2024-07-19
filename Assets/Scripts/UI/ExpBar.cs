@@ -15,15 +15,7 @@ public class ExpBar : MonoBehaviour
     }
     void Refresh()
     {
-        if (player == null)
-        {
-            //Debug.LogError("Player is null");
-        }
-        else if (player.levelUpExp == null)
-        {
-            Debug.LogError("Player levelUpExp is null");
-        }
-        else
+        if (player != null && player.levelUpExp != null)
         {
             if (player.level + 1 >= player.levelUpExp.Length)
             {

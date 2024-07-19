@@ -66,6 +66,7 @@ public class StageEditor : EditorWindow
 
         data.SelectEnemyData(-1);
 
+        instance = null;
         return true;
     }
     void OnValidate()

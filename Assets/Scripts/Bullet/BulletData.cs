@@ -5,4 +5,7 @@ using UnityEngine;
 public class BulletData : ScriptableObject
 {
     public Pool pool;
+
+    public float damage;
+    public float speed;
 }

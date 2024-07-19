@@ -1,5 +1,3 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -10,6 +8,8 @@ public class Stage : ScriptableObject
     public int[] enemyPrefabArrayCounts;
 
     public EnemySpawnData[] enemySpawnDataArray;
+
+    public StageEvent[] stageEvent;
 
     public Pool[][] enemyPool;
 
@@ -89,8 +89,18 @@ public class Stage : ScriptableObject
         return -1;
     }
     
-    public void Read(int startIndex, float curTime)
+    public void Read(int startIndex, ref int eventIndex, float curTime)
     {
+        for (int i = eventIndex; i < stageEvent.Length; i++)
+        {
+            StageEvent e = stageEvent[i];
+            
+            if (curTime < e.time) break;
+
+            eventIndex = i + 1;
+            e.Invoke();
+        }
+
 #if UNITY_EDITOR
         StageEditor.data?.RefreshStageArray();
         StageEditor.data?.SelectStage(this);

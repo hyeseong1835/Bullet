@@ -9,12 +9,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b9e7b14e036d28040af516a8ea94f2a8, type: 3}
-  m_Name: ShooterBullet Data
+  m_Script: {fileID: 11500000, guid: 0d117aa7832bffe4eb5a91b36091dc46, type: 3}
+  m_Name: Shooter Upgrade Data
   m_EditorClassIdentifier: 
-  pool:
-    prefab: {fileID: 4026119069186307829, guid: 6c32088d52cab394db9e36aaf369b63e, type: 3}
-    maxDisableCount: 0
-    startCount: 0
-  damage: 1
-  speed: 3
+  obj: []

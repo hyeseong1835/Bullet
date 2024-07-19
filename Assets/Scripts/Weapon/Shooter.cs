@@ -4,52 +4,54 @@ public class Shooter : Weapon
 {
     static Player player => Player.instance;
 
+    [SerializeField] BulletData bulletData;
+
     [SerializeField] Transform look;
     [SerializeField] Transform tip;
-    
-    Bullet bullet;
-    public GameObject bulletPrefab;
-
-    public float damage;
-    public float speed;
 
     void Awake()
     {
-        bullet = bulletPrefab.GetComponent<Bullet>();
-        
-        if (bullet.data.pool.holder == null) bullet.data.pool.Init();
+        if (bulletData.pool.holder == null) bulletData.pool.Init();
     }
-    protected override void Use()
+    public override void Use()
     {
         look.transform.rotation = player.input.toMouseRot;
 
-        GameObject obj = bullet.data.pool.Use();
+        GameObject obj = bulletData.pool.Use();
         obj.transform.position = tip.position;
-        obj.transform.rotation = tip.rotation;
+        obj.transform.rotation = player.input.toMouseRot;
 
-        obj.GetComponent<Bullet>().Initialize(
-            (bullet) => {
-                transform.position += GameManager.instance.gameSpeed * transform.up * speed * Time.deltaTime;
-
-                if (bullet.coll.ToBox().IsExitGame(transform.position))
-                {
-                    bullet.DeUse();
-                }
-            },
-            (bullet) => {
-                bullet.data.pool.DeUse(gameObject);
-            },
-            (bullet, coll) =>
-            {
-                Entity entity = coll.GetComponent<Entity>();
-                entity.TakeDamage(damage * player.damage);
-
-                bullet.DeUse();
-            },
+        Bullet bullet = obj.GetComponent<Bullet>();
+        bullet.data = bulletData;
+        bullet.Initialize(
+            BulletUpdate,
+            BulletDeUse,
+            BulletEnter,
             null,
             null
-        );            
+        );    
     }
+    void BulletUpdate(Bullet bullet)
+    {
+        bullet.transform.position += bullet.transform.up * bullet.data.speed * GameManager.deltaTime;
+
+        if (bullet.coll.ToBox().IsExitGame(bullet.transform.position))
+        {
+            bullet.DeUse();
+        }
+    }
+    void BulletDeUse(Bullet bullet)
+    {
+        bullet.data.pool.DeUse(bullet.gameObject);
+    }
+    void BulletEnter(Bullet bullet, Collider2D coll)
+    {
+        Entity entity = coll.GetComponent<Entity>();
+        entity.TakeDamage(bullet.data.damage * player.damage);
+
+        bullet.DeUse();
+    }
+    
     void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.cyan;
