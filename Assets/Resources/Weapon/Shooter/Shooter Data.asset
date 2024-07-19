@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c6473b79c5d5fd9418244b9c8431bb72, type: 3}
   m_Name: Shooter Data
   m_EditorClassIdentifier: 
-  UI: {fileID: 0}
-  upgrade: {fileID: 0}
+  prefab: {fileID: 6256981796523471148, guid: 1ebba1f360ac6534393bdb7f6e0230c1, type: 3}
+  UI: {fileID: 21300000, guid: fb2fe43d978b4ef43bdad4eea9c7b0c3, type: 3}
+  upgrade: {fileID: 11400000, guid: 693975abe55de0b4ca1f3f63929bdb61, type: 2}
   level: 0

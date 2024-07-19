@@ -21,12 +21,14 @@ public class Player : Entity
     static GameManager Game => GameManager.instance;
     public override float GetMaxHP() => maxHp;
 
-
     [HideInInspector] public Rigidbody2D rigid;
     [HideInInspector] public CircleCollider2D coll;
-    public static Transform weaponHolder { get; private set; }
+    
+    public Transform weaponHolder { get; private set; }
+    public RectTransform effectHolder;
+    public Effect[] effects { get; private set; }
     Transform look;
-    Transform effect;
+    Transform vfx;
     ParticleSystem levelUpParticle;
 
     [Header("Object")]
@@ -49,8 +51,6 @@ public class Player : Entity
     [SerializeField] Box moveLock;
 
     [Header("Data")]
-    [SerializeField] List<Effect> effects = new List<Effect>();
-
     public Weapon defaultWeapon;
     public Weapon weapon;
     [SerializeField] List<Weapon> weaponList = new List<Weapon>();
@@ -72,8 +72,15 @@ public class Player : Entity
         coll = GetComponent<CircleCollider2D>();
         weaponHolder = transform.Find("WeaponHolder");
         look = transform.Find("Look");
-        effect = transform.Find("Effect");
-        levelUpParticle = effect.Find("LevelUp").GetComponent<ParticleSystem>();
+        vfx = transform.Find("VFX");
+        {
+            levelUpParticle = vfx.Find("LevelUp").GetComponent<ParticleSystem>();
+        }
+        effects = new Effect[effectHolder.childCount];
+        for (int i = 0; i < effectHolder.childCount; i++)
+        {
+            effects[i] = effectHolder.GetChild(i).GetComponent<Effect>();
+        }
     }
     void Update()
     {

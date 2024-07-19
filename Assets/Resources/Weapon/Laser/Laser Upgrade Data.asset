@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0d117aa7832bffe4eb5a91b36091dc46, type: 3}
   m_Name: Laser Upgrade Data
   m_EditorClassIdentifier: 
-  obj:
-  - {fileID: 3474360992011919182, guid: 1f03b58dd91e9ee4b879c69912673b0b, type: 3}
+  data:
+  - {fileID: 11400000, guid: cc1fc73a34f0f114da668d42558146d3, type: 2}

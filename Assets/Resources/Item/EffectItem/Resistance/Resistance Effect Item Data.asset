@@ -9,11 +9,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 85696e2052dd16b45babefc9a2a7e19b, type: 3}
-  m_Name: Laser Item Data
+  m_Script: {fileID: 11500000, guid: f23fb09fe2ee4f44f9eaa9b3f05b7af6, type: 3}
+  m_Name: Resistance Effect Item Data
   m_EditorClassIdentifier: 
   pool:
-    prefab: {fileID: 242570612577920784, guid: 3b3b9e6aa987b3a4487ea31ca776723b, type: 3}
+    prefab: {fileID: 9043560855095070803, guid: 05a9db71a1ec945498739be16a2bcc1d, type: 3}
     maxDisableCount: 0
     startCount: 0
-  upgrade: {fileID: 11400000, guid: 68efbd29b275e69449c21a6969827e1d, type: 2}
+  effectIndex: 0
+  effect: {fileID: 0}
+  time: 7
+  type: 1

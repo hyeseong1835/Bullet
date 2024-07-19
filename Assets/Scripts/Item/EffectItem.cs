@@ -1,6 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 
 public class EffectItem : Item
 {
@@ -16,23 +13,37 @@ public class EffectItem : Item
         set => data = (EffectItemData)value;
     }
 
-    protected override void OnPickup()
+    protected override bool OnPickup()
     {
+        if (data.effect == null) data.effect = Player.instance.effects[data.effectIndex];
+
         switch (data.type)
         {
             case StackType.Ignore:
-                if (data.effect.time == 0)
+                if (data.effect.time != 0) return false;
+
+                data.effect.Execute(data.time);
+                return true;
+
+
+            case StackType.Replace:
+                if (data.effect.time < data.time)
                 {
                     data.effect.Execute(data.time);
-
+                    return true;
                 }
-                break;
-            case StackType.Replace:
-                data.effect.Execute(data.time);
-                break;
+                return false;
+
             case StackType.Add:
-                data.effect.Execute(data.time);
-                break;
+                if (data.effect.time != 0)
+                {
+                    data.effect.time += data.time;
+                    data.effect.maxTime = data.effect.time;
+                }
+                else data.effect.Execute(data.time);
+                return true;
+
+            default: return false;
         }
     }
 }

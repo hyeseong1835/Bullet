@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 2252819536391700565}
   - component: {fileID: 4236583990731441353}
   m_Layer: 10
-  m_Name: Laser
+  m_Name: Laser 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -47,10 +47,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   data: {fileID: 11400000, guid: cc1fc73a34f0f114da668d42558146d3, type: 2}
-  canUse: 1
-  cooltime: 0.1
+  cooltime: 1
   tip: {fileID: 2792558832575340715}
-  laser: {fileID: 9181470246920435197}
+  laserPrefab: {fileID: 5630565458787259537, guid: f7eb2095dc18df84882e6166f999803f, type: 3}
+  laserShowTime: 0.1
   damage: 10
   width: 0.1
 --- !u!1 &7160331037311100911

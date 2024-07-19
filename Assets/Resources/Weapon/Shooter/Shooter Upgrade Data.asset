@@ -12,4 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0d117aa7832bffe4eb5a91b36091dc46, type: 3}
   m_Name: Shooter Upgrade Data
   m_EditorClassIdentifier: 
-  obj: []
+  data:
+  - {fileID: 11400000, guid: 4054f96984d348a439761baab858f978, type: 2}
