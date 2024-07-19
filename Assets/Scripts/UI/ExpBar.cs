@@ -1,3 +1,4 @@
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -5,6 +6,7 @@ public class ExpBar : MonoBehaviour
 {
     Player player => Player.instance;
     [SerializeField] Slider slider;
+    [SerializeField] TextMeshProUGUI text;
     void Awake()
     {
         slider = GetComponent<Slider>();
@@ -15,6 +17,14 @@ public class ExpBar : MonoBehaviour
     }
     void Refresh()
     {
+        if (player.level + 1 < player.levelUpExp.Length)
+        {
+            text.text = $"{player.level}: {player.exp.ToString("F1")}/{player.levelUpExp[player.level + 1].ToString("F1")}";
+        }
+        else
+        {
+            text.text = $"{player.level}: Max";
+        }
         if (player != null && player.levelUpExp != null)
         {
             if (player.level + 1 >= player.levelUpExp.Length)
