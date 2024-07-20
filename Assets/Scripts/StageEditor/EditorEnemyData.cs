@@ -6,13 +6,22 @@ using UnityEngine;
 
 public class EditorEnemyData
 {
-    public EnemySpawnData spawnData;
+    public EnemySpawnData spawnData { get; private set; }
     public EnemyEditorGUI editorGUI => unSafeEditorGUI ?? SetEditorGUI();
     public EnemyEditorGUI unSafeEditorGUI { get; private set; }
 
-    public GameObject prefab;
-    public Type prefabType;
+    public GameObject prefab { get; private set; }
+    public Type prefabType { get; private set; }
 
+    public GameObject preview;
+
+    public EditorEnemyData(EnemySpawnData spawnData)
+    {
+        this.spawnData = spawnData;
+        
+        prefabType = StageEditor.data.prefabTypeList[spawnData.prefabTypeIndex];
+        prefab = SelectPrefab(spawnData.prefabIndex);
+    }
     public EditorEnemyData(EnemySpawnData spawnData, Type prefabType)
     {
         this.spawnData = spawnData;
@@ -37,10 +46,11 @@ public class EditorEnemyData
     }
     public void Apply()
     {
-        StageEditor.data.RefreshPrefabList();
-        ApplyPrefab();
+        spawnData.prefabTypeIndex = StageEditor.data.GetPrefabListIndex(spawnData);
+        spawnData.prefabIndex = StageEditor.data.prefabLists[spawnData.prefabTypeIndex].IndexOf(prefab);
 
-        EditorUtility.SetDirty(StageEditor.data);
+        spawnData.prefabIndex = StageEditor.data.GetPrefabList(prefabType).IndexOf(prefab);
+        EditorUtility.SetDirty(spawnData);
     }
 
     #region EditorGUI
@@ -56,10 +66,6 @@ public class EditorEnemyData
 
     #region Prefab
 
-    public void ApplyPrefab()
-    {
-        spawnData.prefabIndex = StageEditor.data.GetPrefabList(prefabType).IndexOf(prefab);
-    }
     public GameObject SelectPrefab(int index)
     {
         if (index == -1)
@@ -93,7 +99,6 @@ public class EditorEnemyData
                 Debug.LogWarning($"Can't Select Prefab (Out of Index {index}/{prefabList.Count - 1})");
 
                 spawnData.prefabIndex = 0;
-
                 return prefab = prefabList[0];
             }
             Debug.LogError("Can't Select Prefab (PrefabList is Empty)");

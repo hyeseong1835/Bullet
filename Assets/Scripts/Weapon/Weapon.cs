@@ -8,4 +8,5 @@ public abstract class Weapon : MonoBehaviour
     public float cooltime;
 
     public abstract void Use();
+    public abstract void Skill();
 }

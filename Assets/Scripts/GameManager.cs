@@ -14,6 +14,8 @@ public class GameManager : MonoBehaviour
     public static GameManager instance;
     static Player player => Player.instance;
 
+    public KeySetting key;
+
     public GameState state;
     public static bool IsEditor => instance.state == GameState.Editor;
     public static float deltaTime => instance.gameSpeed * Time.deltaTime;

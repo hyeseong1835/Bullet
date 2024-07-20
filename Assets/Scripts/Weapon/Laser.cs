@@ -13,6 +13,7 @@ public class Laser : Weapon
     [SerializeField] float laserShowTime = 0.1f;
     public float damage;
     public float width;
+    [SerializeField] float chargeOnHit;
     protected void Start()
     {
         laser = Instantiate(laserPrefab);
@@ -42,6 +43,7 @@ public class Laser : Weapon
             Enemy enemy = info.collider.GetComponent<Enemy>();
             enemy.TakeDamage(damage * Player.instance.damage);
         }
+        player.skillCharge += hit.Length * chargeOnHit;
         
         StartCoroutine(Grafic());
     }
@@ -54,7 +56,10 @@ public class Laser : Weapon
         yield return new WaitForSeconds(laserShowTime);
         laser?.SetActive(false);
     }
+    public override void Skill()
+    {
 
+    }
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.cyan;

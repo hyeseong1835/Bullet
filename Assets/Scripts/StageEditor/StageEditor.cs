@@ -23,7 +23,7 @@ public class StageEditor : EditorWindow
     public bool debug = false;
 
     FloatingAreaManager floatingArea;
-    public Dictionary<Type, EnemyEditorGUI> enemyEditorGUIDictionary = new Dictionary<Type, EnemyEditorGUI>();
+    public Dictionary<string, EnemyEditorGUI> enemyEditorGUIDictionary = new Dictionary<string, EnemyEditorGUI>();
 
     public float fileViewerScroll;
 
@@ -38,48 +38,32 @@ public class StageEditor : EditorWindow
     Rect selectRect = default;
 
     Rect enemySpawnDataReNameFloatingAreaHeader = default;
+    
+    Texture previewTexture;
 
-    #region Event
-
-    static StageEditor()
-    {
-        Debug.Log("Initialize");
-        
-        EditorApplication.wantsToQuit += OnQuit;
-    }
 
     [MenuItem("Window/StageEditor")]
     public static void CreateWindow()
     {
-        Debug.Log("Create");
+        //Debug.Log("Create");
 
         instance = (StageEditor)GetWindow(typeof(StageEditor));
 
         instance.Show();
     }
 
-    Texture _outputTexture;
+    #region Event
 
-    static bool OnQuit()
-    {
-        Debug.Log("Quit");
-
-        if (instance == null) return true;
-
-        data.SelectEnemyData(-1);
-
-        instance = null;
-        return true;
-    }
     void OnValidate()
     {
-        Debug.Log("Validate");
+        //Debug.Log("Validate");
         
         instance = this;
     }
+
     void OnEnable()
     {
-        Debug.Log("Enable");
+        //Debug.Log("Enable");
         
         data = (StageEditorData)EditorResources.Load<ScriptableObject>("StageEditor/Data.asset");
         setting = (StageEditorSetting)EditorResources.Load<ScriptableObject>("StageEditor/Setting.asset");
@@ -92,13 +76,16 @@ public class StageEditor : EditorWindow
         Refresh();
     }
 
-    private void OnDisable()
+    void OnDisable()
     {
-        Debug.Log("Disable");
+        //Debug.Log("Disable");
         
         Apply();
         ClearPreview();
     }
+    
+    #endregion
+
     public void Apply()
     {
         data.ApplyToStage();
@@ -121,7 +108,6 @@ public class StageEditor : EditorWindow
         enemySpawnDataReNameFloatingAreaHeader = default;
     }
 
-    #endregion
 
     #region EnemyEditorGUI
 
@@ -135,12 +121,10 @@ public class StageEditor : EditorWindow
     public EnemyEditorGUI GetEnemyEditor(EnemySpawnData spawnData) => GetEnemyEditor(spawnData.EditorType);
     public EnemyEditorGUI GetEnemyEditor(Type editorType)
     {
-        EnemyEditorGUI editorInstance;
-
-        if (enemyEditorGUIDictionary.TryGetValue(editorType, out editorInstance) == false)
+        if (enemyEditorGUIDictionary.TryGetValue(editorType.Name, out EnemyEditorGUI editorInstance) == false)
         {
             editorInstance = (EnemyEditorGUI)Activator.CreateInstance(editorType);
-            enemyEditorGUIDictionary.Add(editorType, editorInstance);
+            enemyEditorGUIDictionary.Add(editorType.Name, editorInstance);
         }
         return editorInstance;
     }
@@ -158,14 +142,17 @@ public class StageEditor : EditorWindow
     {
         previewRender.camera.transform.position = VectorUtility.SetZ(((Vector3)StageEditor.ScreenToWorldPoint(rect.GetPivotPos(Anchor.MiddleCenter))), -10);
         previewRender.camera.orthographicSize = 0.5f * (rect.height / data.cellSize);
+        previewRender.lights[0].intensity = 1;
 
         previewRender.BeginPreview(rect, GUIStyle.none);
+        {
+            foreach (EditorEnemyData editorEnemyData in data.editorEnemySpawnDataList)
+            {
+                editorEnemyData.editorGUI.Render(editorEnemyData);
+            }
 
-        //previewRender.lights[0].transform.localEulerAngles = new Vector3(30, 30, 0);
-        previewRender.lights[0].intensity = 2;
-
-        previewRender.camera.Render();
-
+            previewRender.camera.Render();
+        }
         return (RenderTexture)previewRender.EndPreview();
     }
     public void PreviewInit()
@@ -207,7 +194,7 @@ public class StageEditor : EditorWindow
         floatingArea.EventListen(e);
 
         RefreshPreviewRect();
-        
+
         if(data.selectedStage != null && previewRect.width != 0)
         {
             DrawPreview();
@@ -231,18 +218,14 @@ public class StageEditor : EditorWindow
 
         void Input()
         {
-            if (data.selectedEnemyData != null) data.selectedEnemyData.editorGUI.Event();
+            data.selectedEnemyData?.editorGUI.Event();
 
             if (e.isScrollWheel)
             {
                 if (previewRect.Contains(e.mousePosition))
                 {
-                    switch (e.pointerType)
-                    {
-                        case PointerType.Mouse:
-                            data.cellSize += e.delta.y;
-                            break;
-                    }
+                    data.cellSize += e.delta.y;
+                    
                     if (data.cellSize < setting.cellSizeMin) data.cellSize = setting.cellSizeMin;
                     Repaint();
                 }
@@ -575,10 +558,10 @@ public class StageEditor : EditorWindow
                     }
                     CustomGUILayout.EndNewTab();
 
-                    CustomGUILayout.TitleHeaderLabel(title: "Preview Object");
+                    CustomGUILayout.TitleHeaderLabel("Enemy Editor GUI");
                     CustomGUILayout.BeginNewTab();
                     {
-                        DrawPreviewObject();
+                        //DrawEnemyEditorGUI();
                     }
                     CustomGUILayout.EndNewTab();
 
@@ -746,30 +729,13 @@ public class StageEditor : EditorWindow
                         }
                     }
 
-                    void DrawPreviewObject()
+                    void DrawEnemyEditorGUI()
                     {
-                        for (int categoryIndex = 0; categoryIndex < enemyEditorGUIDictionary.Count; categoryIndex++)
+                        foreach (EnemyEditorGUI enemyEditorGUI in enemyEditorGUIDictionary.Values)
                         {
-                            foreach (EnemyEditorGUI category in enemyEditorGUIDictionary.Values)
-                            {
-                                string categoryName = category.GetType().Name;
-                                CustomGUILayout.UnderBarTitleText(categoryName);
-
-                                if (category.instance.Count == 0)
-                                {
-                                    CustomGUILayout.WarningLabel("Empty List");
-                                }
-                                else
-                                {
-                                    foreach (EditorEnemyData key in category.instance.Keys)
-                                    {
-                                        EditorGUILayout.BeginHorizontal();
-                                        EditorGUILayout.ObjectField(key.spawnData, typeof(EnemySpawnData), true);
-                                        EditorGUILayout.ObjectField(category.instance[key], typeof(GameObject), true);
-                                        EditorGUILayout.EndHorizontal();
-                                    }
-                                }
-                            }
+                            string categoryName = enemyEditorGUI.GetType().Name;
+                            CustomGUILayout.UnderBarTitleText(categoryName);
+                            enemyEditorGUI.DrawFiledViewerGUI();
                         }
                     }
                 }
@@ -1206,10 +1172,10 @@ public class StageEditor : EditorWindow
         {
             if (e.type == EventType.Repaint && previewRect.width > 0 && previewRect.height > 0)
             {
-                _outputTexture = CreatePreviewTexture(previewRect);
+                previewTexture = CreatePreviewTexture(previewRect);
             }
-            if (_outputTexture != null)
-                GUI.DrawTexture(previewRect, _outputTexture);
+            if (previewTexture != null)
+                GUI.DrawTexture(previewRect, previewTexture);
 
             Vector2Int cellCount = 3 * Vector2Int.one + new Vector2Int(
                 Mathf.FloorToInt(previewRect.width / data.cellSize),

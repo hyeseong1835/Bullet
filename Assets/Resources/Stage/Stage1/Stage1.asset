@@ -13,20 +13,23 @@ MonoBehaviour:
   m_Name: Stage1
   m_EditorClassIdentifier: 
   enemyPrefabs:
+  - {fileID: 5235914642448064442, guid: 1c98ca15ac50d3547870b81f73f033b7, type: 3}
   - {fileID: 5235914642448064442, guid: 37af630dcfdcfde45b2d347b2e9bebb0, type: 3}
   - {fileID: 5235914642448064442, guid: 3ed429bc1e8a29444962959c6d58af02, type: 3}
-  enemyPrefabArrayCounts: 02000000
+  enemyPrefabArrayCounts: 0100000002000000
   enemySpawnDataArray:
+  - {fileID: 11400000, guid: e6aa04e0d0f466541b021593fe763780, type: 2}
+  - {fileID: 11400000, guid: c951cecbe7379124ca38189b9aee5691, type: 2}
   - {fileID: 11400000, guid: 0bbb0639477a00448aedb1db80286fe1, type: 2}
   - {fileID: 11400000, guid: 99688b3200f1ffb4ebcd090eb517ffa4, type: 2}
   - {fileID: 11400000, guid: 3071cc0a4e3b8d24baa9fed252468e49, type: 2}
   - {fileID: 11400000, guid: 60f037e20a51d6a4aaa5e208a5fed9a1, type: 2}
-  - {fileID: 11400000, guid: dc0f1a77d52e59e448beec6ed0b6f444, type: 2}
   - {fileID: 11400000, guid: fa020c266b11ef648ad375f72239eb4a, type: 2}
+  - {fileID: 11400000, guid: dc0f1a77d52e59e448beec6ed0b6f444, type: 2}
   - {fileID: 11400000, guid: 46b072bdd396f3748a47355d443b52a2, type: 2}
   - {fileID: 11400000, guid: 1808e9a53cecd814d8c9b985f0f21418, type: 2}
-  - {fileID: 11400000, guid: 6fcefdd020b6d9441b63ca8df342856a, type: 2}
   - {fileID: 11400000, guid: aace5dc1dfef134488eb6822d7b0e4d6, type: 2}
+  - {fileID: 11400000, guid: 6fcefdd020b6d9441b63ca8df342856a, type: 2}
   - {fileID: 11400000, guid: 1ce05f10e192fc947b81651b5f1b07a1, type: 2}
   - {fileID: 11400000, guid: d709293ac2c586243a99156b8b1aa1ac, type: 2}
   - {fileID: 11400000, guid: c049cec819d03c041963f163983f7449, type: 2}
@@ -39,5 +42,5 @@ MonoBehaviour:
   - time: 5
     typeName: GameManager
     methodName: StartBoss
-  lastIndex: 7
+  lastIndex: 5
   timeLength: 7

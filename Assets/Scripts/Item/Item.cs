@@ -6,14 +6,7 @@ public abstract class Item : MonoBehaviour
     public abstract ItemData ItemData { get; set; }
 
     public Vector2 velocity = Vector2.zero;
-
-    protected void OnEnable()
-    {
-        if (new Box(Vector2.one * 1.5f, Vector2.zero).IsContactGame(transform.position, out Vector2 contact))
-        {
-            transform.position = contact;
-        }
-    }
+    
     protected void Start()
     {
         if (ItemData.pool.holder == null) ItemData.pool.Init();

@@ -1,7 +1,4 @@
 #if UNITY_EDITOR
-using System.Collections.Generic;
-using System.IO;
-using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
 
@@ -66,21 +63,13 @@ public class InstantEnemyEditorGUI : EnemyEditorGUI
         CustomGUI.DrawArrow(startScreenPos, endScreenPos, 0.25f * Mathf.PI, 25);
         Handles.color = Color.white;
     }
-    public override void Render(PreviewRenderUtility renderer, EditorEnemyData enemyData)
+    public override void Render(EditorEnemyData enemyData)
     {
-        if (enemyData.prefab == null)
-        {
-            Debug.LogError("Prefab is null");
-            return;
-        }
-
+        if (enemyData.preview == null) return;
+        
         InstantEnemySpawnData data = (InstantEnemySpawnData)enemyData.spawnData;
 
-        GameObject obj = renderer.InstantiatePrefabInScene(enemyData.prefab);
-        obj.transform.position = Vector3.zero;
-        renderer.camera.transform.LookAt(obj.transform);
-        
-        Debug.Log($"Render: {enemyData.prefab}");
+        enemyData.preview.transform.position = data.startPos;
     }
     public override void DrawSameTimeEnemyDataGizmos(EditorEnemyData enemyData)
     {

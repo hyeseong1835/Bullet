@@ -22,7 +22,7 @@ public abstract class Effect : MonoBehaviour
         {
             time -= GameManager.deltaTime;
             if (time < 0) time = 0;
-            timeFill.fillAmount = time / maxTime;
+            timeFill.fillAmount = 1 - time / maxTime;
         }
 
         return time != 0;

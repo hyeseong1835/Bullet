@@ -64,6 +64,9 @@ public class Player : Entity
     float weaponBreakTime = 1;
     bool canWeaponBreak = true;
 
+    public float skillCharge = 0;
+    public float skillChargeMax = 1;
+
     void Awake()
     {
         instance = this;
@@ -71,14 +74,18 @@ public class Player : Entity
         coll = GetComponent<CircleCollider2D>();
         weaponHolder = transform.Find("WeaponHolder");
         look = transform.Find("Look");
+
         vfx = transform.Find("VFX");
         {
             levelUpParticle = vfx.Find("LevelUp").GetComponent<ParticleSystem>();
         }
+
         effects = new Effect[effectHolder.childCount];
-        for (int i = 0; i < effectHolder.childCount; i++)
         {
-            effects[i] = effectHolder.GetChild(i).GetComponent<Effect>();
+            for (int i = 0; i < effectHolder.childCount; i++)
+            {
+                effects[i] = effectHolder.GetChild(i).GetComponent<Effect>();
+            }
         }
     }
     void Update()
@@ -102,6 +109,11 @@ public class Player : Entity
             DestroyWeaponKey();
             UseWeapon();
         }
+    }
+    public void SkillCharge(float charge)
+    {
+        skillCharge += charge;
+       if (skillCharge > skillChargeMax) skillCharge = skillChargeMax;
     }
     void Key()
     {
@@ -219,7 +231,6 @@ public class Player : Entity
     
     public void GetWeapon(Weapon weapon)
     {
-        Debug.Log($"Get Weapon! {weapon.data.prefab.name}[{weapon.data.level}]");
         defaultWeapon.gameObject.SetActive(false);
 
         this.weapon = weapon;
@@ -227,7 +238,6 @@ public class Player : Entity
     }
     public void UpgradeWeapon()
     {
-        Debug.Log($"Upgrade Weapon! {weapon.data.upgrade.data[weapon.data.level + 1].prefab.name}[{weapon.data.level + 1}]");
         GameObject weaponObj = Instantiate(
             weapon.data.upgrade.data[weapon.data.level + 1].prefab, 
             weaponHolder

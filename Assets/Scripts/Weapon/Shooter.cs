@@ -9,6 +9,7 @@ public class Shooter : Weapon
     [SerializeField] Transform look;
     [SerializeField] Transform tip;
 
+    [SerializeField] float chargeOnHit;
     void Awake()
     {
         if (bulletData.pool.holder == null) bulletData.pool.Init();
@@ -50,8 +51,13 @@ public class Shooter : Weapon
         entity.TakeDamage(bullet.data.damage * player.damage);
 
         bullet.DeUse();
+        player.skillCharge += chargeOnHit;
     }
-    
+    public override void Skill()
+    {
+
+    }
+
     void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.cyan;

@@ -33,32 +33,32 @@ public class InstantEnemy : Enemy
     void Update()
     {
         transform.position += dir * data.speed * GameManager.deltaTime;
-        
-        if (spawnData.endPos.x < spawnData.startPos.x)
-        {
-            if(transform.position.x < spawnData.endPos.x)
-            {
-                DeUse();
-            }
-        }
-        else if (spawnData.endPos.x > spawnData.startPos.x)
+
+        if (dir.x > 0)
         {
             if (transform.position.x > spawnData.endPos.x)
             {
                 DeUse();
             }
         }
-
-        if (spawnData.endPos.y < spawnData.startPos.y)
+        else if (dir.x < 0)
         {
-            if (transform.position.y < spawnData.endPos.y)
+            if (transform.position.x < spawnData.endPos.x)
             {
                 DeUse();
             }
         }
-        else if (spawnData.endPos.y > spawnData.startPos.y)
+
+        if (dir.x > 0)
         {
             if (transform.position.y > spawnData.endPos.y)
+            {
+                DeUse();
+            }
+        }
+        else if (dir.x < 0)
+        {
+            if (transform.position.y < spawnData.endPos.y)
             {
                 DeUse();
             }

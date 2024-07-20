@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: 56393308
   m_EditorClassIdentifier: 
   prefabIndex: 0
-  prefabTypeIndex: 0
+  prefabTypeIndex: 1
   spawnTime: 2
   startPos: {x: 3, y: 4}
   endPos: {x: -3, y: 0}

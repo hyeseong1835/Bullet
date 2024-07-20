@@ -3,12 +3,6 @@ using UnityEngine;
 
 public abstract class Enemy : Entity
 {
-    public enum EnemyState
-    {
-        Disable, Enable
-    }
-    public EnemyState entityState = EnemyState.Disable;
-    
     public override float GetMaxHP() => EnemyData.maxHp;
     public abstract EnemyData EnemyData { get; set; }
     public abstract EnemySpawnData EnemySpawnData { get; set; }
