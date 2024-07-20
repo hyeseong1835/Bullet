@@ -565,7 +565,18 @@ public class StageEditor : EditorWindow
                     EditorGUILayout.ObjectField(data, typeof(StageEditorData), false);
                     EditorGUILayout.ObjectField(setting, typeof(StageEditorSetting), false);
 
-                    DrawSelectStage();
+                    CustomGUILayout.TitleHeaderLabel("Selected Stage");
+                    DrawStageData();
+
+                    CustomGUILayout.TitleHeaderLabel("Play Data");
+                    if (EditorApplication.isPlaying)
+                    {
+                        DrawPlayData();
+                    }
+                    else
+                    {
+                        CustomGUILayout.WarningLabel("Not Playing");
+                    }
 
                     DrawStageList();
 
@@ -585,36 +596,44 @@ public class StageEditor : EditorWindow
                     }
                     CustomGUILayout.EndNewTab();
 
-                    void DrawSelectStage()
+                    void DrawStageData()
                     {
-                        CustomGUILayout.TitleHeaderLabel("Selected Stage");
-                        
                         if (data.selectedStage == null)
                         {
                             CustomGUILayout.WarningLabel("SelectedStage is null");
                             return;
                         }
-
+                        for (int i = 0; i < data.selectedStage.enemyPrefabFolderNameArray.Length; i++)
+                        {
+                            EditorGUILayout.TextField(
+                                "",
+                                data.selectedStage.enemyPrefabFolderNameArray[i]
+                            );
+                        }
+                    }
+                    void DrawPlayData()
+                    {
                         CustomGUILayout.BeginNewTab();
                         {
                             CustomGUILayout.TitleHeaderLabel("Prefab");
-                            if (data.selectedStage.enemyPrefabDoubleArray == null) CustomGUILayout.WarningLabel("EnemyPrefabs is null");
-                            else if (data.selectedStage.enemyPrefabDoubleArray.Length == 0) CustomGUILayout.WarningLabel("EnemyPrefabs is Empty");
+                            if (data.selectedStage.enemyPool == null) CustomGUILayout.WarningLabel("EnemyPool is null");
+                            else if (data.selectedStage.enemyPool.Length == 0) CustomGUILayout.WarningLabel("EnemyPool is Empty");
                             else
                             {
-                                for (int i = 0; i < data.selectedStage.enemyPrefabFolderNameArray.Length; i++)
+                                for (int i = 0; i < data.selectedStage.enemyPool.Length; i++)
                                 {
-                                    GameObject[] prefabArray = data.selectedStage.enemyPrefabDoubleArray[i];
-                                    foreach(GameObject prefab in prefabArray)
+                                    CustomGUILayout.TitleHeaderLabel(data.selectedStage.enemyPrefabFolderNameArray[i]);
+                                    Pool[] poolArray = data.selectedStage.enemyPool[i];
+                                    foreach(Pool pool in poolArray)
                                     {
                                         EditorGUILayout.ObjectField(
-                                            prefab, 
+                                            pool.prefab, 
                                             typeof(GameObject), 
                                             false
                                         );
                                     }
                                 }
-                            }
+                    }
 
                             CustomGUILayout.TitleHeaderLabel("Spawn Data");
                             if (data.selectedStage.enemySpawnDataArray == null)
@@ -658,7 +677,6 @@ public class StageEditor : EditorWindow
                         }
                         CustomGUILayout.EndNewTab();
                     }
-
                     void DrawStageList()
                     {
                         CustomGUILayout.TitleHeaderLabel("Stage");
@@ -753,16 +771,6 @@ public class StageEditor : EditorWindow
                                 EditorGUILayout.TextField("Prefab Type", "None");
                             }
                             else EditorGUILayout.TextField("Prefab Type", data.selectedEnemyData.EnemyType.Name);
-                        }
-                    }
-
-                    void DrawEnemyEditorGUI()
-                    {
-                        foreach (EnemyEditorData enemyEditorGUI in data.editorEnemySpawnDataList)
-                        {
-                            string categoryName = enemyEditorGUI.GetType().Name;
-                            CustomGUILayout.UnderBarTitleText(categoryName);
-                            enemyEditorGUI.DrawFiledViewerGUI();
                         }
                     }
                 }

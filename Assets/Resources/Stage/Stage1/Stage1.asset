@@ -12,30 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 716bf7d622075f147aeeea90e2564d49, type: 3}
   m_Name: Stage1
   m_EditorClassIdentifier: 
-  EnemyPrefabFolderNameArray:
+  enemyPrefabFolderNameArray:
   - AutoInstantEnemy
   - InstantEnemy
-  enemySpawnDataArray:
-  - {fileID: 11400000, guid: e6aa04e0d0f466541b021593fe763780, type: 2}
-  - {fileID: 11400000, guid: c951cecbe7379124ca38189b9aee5691, type: 2}
-  - {fileID: 11400000, guid: 0bbb0639477a00448aedb1db80286fe1, type: 2}
-  - {fileID: 11400000, guid: 99688b3200f1ffb4ebcd090eb517ffa4, type: 2}
-  - {fileID: 11400000, guid: 3071cc0a4e3b8d24baa9fed252468e49, type: 2}
-  - {fileID: 11400000, guid: 60f037e20a51d6a4aaa5e208a5fed9a1, type: 2}
-  - {fileID: 11400000, guid: fa020c266b11ef648ad375f72239eb4a, type: 2}
-  - {fileID: 11400000, guid: dc0f1a77d52e59e448beec6ed0b6f444, type: 2}
-  - {fileID: 11400000, guid: 46b072bdd396f3748a47355d443b52a2, type: 2}
-  - {fileID: 11400000, guid: 1808e9a53cecd814d8c9b985f0f21418, type: 2}
-  - {fileID: 11400000, guid: aace5dc1dfef134488eb6822d7b0e4d6, type: 2}
-  - {fileID: 11400000, guid: 6fcefdd020b6d9441b63ca8df342856a, type: 2}
-  - {fileID: 11400000, guid: 1ce05f10e192fc947b81651b5f1b07a1, type: 2}
-  - {fileID: 11400000, guid: d709293ac2c586243a99156b8b1aa1ac, type: 2}
-  - {fileID: 11400000, guid: c049cec819d03c041963f163983f7449, type: 2}
-  - {fileID: 11400000, guid: 8463f9fc1f5f39048be8b6f649362fad, type: 2}
-  - {fileID: 11400000, guid: e2f054e5cba0c234b82700b94569cc86, type: 2}
-  - {fileID: 11400000, guid: 9d4f8cf6fd97d8d4eadf072273af6bfc, type: 2}
-  - {fileID: 11400000, guid: a055f07bc9c725e469f04d5ef3baa476, type: 2}
-  - {fileID: 11400000, guid: 33a5b40bb70fa9d4098d89795acd6573, type: 2}
   stageEvent:
   - time: 5
     typeName: GameManager

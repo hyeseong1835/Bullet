@@ -12,32 +12,24 @@ public class Stage : ScriptableObject
     public float timeLength = 0;
 
 
-
     public EnemySpawnData[] enemySpawnDataArray { get; private set; }
-    public GameObject[][] enemyPrefabDoubleArray { get; set; }
     public Pool[][] enemyPool { get; private set; }
-
-
     public int lastIndex { get; set; } = -1;
 
     public void Init()
     {
         List<EnemySpawnData> enemySpawnDataList = new List<EnemySpawnData>();
-        List<GameObject[]> enemyPrefabArrayList = new List<GameObject[]>();
         List<Pool[]> poolLists = new List<Pool[]>();
         
         for (int folderIndex = 0; folderIndex < enemyPrefabFolderNameArray.Length; folderIndex++)
         {
             string folderName = enemyPrefabFolderNameArray[folderIndex];
-            GameObject[] enemyPrefabArray = Resources.LoadAll<GameObject>($"{StageDirectoryResourcePath}/EnemyPrefabs{folderName}");
+            GameObject[] enemyPrefabArray = Resources.LoadAll<GameObject>($"{StageDirectoryResourcePath}/EnemyPrefabs/{folderName}");
             
             // Enemy Spawn Data
             string enemySpawnDataFolderResourcePath = $"{StageDirectoryResourcePath}/EnemySpawnData/{folderName}";
-            EnemySpawnData[] enemySpawnDataArray = Resources.LoadAll<EnemySpawnData>($"{StageDirectoryResourcePath}/EnemyPrefabs{folderName}");
+            EnemySpawnData[] enemySpawnDataArray = Resources.LoadAll<EnemySpawnData>(enemySpawnDataFolderResourcePath);
             enemySpawnDataList.AddRange(enemySpawnDataArray);
-
-            // Prefab
-            enemyPrefabArrayList.Add(enemyPrefabArray);
 
             // Pool
             Pool[] poolArray = new Pool[enemyPrefabArray.Length];
@@ -58,9 +50,6 @@ public class Stage : ScriptableObject
         enemySpawnDataList.Sort((a, b) => a.spawnTime.CompareTo(b.spawnTime));
         enemySpawnDataArray = enemySpawnDataList.ToArray();
 
-        // Prefab
-        enemyPrefabDoubleArray = enemyPrefabArrayList.ToArray();
-        
         // Pool
         enemyPool = poolLists.ToArray();
     }

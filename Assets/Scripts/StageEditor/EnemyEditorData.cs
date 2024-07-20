@@ -54,10 +54,6 @@ public abstract class EnemyEditorData
 
     #endregion
 
-    public virtual void DrawFiledViewerGUI()
-    {
-
-    }
     public virtual void Refresh()
     {
 

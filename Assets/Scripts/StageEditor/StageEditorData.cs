@@ -142,7 +142,6 @@ public class StageEditorData : ScriptableObject
     public void ApplyPrefab()
     {
         selectedStage.enemyPrefabFolderNameArray = enemyTypeNameArray;
-        selectedStage.enemyPrefabDoubleArray = prefabDoubleArray;
     }
     public void RefreshPrefab()
     {
