@@ -1,14 +1,10 @@
 #if UNITY_EDITOR
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using UnityEditor;
-using UnityEditor.UI;
 using UnityEngine;
-using UnityEngine.Rendering.Universal;
 
 [CreateAssetMenu(fileName = "Data", menuName = "StageEditor/Data")]
 public class StageEditorData : ScriptableObject
@@ -21,17 +17,18 @@ public class StageEditorData : ScriptableObject
     public int selectedStageIndex { get; private set; }
 
     //EnemySpawnData
-    public EditorEnemyData selectedEnemyData { get; private set; }
+    public EnemyEditorData selectedEnemyData { get; private set; }
     public int selectedEnemyDataIndex { get; private set; } = -1;
     
-    public List<EditorEnemyData> sameTimeEnemyList { get; private set; } = new List<EditorEnemyData>();
+    public List<EnemyEditorData> sameTimeEnemyList { get; private set; } = new List<EnemyEditorData>();
 
-    public List<EditorEnemyData> editorEnemySpawnDataList { get; private set; } = new List<EditorEnemyData>();
+    public List<EnemyEditorData> editorEnemySpawnDataList { get; private set; } = new List<EnemyEditorData>();
 
     //Prefab
-    public List<List<GameObject>> prefabLists { get; private set; } = new List<List<GameObject>>();
-    public List<Type> prefabTypeList { get; private set; } = new List<Type>();
-    
+    public GameObject[][] prefabDoubleArray { get; private set; }
+    public string[] enemyTypeNameArray { get; private set; }
+    public string selectedEnemyTypeName { get; private set; }
+    public int selectedEnemyTypeNameIndex { get; private set; }
     public int prefabLength { get; private set; }
 
     public Vector2 previewPos;
@@ -49,7 +46,10 @@ public class StageEditorData : ScriptableObject
     }
     private void OnDisable()
     {
-        
+        if (selectedStage != null)
+        {
+            ApplyStage();
+        }
     }
 
     #endregion
@@ -95,7 +95,7 @@ public class StageEditorData : ScriptableObject
         selectedStageIndex = index;
         selectedStage = AssetDatabase.LoadAssetAtPath<Stage>(stagePath);
         
-        RefreshPrefabList();
+        RefreshPrefab();
         RefreshEnemySpawnDataList();
 
         return selectedStage;
@@ -125,17 +125,13 @@ public class StageEditorData : ScriptableObject
         }
         else SelectStage(prevStageIndex);
     }
-    public void ApplyToStage()
+    public void ApplyStage()
     {
+        RefreshPrefab();
         RefreshEnemySpawnDataList();
-        RefreshPrefabList();
 
-        ApplyPrefabListToStageEnemyPrefabs();
-        ApplyEnemySpawnData();
-        foreach (EnemySpawnData data in selectedStage.enemySpawnDataArray)
-        {
-            EditorUtility.SetDirty(data);
-        }
+        ApplyPrefab();
+        ApplyEnemySpawnDataArray();
         EditorUtility.SetDirty(selectedStage);
     }
 
@@ -143,41 +139,41 @@ public class StageEditorData : ScriptableObject
 
     #region Prefab
 
-    public void ApplyPrefabListToStageEnemyPrefabs()
+    public void ApplyPrefab()
     {
-        selectedStage.enemyPrefabArrayCounts = prefabLists.GetCounts();
-        selectedStage.enemyPrefabs = prefabLists.ToSingleArray();
+        selectedStage.enemyPrefabFolderNameArray = enemyTypeNameArray;
+        selectedStage.enemyPrefabDoubleArray = prefabDoubleArray;
     }
-    public List<GameObject> GetPrefabList(EnemySpawnData enemyData) => GetPrefabList(enemyData.GetType());
-    public List<GameObject> GetPrefabList(Type spawnDataType)
-    {
-        int index = GetPrefabListIndex(spawnDataType);
-        return prefabLists[index];
-    }
-    public int GetPrefabListIndex(EnemySpawnData enemyData) => GetPrefabListIndex(enemyData.GetType());
-    public int GetPrefabListIndex(Type spawnDataType)
-    {
-        int index = prefabTypeList.IndexOf(spawnDataType);
-        if (index == -1) Debug.LogError("Can't Find PrefabList");
-        
-        return index;
-    }
-    public void RefreshPrefabList()
+    public void RefreshPrefab()
     {
         prefabLength = 0;
-        prefabLists.Clear();
-        prefabTypeList.Clear();
 
         if (selectedStage == null) return;
 
         string enemyPrefabsFolderPath = GetStageDirectoryPath(selectedStage) + "/EnemyPrefabs";
-        string[] prefabListFolderPath = Directory.GetDirectories(enemyPrefabsFolderPath);
+        string[] prefabFolderPath = Directory.GetDirectories(enemyPrefabsFolderPath);
 
-        for (int folderIndex = 0; folderIndex < prefabListFolderPath.Length; folderIndex++)
+        //EnemyTypeNameArray
+        enemyTypeNameArray = new string[prefabFolderPath.Length];
+        for (int i = 0; i < enemyTypeNameArray.Length; i++)
+        {
+            string enemyTypeName = prefabFolderPath[i].Substring(prefabFolderPath[i].LastIndexOf('\\') + 1);
+            
+            if (selectedEnemyTypeName == enemyTypeName)
+            {
+                selectedEnemyTypeNameIndex = i;
+            }
+            enemyTypeNameArray[i] = enemyTypeName;
+        }
+
+        //PrefabDoubleArray
+        List<List<GameObject>> result = new List<List<GameObject>>();
+
+        for (int folderIndex = 0; folderIndex < prefabFolderPath.Length; folderIndex++)
         {
             List<GameObject> prefabList = new List<GameObject>();
 
-            string[] prefabPathArray = Directory.GetFiles(prefabListFolderPath[folderIndex], "*.prefab");
+            string[] prefabPathArray = Directory.GetFiles(prefabFolderPath[folderIndex], "*.prefab");
             foreach (string path in prefabPathArray)
             {
                 prefabList.Add(AssetDatabase.LoadAssetAtPath<GameObject>(path));
@@ -186,10 +182,10 @@ public class StageEditorData : ScriptableObject
 
             if (prefabList.Count > 0)
             {
-                prefabLists.Add(prefabList);
-                prefabTypeList.Add(prefabList[0].GetComponent<Enemy>().EnemySpawnDataType);
+                result.Add(prefabList);
             }
         }
+        prefabDoubleArray = result.ToDoubleArray();
     }
     
     #endregion
@@ -201,16 +197,16 @@ public class StageEditorData : ScriptableObject
         float prevTime = -1;
 
         Dictionary<float, bool> newTimeFoldout = new Dictionary<float, bool>();
-        foreach (EditorEnemyData enemyData in editorEnemySpawnDataList)
+        foreach (EnemyEditorData enemyData in editorEnemySpawnDataList)
         {
-            if (enemyData.spawnData.spawnTime != prevTime)
+            if (enemyData.SpawnData.spawnTime != prevTime)
             {
-                if (newTimeFoldout.ContainsKey(enemyData.spawnData.spawnTime) == false)
+                if (newTimeFoldout.ContainsKey(enemyData.SpawnData.spawnTime) == false)
                 {
                     bool foldout;
-                    if (!timeFoldout.TryGetValue(enemyData.spawnData.spawnTime, out foldout)) foldout = false;
+                    if (!timeFoldout.TryGetValue(enemyData.SpawnData.spawnTime, out foldout)) foldout = false;
                     
-                    newTimeFoldout.Add(enemyData.spawnData.spawnTime, foldout);
+                    newTimeFoldout.Add(enemyData.SpawnData.spawnTime, foldout);
                 }
             }
         }
@@ -221,11 +217,13 @@ public class StageEditorData : ScriptableObject
     
     #region EnemySpawnData
 
+    public Type GetEnemySpawnDataType(string enemyTypeName) => Type.GetType($"{enemyTypeName}SpawnData");
+
     /// <summary>
     /// 
     /// </summary>
     /// <param name="spawnData"></param>
-    /// <returns>path</returns>
+    /// <returns>생성한 EnemySpawnData의 Asset Path</returns>
     public string CreateEnemySpawnData(EnemySpawnData spawnData)
     {
         string stageDirectoryPath = GetStageDirectoryPath(selectedStage);
@@ -243,98 +241,83 @@ public class StageEditorData : ScriptableObject
         AssetDatabase.CreateAsset(spawnData, path);
         return path;
     }
-    /*
-    public int SelectEnemyData(EditorEnemyData data)
-    {
-        selectedEnemyData?.editorGUI.OnDeSelected(selectedEnemyData);
-
-        if (data == null)
-        {
-            SelectEnemyData(-1);
-            return -1;
-        }
-        int index = editorEnemySpawnDataList.IndexOf(data);
-        if (index == -1)
-        {
-            Debug.LogWarning($"Can't Find EnemySpawnData({data.spawnData.name})");
-            SelectEnemyData(-1);
-            return -1;
-        }
-        SelectEnemyData(editorEnemySpawnDataList.IndexOf(data));
-        
-        return selectedEnemyDataIndex = index;
-    }
-    */
     public int SelectEnemyData(EnemySpawnData data)
     {
-        int dataIndex = editorEnemySpawnDataList.TakeWhile((enemy) => enemy.spawnData != data).Count();
+        int dataIndex = editorEnemySpawnDataList.TakeWhile((enemy) => enemy.SpawnData != data).Count();
         SelectEnemyData(dataIndex);
         return dataIndex;
     }
-    public EditorEnemyData SelectEnemyData(int index)
+    public EnemyEditorData SelectEnemyData(int index)
     {
         if (editorEnemySpawnDataList == null || index < 0 || editorEnemySpawnDataList.Count <= index)
         {
             if (selectedEnemyData != null)
             {
-                selectedEnemyData.editorGUI.OnDeSelected(selectedEnemyData);
+                selectedEnemyData.OnDeSelected();
                 selectedEnemyData = null;
                 selectedEnemyDataIndex = -1;
             }
 
-            foreach (EditorEnemyData editorEnemyData in sameTimeEnemyList)
+            foreach (EnemyEditorData editorEnemyData in sameTimeEnemyList)
             {
-                editorEnemyData.editorGUI.OnDeSelected(editorEnemyData);
+                editorEnemyData.OnDeSelected();
             }
             sameTimeEnemyList.Clear();
 
+            selectedEnemyTypeName = "Null";
+            selectedEnemyTypeNameIndex = -1;
             return null;
         }
 
-        selectedEnemyData?.editorGUI.OnDeSelected(selectedEnemyData);
+        selectedEnemyData?.OnDeSelected();
         selectedEnemyData = editorEnemySpawnDataList[index];
         selectedEnemyDataIndex = index;
-        selectedEnemyData.editorGUI.OnSelected(selectedEnemyData);
+        selectedEnemyData.OnSelected();
 
-        foreach (EditorEnemyData enemyData in sameTimeEnemyList)
+        //SameTimeEnemyList 초기화 (selectedEnemyData 제외)
+        foreach (EnemyEditorData enemyData in sameTimeEnemyList)
         {
             if (enemyData != selectedEnemyData)
             {
-                enemyData.editorGUI.OnDeSelected(enemyData);
+                enemyData.OnDeSelected();
             }
         }
         sameTimeEnemyList.Clear();
 
+        //SameTimeEnemyList 추가 (+)
         for (int i = selectedEnemyDataIndex + 1; i < editorEnemySpawnDataList.Count; i++)
         {
-            EditorEnemyData enemyData = editorEnemySpawnDataList[i];
+            EnemyEditorData enemyData = editorEnemySpawnDataList[i];
 
-            if (selectedEnemyData.spawnData.spawnTime == enemyData.spawnData.spawnTime)
+            if (selectedEnemyData.SpawnData.spawnTime == enemyData.SpawnData.spawnTime)
             {
                 sameTimeEnemyList.Add(enemyData);
-                enemyData.editorGUI.OnSelected(enemyData);
+                enemyData.OnSelected();
             }
             else break;
         }
+        //SameTimeEnemyList 추가 (-)
         for (int i = selectedEnemyDataIndex - 1; i >= 0; i--)
         {
-            EditorEnemyData enemyData = editorEnemySpawnDataList[i];
-            if (selectedEnemyData.spawnData.spawnTime == enemyData.spawnData.spawnTime)
+            EnemyEditorData enemyData = editorEnemySpawnDataList[i];
+            if (selectedEnemyData.SpawnData.spawnTime == enemyData.SpawnData.spawnTime)
             {
                 sameTimeEnemyList.Add(enemyData);
-                enemyData.editorGUI.OnSelected(enemyData);
+                enemyData.OnSelected();
             }
             else break;
         }
 
+        selectedEnemyTypeName = selectedEnemyData.EnemyType.Name;
+        selectedEnemyTypeNameIndex = enemyTypeNameArray.IndexOf(selectedEnemyData.EnemyType.Name);
         return selectedEnemyData;
     }
-    public int InsertToEditorEnemySpawnDataList(EditorEnemyData editorEnemyData)
+    public int InsertToEditorEnemySpawnDataList(EnemyEditorData editorEnemyData)
     {
         for (int index = 0; index < editorEnemySpawnDataList.Count; index++)
         {
-            EditorEnemyData enemy = editorEnemySpawnDataList[index];
-            if (enemy.spawnData.spawnTime > editorEnemyData.spawnData.spawnTime)
+            EnemyEditorData enemy = editorEnemySpawnDataList[index];
+            if (enemy.SpawnData.spawnTime > editorEnemyData.SpawnData.spawnTime)
             {
                 editorEnemySpawnDataList.Insert(index, editorEnemyData);
                 return index;
@@ -345,7 +328,7 @@ public class StageEditorData : ScriptableObject
     }
     public int SortSelectedEnemyData()
     {
-        EditorEnemyData data = selectedEnemyData;
+        EnemyEditorData data = selectedEnemyData;
         editorEnemySpawnDataList.RemoveAt(selectedEnemyDataIndex);
 
         return selectedEnemyDataIndex = InsertToEditorEnemySpawnDataList(data);
@@ -353,33 +336,45 @@ public class StageEditorData : ScriptableObject
     
     public void RefreshEnemySpawnDataList()
     {
+        editorEnemySpawnDataList.Clear();
+        
         if (selectedStage == null)
         {
             Debug.LogWarning("Fail RefreshEnemySpawnDataList (selectedStage is null)");
-            editorEnemySpawnDataList.Clear();
             return;
         }
-        string enemySpawnDataFolderPath = $"{GetStageDirectoryPath(selectedStage)}/EnemySpawnData";
-        string[] enemySpawnDataPathArray = Directory.GetFiles(enemySpawnDataFolderPath, "*.asset");
-        
-        editorEnemySpawnDataList.Clear();
-        foreach (string enemySpawnDataPath in enemySpawnDataPathArray)
+        if (enemyTypeNameArray == null)
         {
-            EnemySpawnData spawnData = AssetDatabase.LoadAssetAtPath<EnemySpawnData>(enemySpawnDataPath);
-            EditorEnemyData enemyData = new EditorEnemyData(spawnData);
-            editorEnemySpawnDataList.Add(enemyData);
+            Debug.LogWarning("Fail RefreshEnemySpawnDataList (enemyTypeNameArray is null)");
+            return;
         }
-        editorEnemySpawnDataList.Sort((a, b) => a.spawnData.spawnTime.CompareTo(b.spawnData.spawnTime));
-    }
-    public void ApplyEnemySpawnData()
-    {
-        
+        if (enemyTypeNameArray.Length == 0)
+        {
+            Debug.LogWarning("Fail RefreshEnemySpawnDataList (enemyTypeNameArray is Empty)");
+            return;
+        }
 
-        selectedStage.enemySpawnDataArray = new EnemySpawnData[editorEnemySpawnDataList.Count];
+        for (int folderIndex = 0; folderIndex < enemyTypeNameArray.Length; folderIndex++)
+        {
+            string folderName = enemyTypeNameArray[folderIndex];
+            string enemySpawnDataFolderResourcePath = $"{selectedStage.StageDirectoryResourcePath}/EnemySpawnData";
+       
+            EnemySpawnData[] enemySpawnDataArray = Resources.LoadAll<EnemySpawnData>($"{enemySpawnDataFolderResourcePath}/{folderName}");
+            foreach (EnemySpawnData spawnData in enemySpawnDataArray)
+            {
+                editorEnemySpawnDataList.Add(spawnData.CreateEditorData());
+            }
+        }
+        editorEnemySpawnDataList.Sort(
+            (a, b) => 
+                a.SpawnData.spawnTime.CompareTo(b.SpawnData.spawnTime)
+        );
+    }
+    public void ApplyEnemySpawnDataArray()
+    {
         for (int i = 0; i < editorEnemySpawnDataList.Count; i++)
         {
-            EditorEnemyData editorEnemyData = editorEnemySpawnDataList[i];
-            selectedStage.enemySpawnDataArray[i] = editorEnemyData.spawnData;
+            EnemyEditorData editorEnemyData = editorEnemySpawnDataList[i];
             editorEnemyData.Apply();
         }
     }

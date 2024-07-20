@@ -23,7 +23,6 @@ public class StageEditor : EditorWindow
     public bool debug = false;
 
     FloatingAreaManager floatingArea;
-    public Dictionary<string, EnemyEditorGUI> enemyEditorGUIDictionary = new Dictionary<string, EnemyEditorGUI>();
 
     public float fileViewerScroll;
 
@@ -88,48 +87,25 @@ public class StageEditor : EditorWindow
 
     public void Apply()
     {
-        data.ApplyToStage();
+        data.ApplyStage();
         EditorUtility.SetDirty(data);
         EditorUtility.SetDirty(setting);
     }
     public void Refresh()
     {
-        RefreshEnemyEditors();
-        enemyEditorGUIDictionary.Clear();
-
         PreviewInit();
 
         data.RefreshStageArray();
+
+        data.RefreshPrefab();
         data.RefreshTimeFoldout();
 
+        data.RefreshEnemySpawnDataList();
         selectRect = default;
 
         floatingArea.area = null;
         enemySpawnDataReNameFloatingAreaHeader = default;
     }
-
-
-    #region EnemyEditorGUI
-
-    public void RefreshEnemyEditors()
-    {
-        foreach (EnemyEditorGUI editorGUI in enemyEditorGUIDictionary.Values)
-        {
-            editorGUI.Refresh();
-        }
-    }
-    public EnemyEditorGUI GetEnemyEditor(EnemySpawnData spawnData) => GetEnemyEditor(spawnData.EditorType);
-    public EnemyEditorGUI GetEnemyEditor(Type editorType)
-    {
-        if (enemyEditorGUIDictionary.TryGetValue(editorType.Name, out EnemyEditorGUI editorInstance) == false)
-        {
-            editorInstance = (EnemyEditorGUI)Activator.CreateInstance(editorType);
-            enemyEditorGUIDictionary.Add(editorType.Name, editorInstance);
-        }
-        return editorInstance;
-    }
-
-    #endregion
 
     #region DrawPreview
 
@@ -146,9 +122,9 @@ public class StageEditor : EditorWindow
 
         previewRender.BeginPreview(rect, GUIStyle.none);
         {
-            foreach (EditorEnemyData editorEnemyData in data.editorEnemySpawnDataList)
+            foreach (EnemyEditorData editorEnemyData in data.editorEnemySpawnDataList)
             {
-                editorEnemyData.editorGUI.Render(editorEnemyData);
+                editorEnemyData.Render();
             }
 
             previewRender.camera.Render();
@@ -218,7 +194,7 @@ public class StageEditor : EditorWindow
 
         void Input()
         {
-            data.selectedEnemyData?.editorGUI.Event();
+            data.selectedEnemyData?.Event();
 
             if (e.isScrollWheel)
             {
@@ -290,31 +266,75 @@ public class StageEditor : EditorWindow
                     switch (e.keyCode)
                     {
                         case KeyCode.UpArrow:
-                            int prevIndex = data.selectedEnemyDataIndex - 1;
-                            if (0 <= prevIndex)
+                            if (e.shift)
                             {
-                                data.SelectEnemyData(prevIndex);
-                                Repaint();
+                                int index = data.selectedEnemyDataIndex - 1;
+                                float prevTime = data.selectedEnemyData.SpawnData.spawnTime;
+                                for (int i = index; i >= 0; i--)
+                                {
+                                    EnemyEditorData enemyData = data.editorEnemySpawnDataList[i];
+                                    if (enemyData.SpawnData.spawnTime != prevTime)
+                                    {
+                                        prevTime = enemyData.SpawnData.spawnTime;
+
+                                        if (i + 1 == data.selectedEnemyDataIndex) continue;
+                                            
+                                        data.SelectEnemyData(i + 1);
+                                        Repaint();
+                                        goto ExitEventTypeSwitch;
+                                    }
+                                }
+                                if (data.selectedEnemyDataIndex != 0)
+                                {
+                                    data.SelectEnemyData(0);
+                                    Repaint();
+                                }
+                            }
+                            else
+                            {
+                                int prevIndex = data.selectedEnemyDataIndex - 1;
+                                if (0 <= prevIndex)
+                                {
+                                    data.SelectEnemyData(prevIndex);
+                                    Repaint();
+                                }
                             }
                             break;
 
                         case KeyCode.DownArrow:
-                            int nextIndex = data.selectedEnemyDataIndex + 1;
-                            if (data.selectedEnemyDataIndex != -1 && nextIndex < data.editorEnemySpawnDataList.Count)
+                            if (e.shift)
                             {
-                                data.SelectEnemyData(nextIndex);
-                                Repaint();
+                                int index = data.selectedEnemyDataIndex + 1;
+                                for (int i = index; i < data.editorEnemySpawnDataList.Count; i++)
+                                {
+                                    if (data.editorEnemySpawnDataList[i].SpawnData.spawnTime != data.selectedEnemyData.SpawnData.spawnTime)
+                                    {
+                                        data.SelectEnemyData(i);
+                                        Repaint();
+                                        break;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                int nextIndex = data.selectedEnemyDataIndex + 1;
+                                if (data.selectedEnemyDataIndex != -1 && nextIndex < data.editorEnemySpawnDataList.Count)
+                                {
+                                    data.SelectEnemyData(nextIndex);
+                                    Repaint();
+                                }
                             }
                             break;
+
                         case KeyCode.Comma:
-                            if (data.selectedEnemyData != null && 0 < data.selectedEnemyData.spawnData.spawnTime)
+                            if (data.selectedEnemyData != null && 0 < data.selectedEnemyData.SpawnData.spawnTime)
                             {
-                                data.selectedEnemyData.spawnData.spawnTime -= setting.timeMoveSnap;
-                                if (data.selectedEnemyData.spawnData.spawnTime < 0)
+                                data.selectedEnemyData.SpawnData.spawnTime -= setting.timeMoveSnap;
+                                if (data.selectedEnemyData.SpawnData.spawnTime < 0)
                                 {
-                                    data.selectedEnemyData.spawnData.spawnTime = 0;
+                                    data.selectedEnemyData.SpawnData.spawnTime = 0;
                                 }
-                                else data.selectedEnemyData.spawnData.spawnTime = Mathf.Ceil(data.selectedEnemyData.spawnData.spawnTime / setting.timeMoveSnap) * setting.timeMoveSnap;
+                                else data.selectedEnemyData.SpawnData.spawnTime = Mathf.Ceil(data.selectedEnemyData.SpawnData.spawnTime / setting.timeMoveSnap) * setting.timeMoveSnap;
 
                                 data.SortSelectedEnemyData();
                                 Repaint();
@@ -323,12 +343,12 @@ public class StageEditor : EditorWindow
                         case KeyCode.Period:
                             if (data.selectedEnemyData != null)
                             {
-                                data.selectedEnemyData.spawnData.spawnTime += setting.timeMoveSnap;
-                                data.selectedEnemyData.spawnData.spawnTime = Mathf.Floor(data.selectedEnemyData.spawnData.spawnTime / setting.timeMoveSnap) * setting.timeMoveSnap;
+                                data.selectedEnemyData.SpawnData.spawnTime += setting.timeMoveSnap;
+                                data.selectedEnemyData.SpawnData.spawnTime = Mathf.Floor(data.selectedEnemyData.SpawnData.spawnTime / setting.timeMoveSnap) * setting.timeMoveSnap;
 
-                                if (data.selectedEnemyData.spawnData.spawnTime > data.selectedStage.timeLength)
+                                if (data.selectedEnemyData.SpawnData.spawnTime > data.selectedStage.timeLength)
                                 {
-                                    data.selectedStage.timeLength = data.selectedEnemyData.spawnData.spawnTime;
+                                    data.selectedStage.timeLength = data.selectedEnemyData.SpawnData.spawnTime;
                                 }
 
                                 data.SortSelectedEnemyData();
@@ -338,8 +358,8 @@ public class StageEditor : EditorWindow
                     }
                     break;
             }
-
-            data.selectedEnemyData?.editorGUI.LateEvent();
+            ExitEventTypeSwitch:
+            data.selectedEnemyData?.LateEvent();
 
             void Mouse0Down()
             {
@@ -578,13 +598,21 @@ public class StageEditor : EditorWindow
                         CustomGUILayout.BeginNewTab();
                         {
                             CustomGUILayout.TitleHeaderLabel("Prefab");
-                            if (data.selectedStage.enemyPrefabs == null) CustomGUILayout.WarningLabel("EnemyPrefabs is null");
-                            else if (data.selectedStage.enemyPrefabs.Length == 0) CustomGUILayout.WarningLabel("EnemyPrefabs is Empty");
+                            if (data.selectedStage.enemyPrefabDoubleArray == null) CustomGUILayout.WarningLabel("EnemyPrefabs is null");
+                            else if (data.selectedStage.enemyPrefabDoubleArray.Length == 0) CustomGUILayout.WarningLabel("EnemyPrefabs is Empty");
                             else
                             {
-                                foreach (GameObject prefab in data.selectedStage.enemyPrefabs)
+                                for (int i = 0; i < data.selectedStage.enemyPrefabFolderNameArray.Length; i++)
                                 {
-                                    EditorGUILayout.ObjectField(prefab, typeof(GameObject), false);
+                                    GameObject[] prefabArray = data.selectedStage.enemyPrefabDoubleArray[i];
+                                    foreach(GameObject prefab in prefabArray)
+                                    {
+                                        EditorGUILayout.ObjectField(
+                                            prefab, 
+                                            typeof(GameObject), 
+                                            false
+                                        );
+                                    }
                                 }
                             }
 
@@ -653,9 +681,12 @@ public class StageEditor : EditorWindow
 
                     void DrawPrefabList()
                     {
-                        CustomGUILayout.TitleHeaderLabel("Prefab");
-                        
-                        if (data.prefabLists == null || data.prefabLists.Count == 0)
+                        CustomGUILayout.TitleHeaderLabel("Prefab List");
+                        if (data.prefabDoubleArray == null)
+                        {
+                            CustomGUILayout.WarningLabel("PrefabList is null"); 
+                        }
+                        else if (data.prefabDoubleArray.Length == 0)
                         {
                             CustomGUILayout.WarningLabel("Empty PrefabList");
                         }
@@ -663,21 +694,24 @@ public class StageEditor : EditorWindow
                         {
                             CustomGUILayout.BeginNewTab();
                             {
-                                for (int listIndex = 0; listIndex < data.prefabLists.Count; listIndex++)
+                                for (int listIndex = 0; listIndex < data.prefabDoubleArray.Length; listIndex++)
                                 {
-                                    List<GameObject> curList = data.prefabLists[listIndex];
-                                    Type listType = data.prefabTypeList[listIndex];
+                                    GameObject[] prefabArray = data.prefabDoubleArray[listIndex];
+                                    string prefabTypeName = data.enemyTypeNameArray[listIndex];
 
-                                    if (curList.Count < 1)
+                                    CustomGUILayout.UnderBarTitleText(prefabTypeName);
+                                    if (prefabArray.Length == 0)
                                     {
                                         CustomGUILayout.WarningLabel("Empty List");
                                         continue;
                                     }
-                                    CustomGUILayout.UnderBarTitleText(listType.Name);
-
-                                    for (int elementIndex = 0; elementIndex < curList.Count; elementIndex++)
+                                    for (int prefabIndex = 0; prefabIndex < prefabArray.Length; prefabIndex++)
                                     {
-                                        EditorGUILayout.ObjectField(curList[elementIndex], typeof(GameObject), false);
+                                        EditorGUILayout.ObjectField(
+                                            prefabArray[prefabIndex], 
+                                            typeof(GameObject), 
+                                            false
+                                        );
                                     }
                                 }
                             }
@@ -710,14 +744,7 @@ public class StageEditor : EditorWindow
                             }
 
                             //Spawn Data
-                            EditorGUILayout.ObjectField("Spawn Data", data.selectedEnemyData.spawnData, typeof(EnemySpawnData), false);
-
-                            //EditorGUI
-                            if (data.selectedEnemyData.unSafeEditorGUI == null)
-                            {
-                                EditorGUILayout.TextField("EditorGUI", "None");
-                            }
-                            else EditorGUILayout.TextField("EditorGUI", data.selectedEnemyData.unSafeEditorGUI.GetType().Name);
+                            EditorGUILayout.ObjectField("Spawn Data", data.selectedEnemyData.SpawnData, typeof(EnemySpawnData), false);
 
                             //Prefab
                             EditorGUILayout.ObjectField("Prefab", data.selectedEnemyData.prefab, typeof(GameObject), false);
@@ -725,13 +752,13 @@ public class StageEditor : EditorWindow
                             {
                                 EditorGUILayout.TextField("Prefab Type", "None");
                             }
-                            else EditorGUILayout.TextField("Prefab Type", data.selectedEnemyData.prefabType.Name);
+                            else EditorGUILayout.TextField("Prefab Type", data.selectedEnemyData.EnemyType.Name);
                         }
                     }
 
                     void DrawEnemyEditorGUI()
                     {
-                        foreach (EnemyEditorGUI enemyEditorGUI in enemyEditorGUIDictionary.Values)
+                        foreach (EnemyEditorData enemyEditorGUI in data.editorEnemySpawnDataList)
                         {
                             string categoryName = enemyEditorGUI.GetType().Name;
                             CustomGUILayout.UnderBarTitleText(categoryName);
@@ -774,7 +801,12 @@ public class StageEditor : EditorWindow
                 {
                     EditorGUILayout.Space(5);
                     EditorGUILayout.LabelField("Spawn Data", EditorStyles.boldLabel);
-                    if (data.editorEnemySpawnDataList == null || data.editorEnemySpawnDataList.Count < 1)
+                    if (data.editorEnemySpawnDataList == null)
+                    {
+                        CustomGUILayout.WarningLabel("EnemySpawnData is Null");
+                        return;
+                    }
+                    if(data.editorEnemySpawnDataList.Count == 0)
                     {
                         CustomGUILayout.WarningLabel("EnemySpawnData is Empty");
                         return;
@@ -787,15 +819,15 @@ public class StageEditor : EditorWindow
                     bool foldout = false;
                     for (int i = 0; i < data.editorEnemySpawnDataList.Count; i++)
                     {
-                        EditorEnemyData enemyData = data.editorEnemySpawnDataList[i];
+                        EnemyEditorData enemyData = data.editorEnemySpawnDataList[i];
 
-                        if (enemyData.spawnData.spawnTime != prevTime)
+                        if (enemyData.SpawnData.spawnTime != prevTime)
                         {
                             if (foldout == false) LateCloseHeader();
 
-                            if (data.timeFoldout.TryGetValue(enemyData.spawnData.spawnTime, out foldout) == false)
+                            if (data.timeFoldout.TryGetValue(enemyData.SpawnData.spawnTime, out foldout) == false)
                             {
-                                data.timeFoldout.Add(enemyData.spawnData.spawnTime, true);
+                                data.timeFoldout.Add(enemyData.SpawnData.spawnTime, true);
                                 foldout = true;
                             }
 
@@ -819,11 +851,15 @@ public class StageEditor : EditorWindow
                             }
                             else
                             {
-                                CloseElement(enemyData, i);
+                                if(enemyData == data.selectedEnemyData)
+                                {
+                                    data.timeFoldout[enemyData.SpawnData.spawnTime] = true;
+                                }
+                                else CloseElement(enemyData, i);
                             }
                         }
 
-                        prevTime = enemyData.spawnData.spawnTime;
+                        prevTime = enemyData.SpawnData.spawnTime;
                     }
                     if (selectRect != default)
                     {
@@ -863,7 +899,7 @@ public class StageEditor : EditorWindow
                             EditorGUILayout.Space(5);
                         }
                     }
-                    void OpenHeader(EditorEnemyData editorEnemyData, int i)
+                    void OpenHeader(EnemyEditorData editorEnemyData, int i)
                     {
                         EditorGUILayout.Space(5);
 
@@ -875,11 +911,11 @@ public class StageEditor : EditorWindow
 
                         //Time Label
                         Rect timeRect = fieldRect.SetWidth(setting.timeWidth);
-                        EditorGUI.LabelField(timeRect, editorEnemyData.spawnData.spawnTime.ToString("F1"));
+                        EditorGUI.LabelField(timeRect, editorEnemyData.SpawnData.spawnTime.ToString("F1"));
 
                         if (EventUtility.MouseDown(0) && timeRect.Contains(e.mousePosition))
                         {
-                            data.timeFoldout[editorEnemyData.spawnData.spawnTime] = !foldout;
+                            data.timeFoldout[editorEnemyData.SpawnData.spawnTime] = !foldout;
                             Repaint();
                         }
 
@@ -892,7 +928,7 @@ public class StageEditor : EditorWindow
                         EditorGUI.ObjectField(
                             objectRect,
                             "",
-                            editorEnemyData.spawnData,
+                            editorEnemyData.SpawnData,
                             typeof(EnemySpawnData),
                             false
                         );
@@ -911,12 +947,12 @@ public class StageEditor : EditorWindow
                             selectRect = headerRect;
                         }
                     }
-                    void CloseHeader(EditorEnemyData enemyData, int i)
+                    void CloseHeader(EnemyEditorData enemyData, int i)
                     {
                         OpenHeader(enemyData, i);
                     }
 
-                    void OpenElement(EditorEnemyData editorEnemyData, int i)
+                    void OpenElement(EnemyEditorData editorEnemyData, int i)
                     {
                         Rect fieldRect = GUILayoutUtility.GetRect(
                             area.width,
@@ -936,7 +972,7 @@ public class StageEditor : EditorWindow
                         EditorGUI.ObjectField(
                             objectRect,
                             "",
-                            editorEnemyData.spawnData,
+                            editorEnemyData.SpawnData,
                             typeof(EnemySpawnData),
                             false
                         );
@@ -954,7 +990,7 @@ public class StageEditor : EditorWindow
                             selectRect = RectUtility.SetY(headerRect, objectRect.y);
                         }
                     }
-                    void CloseElement(EditorEnemyData enemyData, int i)
+                    void CloseElement(EnemyEditorData enemyData, int i)
                     {
                         if (enemyData == data.selectedEnemyData)
                         {
@@ -962,30 +998,24 @@ public class StageEditor : EditorWindow
                             isSelectHideByHeader = true;
                         }
                     }
-                    void DrawMarker(Rect objectRect, EditorEnemyData editorEnemyData)
+                    void DrawMarker(Rect objectRect, EnemyEditorData editorEnemyData)
                     {
                         Rect r1 = new Rect();
                         r1 = r1.SetSize(objectRect.height - 3, objectRect.height - 3);
                         r1 = r1.SetPos(objectRect.GetPivotPos(Anchor.TopRight) + new Vector2(-r1.width, 1.5f));
 
-                        Rect r2 = r1.AddX(-r1.width);
+                        //Rect r2 = r1.AddX(-r1.width);
 
-                        CustomGUI.DrawSquare(r2.SetWidth(r2.width * 2), setting.hasEditorBackGroundColor);
+                        CustomGUI.DrawSquare(r1, setting.hasEditorBackGroundColor);
                         
                         GUIStyle textStyle = new GUIStyle(EditorStyles.boldLabel);
                         EditorStyles.boldLabel.alignment = TextAnchor.MiddleCenter;
                         {
-                            //Editor
-                            if (editorEnemyData.unSafeEditorGUI == null) textStyle.normal.textColor = Color.gray;
-                            else textStyle.normal.textColor = Color.white;
-
-                            GUI.Label(r1, " E", textStyle);
-
                             //Prefab
                             if (editorEnemyData.prefab == null) textStyle.normal.textColor = Color.red;
                             else textStyle.normal.textColor = Color.white;
 
-                            GUI.Label(r2, " P", textStyle);
+                            GUI.Label(r1, " P", textStyle);
                         }
                         EditorStyles.boldLabel.alignment = TextAnchor.MiddleLeft;
                     }
@@ -994,89 +1024,24 @@ public class StageEditor : EditorWindow
                 #endregion
             }
             
-            void AddMenu(Rect rect, EditorEnemyData editorEnemyData)
+            void AddMenu(Rect rect, EnemyEditorData editorEnemyData)
             {
                 if (EventUtility.MouseDown(1) && rect.Contains(e.mousePosition))
                 {
                     e.Use();
                     GenericMenu menu = new GenericMenu();
 
-                    /*menu.AddItem(
-                        new GUIContent("Rename"),
-                        false,
-                        () =>
-                        {
-                            enemySpawnDataReNameFloatingAreaHeader = rect.AddPos(area.position);
-                            floatingArea.Create(
-                                new TextFloatingArea(
-                                    editorEnemyData.spawnData.name,
-
-                                    applyEvent: (name) => {
-                                        AssetDatabase.RenameAsset(
-                                            AssetDatabase.GetAssetPath(
-                                                editorEnemyData.spawnData
-                                            ),
-                                            name
-                                        );
-                                        Repaint();
-                                        enemySpawnDataReNameFloatingAreaHeader = default;
-                                    },
-                                    title: "Rename"
-                                )
-                            );
-                            floatingArea.SetRect(enemySpawnDataReNameFloatingAreaHeader.GetAddY(-fileViewerScroll));
-                        }
-                    );*/
                     menu.AddItem(
                         new GUIContent("Copy"),
                         false,
                         () =>
                         {
-                            EnemySpawnData spawnData = editorEnemyData.spawnData.Copy();
+                            EnemySpawnData spawnData = editorEnemyData.SpawnData.Copy();
                             data.CreateEnemySpawnData(spawnData);
 
-                            EditorEnemyData copy = new EditorEnemyData(
-                                spawnData,
-                                editorEnemyData.prefab,
-                                editorEnemyData.prefabType
-                            );
+                            EnemyEditorData copy = spawnData.CreateEditorData();
                             data.InsertToEditorEnemySpawnDataList(copy);
                             Repaint();
-                            /*
-                            string GetNextPath(string target)
-                            {
-                                string noExtensionPath = targetPath.Substring(0, targetPath.Length - ".asset".Length);
-
-                                if (noExtensionPath[^1] == ')')
-                                {
-                                    string noNumberPath = noExtensionPath.Substring(
-                                        0, 
-                                        noExtensionPath.LastIndexOf('(')
-                                    );
-                                    //a (1).asset (11)
-                                    //0123456789
-                                    //noExtension: a (1) (5)
-                                    //             01234
-                                    //noNumber: a_ (2)
-                                    //          01
-
-                                    bool isNumber =
-                                        int.TryParse(
-                                            noExtensionPath.Substring(
-                                                noNumberPath.Length + 1,
-                                                noExtensionPath.Length - noNumberPath.Length - 2
-                                            ),
-                                            out int number
-                                        );
-                                    if (isNumber)
-                                    {
-                                        return $"{noNumberPath}({number + 1}).asset";
-                                    }
-                                    else return $"{noNumberPath}(_).asset";
-                                }
-                                else return $"{noExtensionPath}(Copy).asset";
-                            }
-                            */
                         }
                     );
 
@@ -1087,7 +1052,7 @@ public class StageEditor : EditorWindow
                         {
                             AssetDatabase.DeleteAsset(
                                 AssetDatabase.GetAssetPath(
-                                    editorEnemyData.spawnData
+                                    editorEnemyData.SpawnData
                                 )
                             );
                             data.editorEnemySpawnDataList.Remove(editorEnemyData);
@@ -1125,21 +1090,21 @@ public class StageEditor : EditorWindow
                 {
                     #region SpawnPrefab
 
-                    List<GameObject> prefabList = data.GetPrefabList(data.selectedEnemyData.spawnData);
+                    GameObject[] prefabArray = data.prefabDoubleArray[data.selectedEnemyTypeNameIndex];
 
                     string[] selectablePrefabNameArray;
-                    if (prefabList == null)
+                    if (prefabArray == null)
                     {
-                        CustomGUILayout.WarningLabel("Cannot Found Type: " + data.selectedEnemyData.spawnData.GetType());
+                        CustomGUILayout.WarningLabel("Cannot Found Type: " + data.selectedEnemyData.SpawnData.GetType());
                     }
                     else
                     {
-                        selectablePrefabNameArray = prefabList.Select(prefab => prefab.name).ToArray();
+                        selectablePrefabNameArray = prefabArray.Select(prefab => prefab.name).ToArray();
 
                         int prefabIndexInput = EditorGUILayout.Popup(
-                                data.selectedEnemyData.spawnData.prefabIndex, selectablePrefabNameArray
+                                data.selectedEnemyData.SpawnData.prefabIndex, selectablePrefabNameArray
                             );
-                        if (prefabIndexInput != data.selectedEnemyData.spawnData.prefabIndex)
+                        if (prefabIndexInput != data.selectedEnemyData.SpawnData.prefabIndex)
                         {
                             data.selectedEnemyData.SelectPrefab(prefabIndexInput);
                         }
@@ -1147,18 +1112,15 @@ public class StageEditor : EditorWindow
                     #endregion
 
                     #region SpawnTime
-                    float spawnTimeInput = EditorGUILayout.FloatField("Spawn Time", data.selectedEnemyData.spawnData.spawnTime);
-                    if (spawnTimeInput != data.selectedEnemyData.spawnData.spawnTime)
+                    float spawnTimeInput = EditorGUILayout.FloatField("Spawn Time", data.selectedEnemyData.SpawnData.spawnTime);
+                    if (spawnTimeInput != data.selectedEnemyData.SpawnData.spawnTime)
                     {
-                        if (spawnTimeInput >= 0) data.selectedEnemyData.spawnData.spawnTime = spawnTimeInput;
-                        else data.selectedEnemyData.spawnData.spawnTime = 0;
+                        if (spawnTimeInput >= 0) data.selectedEnemyData.SpawnData.spawnTime = spawnTimeInput;
+                        else data.selectedEnemyData.SpawnData.spawnTime = 0;
 
                         data.SortSelectedEnemyData();
                     }
                     #endregion
-
-                    if (data.selectedEnemyData.editorGUI != null) data.selectedEnemyData.editorGUI.DrawInspectorGUI(data.selectedEnemyData);
-                    else CustomGUILayout.WarningLabel("EditorGUI Missing");
                 }
                 else
                 {
@@ -1194,11 +1156,11 @@ public class StageEditor : EditorWindow
             
             void DrawEnemyGizmos()
             {
-                foreach(EditorEnemyData editorEnemyData in data.sameTimeEnemyList)
+                foreach(EnemyEditorData editorEnemyData in data.sameTimeEnemyList)
                 {
-                    editorEnemyData.editorGUI.DrawSameTimeEnemyDataGizmos(editorEnemyData);
+                    editorEnemyData.DrawSameTimeEnemyDataGizmos();
                 }
-                data.selectedEnemyData.editorGUI.DrawSelectedEnemyDataGizmos(data.selectedEnemyData);
+                data.selectedEnemyData.DrawSelectedEnemyDataGizmos();
             }
 
             void DrawTimeLine()
@@ -1239,14 +1201,14 @@ public class StageEditor : EditorWindow
                     if (i == data.selectedEnemyDataIndex) continue;
 
                     DrawTimeLineMarker(
-                        data.editorEnemySpawnDataList[i].spawnData.spawnTime,
+                        data.editorEnemySpawnDataList[i].SpawnData.spawnTime,
                         setting.enemySpawnTimeColor
                     );
                 }
                 if (data.selectedEnemyData != null)
                 {
                     DrawTimeLineMarker(
-                        data.selectedEnemyData.spawnData.spawnTime,
+                        data.selectedEnemyData.SpawnData.spawnTime,
                         setting.selectEnemySpawnTimeColor
                     );
                 }
@@ -1266,7 +1228,7 @@ public class StageEditor : EditorWindow
                 data.selectedStage.timeLength = EditorGUI.DelayedFloatField(timeLengthFieldRect, data.selectedStage.timeLength);
                 if (data.editorEnemySpawnDataList.Count >= 1)
                 {
-                    data.selectedStage.timeLength = data.editorEnemySpawnDataList[^1].spawnData.spawnTime;
+                    data.selectedStage.timeLength = data.editorEnemySpawnDataList[^1].SpawnData.spawnTime;
                 }
             }
         }

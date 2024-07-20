@@ -19,7 +19,7 @@ public class ExpBar : MonoBehaviour
     {
         if (player.level + 1 < player.levelUpExp.Length)
         {
-            text.text = $"{player.level}: {player.exp.ToString("F1")}/{player.levelUpExp[player.level + 1].ToString("F1")}";
+            text.text = $"{player.level}: {player.exp.ToString("F0")}/{player.levelUpExp[player.level + 1].ToString("F0")}";
         }
         else
         {

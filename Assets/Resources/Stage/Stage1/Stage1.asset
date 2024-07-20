@@ -12,11 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 716bf7d622075f147aeeea90e2564d49, type: 3}
   m_Name: Stage1
   m_EditorClassIdentifier: 
-  enemyPrefabs:
-  - {fileID: 5235914642448064442, guid: 1c98ca15ac50d3547870b81f73f033b7, type: 3}
-  - {fileID: 5235914642448064442, guid: 37af630dcfdcfde45b2d347b2e9bebb0, type: 3}
-  - {fileID: 5235914642448064442, guid: 3ed429bc1e8a29444962959c6d58af02, type: 3}
-  enemyPrefabArrayCounts: 0100000002000000
+  EnemyPrefabFolderNameArray:
+  - AutoInstantEnemy
+  - InstantEnemy
   enemySpawnDataArray:
   - {fileID: 11400000, guid: e6aa04e0d0f466541b021593fe763780, type: 2}
   - {fileID: 11400000, guid: c951cecbe7379124ca38189b9aee5691, type: 2}
@@ -42,5 +40,4 @@ MonoBehaviour:
   - time: 5
     typeName: GameManager
     methodName: StartBoss
-  lastIndex: 5
   timeLength: 7

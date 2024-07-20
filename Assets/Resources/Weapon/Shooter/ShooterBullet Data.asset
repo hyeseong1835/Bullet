@@ -17,4 +17,4 @@ MonoBehaviour:
     maxDisableCount: 0
     startCount: 0
   damage: 1
-  speed: 3
+  speed: 5

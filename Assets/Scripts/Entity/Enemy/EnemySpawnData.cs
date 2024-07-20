@@ -5,7 +5,7 @@ using System;
 public abstract class EnemySpawnData : ScriptableObject
 {
 #if UNITY_EDITOR
-    public abstract Type EditorType { get; }
+    public abstract EnemyEditorData CreateEditorData();
 #endif
     public int prefabIndex = -1;
     public int prefabTypeIndex = -1;

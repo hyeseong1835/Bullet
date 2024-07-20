@@ -4,31 +4,48 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "Stage", menuName = "Data/Stage")]
 public class Stage : ScriptableObject
 {
-    public GameObject[] enemyPrefabs;
-    public int[] enemyPrefabArrayCounts;
-
-    public EnemySpawnData[] enemySpawnDataArray;
-
+    public string StageDirectoryResourcePath => $"Stage/{name}";
+    public string[] enemyPrefabFolderNameArray;
+    
     public StageEvent[] stageEvent;
-
-    public Pool[][] enemyPool;
-
-    public int lastIndex = -1;
+    
     public float timeLength = 0;
+
+
+
+    public EnemySpawnData[] enemySpawnDataArray { get; private set; }
+    public GameObject[][] enemyPrefabDoubleArray { get; set; }
+    public Pool[][] enemyPool { get; private set; }
+
+
+    public int lastIndex { get; set; } = -1;
 
     public void Init()
     {
+        List<EnemySpawnData> enemySpawnDataList = new List<EnemySpawnData>();
+        List<GameObject[]> enemyPrefabArrayList = new List<GameObject[]>();
         List<Pool[]> poolLists = new List<Pool[]>();
-        int startIndex = 0;
-        for (int arrayIndex = 0; arrayIndex < enemyPrefabArrayCounts.Length; arrayIndex++)
+        
+        for (int folderIndex = 0; folderIndex < enemyPrefabFolderNameArray.Length; folderIndex++)
         {
-            int count = enemyPrefabArrayCounts[arrayIndex];
-            Pool[] poolArray = new Pool[count];
+            string folderName = enemyPrefabFolderNameArray[folderIndex];
+            GameObject[] enemyPrefabArray = Resources.LoadAll<GameObject>($"{StageDirectoryResourcePath}/EnemyPrefabs{folderName}");
+            
+            // Enemy Spawn Data
+            string enemySpawnDataFolderResourcePath = $"{StageDirectoryResourcePath}/EnemySpawnData/{folderName}";
+            EnemySpawnData[] enemySpawnDataArray = Resources.LoadAll<EnemySpawnData>($"{StageDirectoryResourcePath}/EnemyPrefabs{folderName}");
+            enemySpawnDataList.AddRange(enemySpawnDataArray);
 
-            for (int poolIndex = 0; poolIndex < count; poolIndex++)
+            // Prefab
+            enemyPrefabArrayList.Add(enemyPrefabArray);
+
+            // Pool
+            Pool[] poolArray = new Pool[enemyPrefabArray.Length];
+
+            for (int poolIndex = 0; poolIndex < enemyPrefabArray.Length; poolIndex++)
             {
                 Pool pool = new Pool(
-                    enemyPrefabs[startIndex + poolIndex], 
+                    enemyPrefabArray[poolIndex], 
                     0, 
                     0
                 );
@@ -36,8 +53,15 @@ public class Stage : ScriptableObject
                 poolArray[poolIndex] = pool;
             }
             poolLists.Add(poolArray);
-            startIndex += count;
         }
+        // Enemy Spawn Data
+        enemySpawnDataList.Sort((a, b) => a.spawnTime.CompareTo(b.spawnTime));
+        enemySpawnDataArray = enemySpawnDataList.ToArray();
+
+        // Prefab
+        enemyPrefabDoubleArray = enemyPrefabArrayList.ToArray();
+        
+        // Pool
         enemyPool = poolLists.ToArray();
     }
 

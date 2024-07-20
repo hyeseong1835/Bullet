@@ -61,22 +61,16 @@ public class CreateNewEnemyFloatingArea : FloatingArea
         {
             if (_manager.area == null)
             {
-                StageEditor.data.RefreshPrefabList();
-
-                string[] prefabTypeNameArray = new string[StageEditor.data.prefabTypeList.Count];
-                for (int i = 0; i < StageEditor.data.prefabTypeList.Count; i++)
-                {
-                    prefabTypeNameArray[i] = StageEditor.data.prefabTypeList[i].Name;
-                }
+                StageEditor.data.RefreshPrefab();
 
                 _manager.Create(
                     new CategoryObjectFloatingArea(
-                        prefabTypeNameArray,
-                        StageEditor.data.prefabLists.ToDoubleArray(),
+                        StageEditor.data.enemyTypeNameArray,
+                        StageEditor.data.prefabDoubleArray,
                         (i1, i2) => {
                             arrayIndex = i1;
                             elementIndex = i2;
-                            selectPrefab = StageEditor.data.prefabLists[i1][i2];
+                            selectPrefab = StageEditor.data.prefabDoubleArray[i1][i2];
                             _manager.area = null;
                         }
                     )
@@ -90,21 +84,22 @@ public class CreateNewEnemyFloatingArea : FloatingArea
         }
         void Create()
         {
-            Type prefabType = StageEditor.data.prefabTypeList[arrayIndex];
+            string enemyTypeName = StageEditor.data.enemyTypeNameArray[arrayIndex];
+            Type spawnDataType = StageEditor.data.GetEnemySpawnDataType(enemyTypeName);
 
-            EnemySpawnData spawnData = (EnemySpawnData)ScriptableObject.CreateInstance(prefabType);
+            EnemySpawnData spawnData = (EnemySpawnData)ScriptableObject.CreateInstance(spawnDataType);
             spawnData.prefabTypeIndex = arrayIndex;
             spawnData.prefabIndex = elementIndex;
+
             if (StageEditor.data.selectedEnemyData != null)
             {
-                spawnData.spawnTime = StageEditor.data.selectedEnemyData.spawnData.spawnTime;
+                spawnData.spawnTime = StageEditor.data.selectedEnemyData.SpawnData.spawnTime;
                 StageEditor.data.timeFoldout[spawnData.spawnTime] = true;
             }
-            
-            StageEditor.data.CreateEnemySpawnData(spawnData);
 
-            EditorEnemyData editorEnemyData = new EditorEnemyData(spawnData, prefabType);
+            EnemyEditorData editorEnemyData = spawnData.CreateEditorData();
             StageEditor.data.InsertToEditorEnemySpawnDataList(editorEnemyData);
+            
             StageEditor.instance.Repaint();
             manager.area = null;
         }

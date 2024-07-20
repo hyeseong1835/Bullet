@@ -30,7 +30,7 @@ public class CategoryObjectFloatingArea : FloatingArea
 
                     if (rect.Contains(e.mousePosition))
                     {
-                        if (ArrayUtility.TryTransformIndex(objectArray, i, out int i1, out int i2))
+                        if (ArrayUtility.TryTransformSingleToDoubleArrayIndex(objectArray, i, out int i1, out int i2))
                         {
                             selectEvent?.Invoke(i1, i2);
                         }

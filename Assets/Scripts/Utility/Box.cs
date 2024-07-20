@@ -33,7 +33,7 @@ public struct Box
         size = coll.bounds.size;
         center = coll.offset;
     }
-
+    
     #region Contact
 
     /// <param name="y">boxÀÇ Y ÁÂÇ¥ </param>

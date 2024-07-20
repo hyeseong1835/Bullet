@@ -6,19 +6,38 @@ using UnityEngine.SearchService;
 
 public static class ArrayUtility
 {
-    public static bool TryTransformIndex<ObjT>(this ObjT[][] doubleArray, int index, out int i1, out int i2)
+    public static int IndexOf<ObjT>(this ObjT[] array, ObjT obj, int startIndex = 0)
     {
-        for (int i = 0; i < doubleArray.Length; i++)
+        for (int i = startIndex; i < array.Length; i++)
         {
-            for (int j = 0; j < doubleArray[i].Length; j++)
+            if (array[i].Equals(obj)) return i;
+        }
+        return -1;
+    }
+    public static int LastIndexOf<ObjT>(this ObjT[] array, ObjT obj, int startIndex = 0)
+    {
+        for (int i = startIndex; i >= 0; i--)
+        {
+            if (array[i].Equals(obj)) return i;
+        }
+        return -1;
+    }
+
+    #region Double Array
+
+    public static bool TryTransformSingleToDoubleArrayIndex<ObjT>(this ObjT[][] doubleArray, int index, out int i1, out int i2)
+    {
+        for (i1 = 0; i1 < doubleArray.Length; i1++)
+        {
+            ObjT[] array = doubleArray[i1];
+            int arrayLength = array.Length;
+
+            if (index < arrayLength)
             {
-                if (index-- == 0)
-                {
-                    i1 = i;
-                    i2 = j;
-                    return true;
-                }
+                index -= arrayLength;
+                continue;
             }
+            i2 = index;
         }
         i1 = -1;
         i2 = -1;
@@ -84,7 +103,7 @@ public static class ArrayUtility
         }
         return result;
     }
-    public static ObjT[] ToSingleArray<ObjT>(ObjT[][] doubleArray)
+    public static ObjT[] ToSingleArray<ObjT>(this ObjT[][] doubleArray)
     {
         ObjT[] result = new ObjT[doubleArray.GetSingleLength()];
         int index = 0;
@@ -99,4 +118,16 @@ public static class ArrayUtility
         }
         return result;
     }
+    public static int[] GetLengthArray<ObjT>(this ObjT[][] doubleArray)
+    {
+        int[] result = new int[doubleArray.Length];
+        for(int i = 0; i < doubleArray.Length; i++)
+        {
+            result[i] = doubleArray[i].Length;
+        }
+        return result;
+    }
+
+    #endregion
+
 }
