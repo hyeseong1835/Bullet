@@ -9,6 +9,7 @@ public class Shooter : Weapon
 
     [SerializeField] BulletData bulletData;
 
+    [SerializeField] AudioSource shootSound;
     [SerializeField] Transform look;
     [SerializeField] Transform tip;
 
@@ -31,7 +32,7 @@ public class Shooter : Weapon
     {
         if (skillTime > 0)
         {
-            cooltimeMultiply = 0.25f;
+            cooltimeMultiply = 0.5f;
             skillTime -= GameManager.deltaTime;
             if (skillTime < 0) skillTime = 0;
         }
@@ -42,6 +43,8 @@ public class Shooter : Weapon
     }
     public override void Use()
     {
+        shootSound.Play();
+
         look.transform.rotation = player.input.toMouseRot;
 
         GameObject obj = bulletPool.Get();
