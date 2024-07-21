@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
 
 public enum PoolType
@@ -11,7 +10,6 @@ public enum PoolType
     Item
 }
 
-[Serializable]
 public class Pool : IDisposable
 {
     public PoolType type;
@@ -30,17 +28,6 @@ public class Pool : IDisposable
 
     Action<GameObject> addEvent;
 
-    public Pool()
-    {
-        if (holder == null)
-        {
-            if (prefab != null)
-            {
-                holder = new GameObject(prefab.name).transform;
-                holder.SetParent(PoolHolder.instance.transform);
-            }
-        }
-    }
     public Pool(PoolType type, GameObject prefab, int maxDisableCount, int startCount, Action<GameObject> addEvent = null)
     {
         this.type = type;
@@ -71,10 +58,6 @@ public class Pool : IDisposable
             case PoolType.Enemy: PoolHolder.instance.enemyPools.Add(this); break;
             case PoolType.Item: PoolHolder.instance.itemPools.Add(this); break;
         }
-    }
-    ~Pool()
-    {
-        Dispose();
     }
 
     public void Dispose()

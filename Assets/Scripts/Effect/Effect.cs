@@ -1,6 +1,4 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -8,13 +6,21 @@ public abstract class Effect : MonoBehaviour
 {
     public Image timeFill;
 
-    public float maxTime = 1;
+    [NonSerialized] public float maxTime = 0;
     public float time;
 
     protected void Update()
     {
-        if (maxTime == -1 || Time()) OnUpdate();
-        else Stop();
+        if (maxTime == -1)
+        {
+            OnUpdate();
+        }
+        else
+        {
+            if (Time()) OnUpdate();
+            else Stop();
+        }
+        
     }
     bool Time()
     {
@@ -48,7 +54,7 @@ public abstract class Effect : MonoBehaviour
     public void Stop()
     {
         time = 0;
-        maxTime = -1;
+        maxTime = 0;
         OnEnd();
         gameObject.SetActive(false);
     }

@@ -1,3 +1,4 @@
+using System;
 using UnityEditor;
 using UnityEngine;
 
@@ -10,46 +11,22 @@ public class Shooter : Weapon
     [SerializeField] Transform look;
     [SerializeField] Transform tip;
 
-    [HideInInspector] public Pool bulletPool;
+    public Pool bulletPool = null;
     public GameObject bulletPrefab;
 
     [SerializeField] float chargeOnHit;
 
-#if UNITY_EDITOR
-    void OnEnable()
+    void Awake()
     {
-        EditorApplication.playModeStateChanged += OnEditorPlayModeStateChanged;
-    }
-    void OnDisable()
-    {
-        EditorApplication.playModeStateChanged -= OnEditorPlayModeStateChanged;
-    }
-    void OnEditorPlayModeStateChanged(PlayModeStateChange state)
-    {
-        switch (state)
-        {
-            case PlayModeStateChange.ExitingPlayMode:
-                bulletPool = null;
-                break;
-        }
-    }
-#endif
-    void Start()
-    {
-        
-    }
-    public override void Use()
-    {
-        if (bulletPool == null)
-        {
-            bulletPool = new Pool(
+        bulletPool = new Pool(
                 PoolType.PlayerBullet,
                 bulletPrefab,
                 0,
                 0
             );
-        }
-
+    }
+    public override void Use()
+    {
         look.transform.rotation = player.input.toMouseRot;
 
         GameObject obj = bulletPool.Get();

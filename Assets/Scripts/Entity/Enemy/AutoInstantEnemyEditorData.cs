@@ -19,44 +19,9 @@ public class AutoInstantEnemyEditorData : EnemyEditorData
         this.spawnData = spawnData;
         prefab = SelectPrefab(spawnData.prefabIndex);
     }
-    public override void Event()
-    {
-        switch (e.type)
-        {
-            case EventType.MouseDown:
-                switch (e.button)
-                {
-                    case 0: Mouse0Down(); break;
-                }
-                break;
 
-            case EventType.MouseDrag:
-                switch (e.button)
-                {
-                    case 0: Mouse0Drag(); break;
-                }
-                break;
-
-            case EventType.MouseUp:
-                switch (e.button)
-                {
-                    case 0: Mouse0Up(); break;
-                }
-                break;
-        }
-        void Mouse0Down()
-        {
-
-        }
-        void Mouse0Drag()
-        {
-
-        }
-        void Mouse0Up()
-        {
-
-        }
-    }
+    Vector2 dir;
+    Vector2 endScreenPos;
     public override void DrawInspectorGUI()
     {
         spawnData.startPos = EditorGUILayout.Vector2Field("World Pos", spawnData.startPos);
@@ -66,38 +31,73 @@ public class AutoInstantEnemyEditorData : EnemyEditorData
         if (preview == null) return;
         
         preview.transform.position = spawnData.startPos;
-        Vector2 startScreenPos = StageEditor.WorldToScreenPos(spawnData.startPos);
-        Vector2 dir = (e.mousePosition - startScreenPos);
         preview.transform.rotation = Quaternion.Euler(0, 0, -90 + Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg);
     }
     public override void DrawSelectedEnemyDataGizmos()
     {
-        Vector2 startScreenPos = StageEditor.WorldToScreenPos(spawnData.startPos);
-        //y = (m.x - p.x) / (m.y - p.y) * (x - p.x) + p.y;
-        //y = 
-        Vector2 endScreenPos = startScreenPos;
-        Vector2 dir = (e.mousePosition - startScreenPos);
+        dir = (StageEditor.ScreenToWorldPoint(e.mousePosition) - spawnData.startPos);
 
-        Vector2 absDir = dir.Abs();
-        if (absDir.x > absDir.y)
+        if (dir.magnitude > 0.1f)
         {
-            if (absDir.x > 0)
+            Vector2 worldPos;
+            if (dir.x > 0) worldPos.x = Window.instance.gameRight + 1;
+            else worldPos.x = Window.instance.gameLeft - 1;
+
+            if (dir.y * (worldPos.x - spawnData.startPos.x) > dir.x * ((Window.instance.gameTop + 1) - spawnData.startPos.y))
             {
-                
+                worldPos.y = Window.instance.gameTop + 1;
+                worldPos.x = (dir.x / dir.y) * (worldPos.y - spawnData.startPos.y) + spawnData.startPos.x;
             }
+            else if (dir.y * (worldPos.x - spawnData.startPos.x) < dir.x * ((Window.instance.gameBottom - 1) - spawnData.startPos.y))
+            {
+                worldPos.y = Window.instance.gameBottom - 1;
+                worldPos.x = (dir.x / dir.y) * (worldPos.y - spawnData.startPos.y) + spawnData.startPos.x;
+            }
+            else worldPos.y = (dir.y / dir.x) * (worldPos.x - spawnData.startPos.x) + spawnData.startPos.y;
+
+            endScreenPos = StageEditor.WorldToScreenPos(worldPos);
         }
+
+        Vector2 startScreenPos = StageEditor.WorldToScreenPos(spawnData.startPos);
+
         Handles.color = Color.cyan;
         CustomGUI.DrawArrow(startScreenPos, endScreenPos, 0.25f * Mathf.PI, 25);
         Handles.color = Color.white;
+
+        if (e.delta != Vector2.zero) StageEditor.instance.Repaint();
     }
     public override void DrawSameTimeEnemyDataGizmos()
     {
-        Vector2 startScreenPos = StageEditor.WorldToScreenPos(spawnData.startPos);
-        Vector2 endScreenPos = e.mousePosition;
+        dir = (StageEditor.ScreenToWorldPoint(e.mousePosition) - spawnData.startPos);
 
+        if (dir.magnitude > 0.1f)
+        {
+            Vector2 worldPos;
+            if (dir.x > 0) worldPos.x = Window.instance.gameRight + 1;
+            else worldPos.x = Window.instance.gameLeft - 1;
+
+            if (dir.y * (worldPos.x - spawnData.startPos.x) > dir.x * ((Window.instance.gameTop + 1) - spawnData.startPos.y))
+            {
+                worldPos.y = Window.instance.gameTop + 1; 
+                worldPos.x = (dir.x / dir.y) * (worldPos.y - spawnData.startPos.y) + spawnData.startPos.x;
+            }
+            else if (dir.y * (worldPos.x - spawnData.startPos.x) < dir.x * ((Window.instance.gameBottom - 1) - spawnData.startPos.y))
+            {
+                worldPos.y = Window.instance.gameBottom - 1;
+                worldPos.x = (dir.x / dir.y) * (worldPos.y - spawnData.startPos.y) + spawnData.startPos.x;
+            }
+            else worldPos.y = (dir.y / dir.x) * (worldPos.x - spawnData.startPos.x) + spawnData.startPos.y;
+
+            endScreenPos = StageEditor.WorldToScreenPos(worldPos);
+        }
+
+        Vector2 startScreenPos = StageEditor.WorldToScreenPos(spawnData.startPos);
+        
         Handles.color = new Color(0, 0.25f, 0.25f, 1);
         CustomGUI.DrawArrow(startScreenPos, endScreenPos, 0.25f * Mathf.PI, 25);
         Handles.color = Color.white;
+        
+        if (e.delta != Vector2.zero) StageEditor.instance.Repaint();
     }
 }
 #endif

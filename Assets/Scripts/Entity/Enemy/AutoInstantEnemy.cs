@@ -3,19 +3,19 @@ using UnityEngine;
 
 public class AutoInstantEnemy : Enemy
 {
-    public AutoInstantEnemyData data;
     public override EnemyData EnemyData {
         get => data; 
         set { data = (AutoInstantEnemyData)value; } 
     }
 
-    AutoInstantEnemySpawnData spawnData;
     public override Type EnemySpawnDataType => typeof(AutoInstantEnemySpawnData);
     public override EnemySpawnData EnemySpawnData { 
         get => spawnData; 
         set { spawnData = (AutoInstantEnemySpawnData)value; } 
     }
 
+    public AutoInstantEnemyData data;
+    AutoInstantEnemySpawnData spawnData;
     Vector2 dir;
 
     void OnEnable()

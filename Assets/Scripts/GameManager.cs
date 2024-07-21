@@ -23,6 +23,8 @@ public class GameManager : MonoBehaviour
     [SerializeField] GameObject mainPanel;
     [SerializeField] TextMeshProUGUI timeText;
     public Stage stage;
+
+    [SerializeField] GameObject bossPrefab;
     
     public float gameSpeed = 1;
     public float time = -1;
@@ -37,25 +39,6 @@ public class GameManager : MonoBehaviour
     //F6
     [SerializeField] ItemData[] activeItem;
 
-#if UNITY_EDITOR
-    void OnEnable()
-    {
-        EditorApplication.playModeStateChanged += OnEditorPlayModeStateChanged;
-    }
-    void OnDisable()
-    {
-        EditorApplication.playModeStateChanged -= OnEditorPlayModeStateChanged;
-    }
-    void OnEditorPlayModeStateChanged(PlayModeStateChange state)
-    {
-        switch (state)
-        {
-            case PlayModeStateChange.ExitingPlayMode:
-
-                break;
-        }
-    }
-#endif
     void Awake()
     {
         instance = this;
@@ -88,8 +71,6 @@ public class GameManager : MonoBehaviour
                 break;
 
             case GameState.Play:
-                
-
                 Play();
                 break;
 
@@ -221,7 +202,7 @@ public class GameManager : MonoBehaviour
 
     public static void StartBoss()
     {
-        Debug.Log("Start Boss");
+        Instantiate(instance.bossPrefab);
     }
     void OnValidate()
     {

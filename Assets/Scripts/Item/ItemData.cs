@@ -8,25 +8,6 @@ public abstract class ItemData : ScriptableObject
     public Pool pool { get; protected set; } = null;
     public GameObject prefab;
 
-#if UNITY_EDITOR
-    void OnEnable()
-    {
-        EditorApplication.playModeStateChanged += OnEditorPlayModeStateChanged;
-    }
-    void OnDisable()
-    {
-        EditorApplication.playModeStateChanged -= OnEditorPlayModeStateChanged;
-    }
-    void OnEditorPlayModeStateChanged(PlayModeStateChange state)
-    {
-        switch (state)
-        {
-            case PlayModeStateChange.ExitingPlayMode:
-                pool = null;
-                break;
-        }
-    }
-#endif
     public virtual Item Drop(Vector2 pos, Vector2 velocity)
     {
         if (pool == null)

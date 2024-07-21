@@ -8,8 +8,9 @@ public class ResistanceEffect : Effect
     public override void OnStart()
     {
         player.resistance = 0;
+
         alphaBlink.gameObject.SetActive(true);
-        alphaBlink.time = 0;
+        alphaBlink.time = 0.25f;
     }
     public override void OnUpdate()
     {
@@ -24,7 +25,7 @@ public class ResistanceEffect : Effect
         if (maxTime != -1)
         {
             alphaBlink.enabled = false;
-            alphaBlink.gameObject.SetActive(false);
         }
+        alphaBlink.gameObject.SetActive(false);
     }
 }

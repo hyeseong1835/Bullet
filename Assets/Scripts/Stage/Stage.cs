@@ -18,25 +18,6 @@ public class Stage : ScriptableObject
     public Pool[][] enemyPool { get; private set; }
     public int lastIndex { get; set; } = -1;
 
-#if UNITY_EDITOR
-    void OnEnable()
-    {
-        EditorApplication.playModeStateChanged += OnEditorPlayModeStateChanged;
-    }
-    void OnDisable()
-    {
-        EditorApplication.playModeStateChanged -= OnEditorPlayModeStateChanged;
-    }
-    void OnEditorPlayModeStateChanged(PlayModeStateChange state)
-    {
-        switch (state)
-        {
-            case PlayModeStateChange.ExitingPlayMode:
-                enemyPool = null;
-                break;
-        }
-    }
-#endif
     public void Init()
     {
         List<EnemySpawnData> enemySpawnDataList = new List<EnemySpawnData>();
