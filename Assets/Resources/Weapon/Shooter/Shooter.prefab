@@ -82,13 +82,8 @@ MonoBehaviour:
   bulletData: {fileID: 11400000, guid: 0fd8e71e07a98c146b7841e7778e5790, type: 2}
   look: {fileID: 1278509754670674251}
   tip: {fileID: 5648400103011303262}
-  bulletPool:
-    type: 0
-    prefab: {fileID: 0}
-    maxDisableCount: 0
-    startCount: 0
   bulletPrefab: {fileID: 4026119069186307829, guid: 6c32088d52cab394db9e36aaf369b63e, type: 3}
-  chargeOnHit: 0
+  chargeOnHit: 10
 --- !u!1 &7067925851655723061
 GameObject:
   m_ObjectHideFlags: 0

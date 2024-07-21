@@ -19,16 +19,7 @@ public class Stage1Boss : Entity
     }
     void OnDisable()
     {
-        if(rightShooter != null)
-        {
-            rightShooter.onDamaged -= OnRightShooterDamaged;
-            rightShooter.onDead -= OnRightShooterDead;
-        }
-        if(leftShooter != null)
-        {
-            leftShooter.onDamaged -= OnLeftShooterDamaged;
-            leftShooter.onDead -= OnLeftShooterDead;
-        }
+        
     }
     void OnRightShooterDamaged(float damage)
     {

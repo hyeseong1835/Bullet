@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using UnityEditor;
 using UnityEngine;
 
@@ -15,6 +16,7 @@ public class Shooter : Weapon
     public GameObject bulletPrefab;
 
     [SerializeField] float chargeOnHit;
+    float skillTime;
 
     void Awake()
     {
@@ -24,6 +26,19 @@ public class Shooter : Weapon
                 0,
                 0
             );
+    }
+    void Update()
+    {
+        if (skillTime > 0)
+        {
+            cooltimeMultiply = 0.25f;
+            skillTime -= GameManager.deltaTime;
+            if (skillTime < 0) skillTime = 0;
+        }
+        else
+        {
+            cooltimeMultiply = 1;
+        }
     }
     public override void Use()
     {
@@ -64,13 +79,14 @@ public class Shooter : Weapon
         entity.TakeDamage(bullet.data.damage * player.damage);
 
         bullet.DeUse();
-        player.SkillCharge(1);
+        player.SkillCharge(chargeOnHit);
     }
     public override void Skill()
     {
-
+        Player.instance.StopCoroutine("WeaponUseCoolTime");
+        Player.instance.canUseWeapon = true;
+        skillTime = 5;
     }
-
     void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.cyan;

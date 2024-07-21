@@ -19,4 +19,3 @@ MonoBehaviour:
   - time: 10
     typeName: GameManager
     methodName: StartBoss
-  timeLength: 7

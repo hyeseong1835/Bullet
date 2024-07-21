@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 72707a419bef5a144a8467c4489e64dc, type: 3}
   m_Name: Data
   m_EditorClassIdentifier: 
-  previewPos: {x: 638, y: 703.5}
-  cellSize: 80
-  inspectorLinePosX: 0
-  fileViewerLinePosX: 406
+  previewPos: {x: 224.5, y: 525.5}
+  cellSize: 44
+  inspectorLinePosX: 136.5
+  fileViewerLinePosX: 136.5

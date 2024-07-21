@@ -47,7 +47,7 @@ public class Player : Entity
     public float damage = 1;
     public float speed = 1;
 
-    bool canUse = true;
+    [NonSerialized] public bool canUseWeapon = true;
     
     [SerializeField] Box moveLock;
 
@@ -109,6 +109,11 @@ public class Player : Entity
 
             DestroyWeaponKey();
             UseWeapon();
+            if (skillCharge == SkillChargeMax && Input.GetKeyDown(KeyCode.Space))
+            {
+                weapon?.Skill();
+                skillCharge = 0;
+            }
         }
     }
     protected override void OnDead()
@@ -144,10 +149,10 @@ public class Player : Entity
         {
             if (weapon == null) return;
             
-            if (canUse)
+            if (canUseWeapon)
             { 
                 weapon.Use();
-                if (weapon.cooltime != -1) StartCoroutine(WeaponUseCoolTime(weapon.cooltime));
+                if (weapon.cooltime != -1) StartCoroutine(WeaponUseCoolTime(weapon.cooltime * weapon.cooltimeMultiply));
             }
         }
     }
@@ -270,11 +275,11 @@ public class Player : Entity
 
     IEnumerator WeaponUseCoolTime(float time)
     {
-        canUse = false;
+        canUseWeapon = false;
 
         yield return new WaitForSeconds(time);
 
-        canUse = true;
+        canUseWeapon = true;
     }
     void OnValidate()
     {

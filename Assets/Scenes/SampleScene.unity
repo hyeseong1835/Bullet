@@ -7313,7 +7313,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_UiScaleMode: 0
   m_ReferencePixelsPerUnit: 100
-  m_ScaleFactor: 1.4366666
+  m_ScaleFactor: 1.2783333
   m_ReferenceResolution: {x: 800, y: 600}
   m_ScreenMatchMode: 0
   m_MatchWidthOrHeight: 0
@@ -8495,7 +8495,7 @@ Camera:
   far clip plane: 1000
   field of view: 34
   orthographic: 1
-  orthographic size: 2.5266821
+  orthographic size: 2.839635
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -8520,7 +8520,7 @@ Transform:
   m_GameObject: {fileID: 519420028}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 2.5266821, z: -10}
+  m_LocalPosition: {x: 0, y: 2.839635, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -8539,7 +8539,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cam: {fileID: 519420031}
-  viewSize: {x: 6, y: 5.0533643}
+  viewSize: {x: 6, y: 5.67927}
 --- !u!1 &529629833
 GameObject:
   m_ObjectHideFlags: 0
@@ -10707,8 +10707,8 @@ Transform:
   m_GameObject: {fileID: 960496518}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 5.026682, z: 0}
-  m_LocalScale: {x: 6, y: 0.053364277, z: 1}
+  m_LocalPosition: {x: 0, y: 5.339635, z: 0}
+  m_LocalScale: {x: 6, y: 0.6792698, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 109920614}
@@ -11362,6 +11362,10 @@ PrefabInstance:
     - target: {fileID: 6256981796523471148, guid: 1ebba1f360ac6534393bdb7f6e0230c1, type: 3}
       propertyPath: m_Name
       value: Shooter
+      objectReference: {fileID: 0}
+    - target: {fileID: 8453316845299625461, guid: 1ebba1f360ac6534393bdb7f6e0230c1, type: 3}
+      propertyPath: chargeOnHit
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 8532601136008918798, guid: 1ebba1f360ac6534393bdb7f6e0230c1, type: 3}
       propertyPath: m_LocalPosition.x
