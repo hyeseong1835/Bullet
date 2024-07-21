@@ -1,5 +1,7 @@
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
+using static UnityEngine.GridBrushBase;
 
 [CreateAssetMenu(fileName = "Stage", menuName = "Data/Stage")]
 public class Stage : ScriptableObject
@@ -16,6 +18,25 @@ public class Stage : ScriptableObject
     public Pool[][] enemyPool { get; private set; }
     public int lastIndex { get; set; } = -1;
 
+#if UNITY_EDITOR
+    void OnEnable()
+    {
+        EditorApplication.playModeStateChanged += OnEditorPlayModeStateChanged;
+    }
+    void OnDisable()
+    {
+        EditorApplication.playModeStateChanged -= OnEditorPlayModeStateChanged;
+    }
+    void OnEditorPlayModeStateChanged(PlayModeStateChange state)
+    {
+        switch (state)
+        {
+            case PlayModeStateChange.ExitingPlayMode:
+                enemyPool = null;
+                break;
+        }
+    }
+#endif
     public void Init()
     {
         List<EnemySpawnData> enemySpawnDataList = new List<EnemySpawnData>();
@@ -37,11 +58,11 @@ public class Stage : ScriptableObject
             for (int poolIndex = 0; poolIndex < enemyPrefabArray.Length; poolIndex++)
             {
                 Pool pool = new Pool(
+                    PoolType.Enemy,
                     enemyPrefabArray[poolIndex], 
                     0, 
                     0
                 );
-                pool.Init();
                 poolArray[poolIndex] = pool;
             }
             poolLists.Add(poolArray);

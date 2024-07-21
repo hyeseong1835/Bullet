@@ -13,8 +13,10 @@ MonoBehaviour:
   m_Name: ShooterBullet Data
   m_EditorClassIdentifier: 
   pool:
+    type: 1
     prefab: {fileID: 4026119069186307829, guid: 6c32088d52cab394db9e36aaf369b63e, type: 3}
     maxDisableCount: 0
     startCount: 0
+  prefab: {fileID: 4026119069186307829, guid: 6c32088d52cab394db9e36aaf369b63e, type: 3}
   damage: 1
   speed: 5

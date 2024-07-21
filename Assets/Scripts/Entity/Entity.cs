@@ -1,5 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
+using System;
 using UnityEngine;
 
 public abstract class Entity : MonoBehaviour
@@ -7,6 +6,8 @@ public abstract class Entity : MonoBehaviour
     public abstract float GetMaxHP();
     public float hp;
     public float resistance = 1;
+    public Action onDead;
+    public Action<float> onDamaged;
 
     public virtual void Heal(float healAmount)
     {
@@ -15,14 +16,20 @@ public abstract class Entity : MonoBehaviour
     }
     public virtual void TakeDamage(float damage)
     {
-        hp -= damage * resistance;
-        if (hp <= 0)
+        float trueDamage = damage * resistance;
+        
+        hp -= trueDamage;
+        if (hp < 0) hp = 0;
+
+        onDamaged?.Invoke(trueDamage);
+
+        if (hp == 0)
         {
             OnDead();
         }
     }
     protected virtual void OnDead()
     {
-        Destroy(gameObject);
+        onDead?.Invoke();
     }
 }

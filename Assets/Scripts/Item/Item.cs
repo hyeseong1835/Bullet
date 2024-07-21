@@ -7,10 +7,6 @@ public abstract class Item : MonoBehaviour
 
     public Vector2 velocity = Vector2.zero;
     
-    protected void Start()
-    {
-        if (ItemData.pool.holder == null) ItemData.pool.Init();
-    }
     protected void Update()
     {
         transform.Translate(velocity * GameManager.deltaTime);

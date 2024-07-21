@@ -22,6 +22,7 @@ public abstract class Effect : MonoBehaviour
         {
             time -= GameManager.deltaTime;
             if (time < 0) time = 0;
+
             timeFill.fillAmount = 1 - time / maxTime;
         }
 
@@ -29,8 +30,17 @@ public abstract class Effect : MonoBehaviour
     }
     public virtual void Execute(float time)
     {
-        this.time = time;
-        if (maxTime < this.time) maxTime = this.time;
+        if (time == -1)
+        {
+            this.time = 0;
+            maxTime = -1;
+            timeFill.fillAmount = 0;
+        }
+        else
+        {
+            this.time = time;
+            if (maxTime < this.time) maxTime = this.time;
+        }
 
         gameObject.SetActive(true);
         OnStart();

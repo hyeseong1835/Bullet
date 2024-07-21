@@ -12,10 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f23fb09fe2ee4f44f9eaa9b3f05b7af6, type: 3}
   m_Name: Resistance Effect Item Data
   m_EditorClassIdentifier: 
-  pool:
-    prefab: {fileID: 9043560855095070803, guid: 05a9db71a1ec945498739be16a2bcc1d, type: 3}
-    maxDisableCount: 0
-    startCount: 0
+  prefab: {fileID: 9043560855095070803, guid: 05a9db71a1ec945498739be16a2bcc1d, type: 3}
   effectIndex: 0
   effect: {fileID: 0}
   time: 7

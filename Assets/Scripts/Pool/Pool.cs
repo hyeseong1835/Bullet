@@ -1,12 +1,21 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Xml.Linq;
+using UnityEditor;
 using UnityEngine;
 
-[Serializable]
-public class Pool
+public enum PoolType
 {
+    EnemyBullet,
+    PlayerBullet,
+    Enemy,
+    Item
+}
+
+[Serializable]
+public class Pool : IDisposable
+{
+    public PoolType type;
+
     public GameObject prefab;
 
     public Transform holder { get; private set; }
@@ -21,24 +30,62 @@ public class Pool
 
     Action<GameObject> addEvent;
 
-    public Pool(GameObject prefab, int maxDisableCount, int startCount)
+    public Pool()
     {
+        if (holder == null)
+        {
+            if (prefab != null)
+            {
+                holder = new GameObject(prefab.name).transform;
+                holder.SetParent(PoolHolder.instance.transform);
+            }
+        }
+    }
+    public Pool(PoolType type, GameObject prefab, int maxDisableCount, int startCount, Action<GameObject> addEvent = null)
+    {
+        this.type = type;
+
         this.prefab = prefab;
 
         this.startCount = startCount;
 
         this.maxDisableCount = maxDisableCount;
-    }
-
-    public void Init(Action<GameObject> addEvent = null)
-    {
-        this.addEvent = addEvent;
-
-        if (holder != null) UnityEngine.Object.Destroy(holder.gameObject);
-
+    
         holder = new GameObject(prefab.name).transform;
         holder.SetParent(PoolHolder.instance.transform);
 
+        this.addEvent = addEvent;
+
+        Clear();
+
+        for (int i = 0; i < startCount; i++)
+        {
+            Add();
+        }
+
+        PoolHolder.instance.pools.Add(this);
+        switch (type)
+        {
+            case PoolType.EnemyBullet: PoolHolder.instance.enemyBulletPools.Add(this); break;
+            case PoolType.PlayerBullet: PoolHolder.instance.playerBulletPools.Add(this); break;
+            case PoolType.Enemy: PoolHolder.instance.enemyPools.Add(this); break;
+            case PoolType.Item: PoolHolder.instance.itemPools.Add(this); break;
+        }
+    }
+    ~Pool()
+    {
+        Dispose();
+    }
+
+    public void Dispose()
+    {
+        Clear();
+
+        if (holder != null) UnityEngine.Object.Destroy(holder.gameObject);
+        addEvent = null;
+    }
+    public void Clear()
+    {
         if (objects == null) objects = new List<GameObject>();
         else if (objects.Count != 0)
         {
@@ -48,13 +95,13 @@ public class Pool
             }
             objects.Clear();
         }
-
-        for (int i = 0; i < startCount; i++)
+    }
+    public void DeUseAll()
+    {
+        foreach (GameObject obj in objects)
         {
-            Add();
+            obj?.SetActive(false);
         }
-
-        PoolHolder.instance.pools.Add(this);
     }
     /// <summary>
     /// 활성화는 항상 Use를 이용해서 하기

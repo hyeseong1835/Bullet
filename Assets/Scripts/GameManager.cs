@@ -31,13 +31,31 @@ public class GameManager : MonoBehaviour
 
     [Header("Debug")]
     //F1
-    [SerializeField] ResistanceEffect Resistance2Effect;
+    [SerializeField] ResistanceEffect ResistanceEffect;
     //F5
     [SerializeField] WeaponItemData[] weaponItemData;
     //F6
     [SerializeField] ItemData[] activeItem;
 
+#if UNITY_EDITOR
+    void OnEnable()
+    {
+        EditorApplication.playModeStateChanged += OnEditorPlayModeStateChanged;
+    }
+    void OnDisable()
+    {
+        EditorApplication.playModeStateChanged -= OnEditorPlayModeStateChanged;
+    }
+    void OnEditorPlayModeStateChanged(PlayModeStateChange state)
+    {
+        switch (state)
+        {
+            case PlayModeStateChange.ExitingPlayMode:
 
+                break;
+        }
+    }
+#endif
     void Awake()
     {
         instance = this;
@@ -80,15 +98,15 @@ public class GameManager : MonoBehaviour
                 break;
         }
     }
-    void Debug_Resist2()
+    void Debug_Resistance()
     {
-        if (Resistance2Effect.gameObject.activeInHierarchy)
+        if (ResistanceEffect.gameObject.activeInHierarchy)
         {
-            Resistance2Effect.Stop();
+            ResistanceEffect.Stop();
         }
         else
         {
-            Resistance2Effect.Execute(99999);
+            ResistanceEffect.Execute(-1);
         }
     }
     void Debug_LevelUp()
@@ -186,7 +204,7 @@ public class GameManager : MonoBehaviour
         StageEditor.instance?.Repaint();
 #endif
 
-        if (Input.GetKeyDown(KeyCode.F1)) Debug_Resist2();
+        if (Input.GetKeyDown(KeyCode.F1)) Debug_Resistance();
         if (Input.GetKeyDown(KeyCode.F2)) Debug_LevelUp();
         if (Input.GetKeyDown(KeyCode.F3)) Debug_LevelDown();
         if (Input.GetKeyDown(KeyCode.F4)) Debug_Heal();

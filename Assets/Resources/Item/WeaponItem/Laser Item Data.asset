@@ -12,8 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 85696e2052dd16b45babefc9a2a7e19b, type: 3}
   m_Name: Laser Item Data
   m_EditorClassIdentifier: 
-  pool:
-    prefab: {fileID: 242570612577920784, guid: 3b3b9e6aa987b3a4487ea31ca776723b, type: 3}
-    maxDisableCount: 0
-    startCount: 0
+  prefab: {fileID: 242570612577920784, guid: 3b3b9e6aa987b3a4487ea31ca776723b, type: 3}
   upgrade: {fileID: 11400000, guid: 68efbd29b275e69449c21a6969827e1d, type: 2}

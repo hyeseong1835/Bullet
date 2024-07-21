@@ -37,15 +37,15 @@ public class Laser : Weapon
             10,
             LayerMask.GetMask("Enemy")
         );
+        StartCoroutine(Grafic());
 
-        foreach(RaycastHit2D info in hit)
+        foreach (RaycastHit2D info in hit)
         {
-            Enemy enemy = info.collider.GetComponent<Enemy>();
-            enemy.TakeDamage(damage * Player.instance.damage);
+            Entity entity = info.collider.GetComponent<Entity>();
+            entity.TakeDamage(damage * Player.instance.damage);
         }
         player.skillCharge += hit.Length * chargeOnHit;
         
-        StartCoroutine(Grafic());
     }
     IEnumerator Grafic()
     {

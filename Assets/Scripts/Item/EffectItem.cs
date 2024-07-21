@@ -17,6 +17,8 @@ public class EffectItem : Item
     {
         if (data.effect == null) data.effect = Player.instance.effects[data.effectIndex];
 
+        if (data.effect.maxTime == -1) return false;
+
         switch (data.type)
         {
             case StackType.Ignore:

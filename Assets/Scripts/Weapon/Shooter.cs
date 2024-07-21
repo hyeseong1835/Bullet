@@ -1,3 +1,4 @@
+using UnityEditor;
 using UnityEngine;
 
 public class Shooter : Weapon
@@ -9,16 +10,49 @@ public class Shooter : Weapon
     [SerializeField] Transform look;
     [SerializeField] Transform tip;
 
+    [HideInInspector] public Pool bulletPool;
+    public GameObject bulletPrefab;
+
     [SerializeField] float chargeOnHit;
-    void Awake()
+
+#if UNITY_EDITOR
+    void OnEnable()
     {
-        if (bulletData.pool.holder == null) bulletData.pool.Init();
+        EditorApplication.playModeStateChanged += OnEditorPlayModeStateChanged;
+    }
+    void OnDisable()
+    {
+        EditorApplication.playModeStateChanged -= OnEditorPlayModeStateChanged;
+    }
+    void OnEditorPlayModeStateChanged(PlayModeStateChange state)
+    {
+        switch (state)
+        {
+            case PlayModeStateChange.ExitingPlayMode:
+                bulletPool = null;
+                break;
+        }
+    }
+#endif
+    void Start()
+    {
+        
     }
     public override void Use()
     {
+        if (bulletPool == null)
+        {
+            bulletPool = new Pool(
+                PoolType.PlayerBullet,
+                bulletPrefab,
+                0,
+                0
+            );
+        }
+
         look.transform.rotation = player.input.toMouseRot;
 
-        GameObject obj = bulletData.pool.Use();
+        GameObject obj = bulletPool.Get();
         obj.transform.position = tip.position;
         obj.transform.rotation = player.input.toMouseRot;
 
@@ -31,6 +65,8 @@ public class Shooter : Weapon
             null,
             null
         );    
+
+        bulletPool.Use(bulletPool.objects.Count - 1, obj);
     }
     void BulletUpdate(Bullet bullet)
     {
@@ -43,7 +79,7 @@ public class Shooter : Weapon
     }
     void BulletDeUse(Bullet bullet)
     {
-        bullet.data.pool.DeUse(bullet.gameObject);
+        bulletPool.DeUse(bullet.gameObject);
     }
     void BulletEnter(Bullet bullet, Collider2D coll)
     {

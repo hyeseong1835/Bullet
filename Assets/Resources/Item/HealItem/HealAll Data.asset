@@ -12,11 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 15fa72c12c0539744a0be23d22be37a1, type: 3}
   m_Name: HealAll Data
   m_EditorClassIdentifier: 
-  pool:
-    prefab: {fileID: 242570612577920784, guid: 3841c09468d6ca44082a2e6022067ec5, type: 3}
-    destroyDelay: 0
-    startCount: 0
-    stayCount: 0
-    objects: []
-    waitDestroy: []
+  prefab: {fileID: 242570612577920784, guid: 3841c09468d6ca44082a2e6022067ec5, type: 3}
   healAmount: 999
