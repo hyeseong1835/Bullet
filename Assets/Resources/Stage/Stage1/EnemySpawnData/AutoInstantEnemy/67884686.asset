@@ -14,5 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   prefabIndex: 0
   prefabTypeIndex: 0
-  spawnTime: 0
+  spawnTime: 1.5
   startPos: {x: 0, y: 6}

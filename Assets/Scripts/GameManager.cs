@@ -115,7 +115,7 @@ public class GameManager : MonoBehaviour
         int random = Random.Range(0, weaponItemData.Length);
         weaponItemData[random].Drop(
             new Vector2(0, 2.5f),
-            new Vector2(0, 0)
+            Random.insideUnitCircle.normalized
         );
     }
     void Debug_SpawnActiveItem()
@@ -125,7 +125,7 @@ public class GameManager : MonoBehaviour
         int random = Random.Range(0, activeItem.Length);
         activeItem[random].Drop(
             new Vector2(0, 2.5f),
-            new Vector2(0, 0)
+            Random.insideUnitCircle.normalized
         );
     }
     void Debug_TimeMove()

@@ -13,6 +13,8 @@ public class AutoInstantEnemy : Enemy
         get => spawnData; 
         set { spawnData = (AutoInstantEnemySpawnData)value; } 
     }
+    protected override Vector2 GetDropDir() => dir;
+
 
     public AutoInstantEnemyData data;
     AutoInstantEnemySpawnData spawnData;
@@ -25,7 +27,11 @@ public class AutoInstantEnemy : Enemy
         hp = data.maxHp;
         transform.position = spawnData.startPos;
         dir = ((Vector2)Player.instance.transform.position - spawnData.startPos).normalized;
-        transform.rotation = Quaternion.Euler(0, 0, -90 + Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg);
+        transform.rotation = Quaternion.Euler(
+            0, 
+            0, 
+            -90 + Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg
+        );
     }
     void Start()
     {
@@ -69,7 +75,6 @@ public class AutoInstantEnemy : Enemy
     {
         GameManager.instance.stage.enemyPool[spawnData.prefabTypeIndex][spawnData.prefabIndex].DeUse(gameObject);
     }
-    protected override Vector2 GetDropDir() => dir;
     void OnTriggerEnter2D(Collider2D other)
     {
         if (other.gameObject.layer == 10)

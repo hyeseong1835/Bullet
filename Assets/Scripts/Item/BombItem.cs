@@ -10,7 +10,7 @@
     {
         foreach (Pool pool in PoolHolder.instance.enemyBulletPools)
         {
-            //pool.DeUseAll();
+            pool.DeUseAll();
         }
         foreach (Pool pool in PoolHolder.instance.enemyPools)
         {
