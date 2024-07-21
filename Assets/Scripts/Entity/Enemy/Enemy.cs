@@ -6,7 +6,6 @@ public abstract class Enemy : Entity
     public override float GetMaxHP() => EnemyData.maxHp;
     public abstract EnemyData EnemyData { get; set; }
     public abstract EnemySpawnData EnemySpawnData { get; set; }
-    public abstract Type EnemySpawnDataType { get; }
 
     protected virtual void Drop()
     {
@@ -39,6 +38,7 @@ public abstract class Enemy : Entity
     protected virtual Vector2 GetDropDir() => UnityEngine.Random.insideUnitCircle.normalized;
     protected override void OnDead()
     {
+        GameManager.instance.killEnemy++;
         Drop();
         PoolHolder.instance.pools.Find((pool) => (pool.prefab.name == gameObject.name)).DeUse(gameObject);
     }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -21,8 +22,8 @@ public class Player : Entity
     static GameManager Game => GameManager.instance;
     public override float GetMaxHP() => maxHp;
 
-    [HideInInspector] public Rigidbody2D rigid;
-    [HideInInspector] public CircleCollider2D coll;
+    [NonSerialized] public Rigidbody2D rigid;
+    [NonSerialized] public CircleCollider2D coll;
     
     public Transform weaponHolder { get; private set; }
     public RectTransform effectHolder;
@@ -58,14 +59,14 @@ public class Player : Entity
 
     [Header("EXP")]
     public float[] levelUpExp;
-    public int level;
-    public float exp;
+    [NonSerialized] public int level = 0;
+    [NonSerialized] public float exp = 0;
 
     float weaponBreakTime = 1;
     bool canWeaponBreak = true;
 
-    public float skillCharge = 0;
-    public float skillChargeMax = 1;
+    [NonSerialized] public float skillCharge = 0;
+    public float SkillChargeMax => 100;
 
     void Awake()
     {
@@ -110,10 +111,15 @@ public class Player : Entity
             UseWeapon();
         }
     }
+    protected override void OnDead()
+    {
+        base.OnDead();
+        Game.GameFail();
+    }
     public void SkillCharge(float charge)
     {
         skillCharge += charge;
-       if (skillCharge > skillChargeMax) skillCharge = skillChargeMax;
+        if (skillCharge > SkillChargeMax) skillCharge = SkillChargeMax;
     }
     void Key()
     {

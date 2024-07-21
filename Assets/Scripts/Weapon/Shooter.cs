@@ -64,7 +64,7 @@ public class Shooter : Weapon
         entity.TakeDamage(bullet.data.damage * player.damage);
 
         bullet.DeUse();
-        player.skillCharge += chargeOnHit;
+        player.SkillCharge(1);
     }
     public override void Skill()
     {

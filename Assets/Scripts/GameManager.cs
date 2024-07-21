@@ -1,4 +1,5 @@
 #if UNITY_EDITOR
+using System;
 using TMPro;
 using UnityEditor;
 #endif
@@ -21,15 +22,18 @@ public class GameManager : MonoBehaviour
     public static float deltaTime => instance.gameSpeed * Time.deltaTime;
 
     [SerializeField] GameObject mainPanel;
+    [SerializeField] GameOverWindow gameOverWindow;
     [SerializeField] TextMeshProUGUI timeText;
+    [SerializeField] HpBar bossBar;
     public Stage stage;
 
     [SerializeField] GameObject bossPrefab;
-    
+
     public float gameSpeed = 1;
-    public float time = -1;
+    [NonSerialized] public float time = -1;
 
     int eventIndex = 0;
+    int enemyIndex = 0;
 
     [Header("Debug")]
     //F1
@@ -38,6 +42,8 @@ public class GameManager : MonoBehaviour
     [SerializeField] WeaponItemData[] weaponItemData;
     //F6
     [SerializeField] ItemData[] activeItem;
+
+    [NonSerialized] public int killEnemy = 0;
 
     void Awake()
     {
@@ -79,6 +85,46 @@ public class GameManager : MonoBehaviour
                 break;
         }
     }
+    public void StartButtonDown()
+    {
+        state = GameState.Play;
+        mainPanel.SetActive(false);
+        time = 0;
+#if UNITY_EDITOR
+        StageEditor.instance?.Repaint();
+#endif
+    }
+    void Ready()
+    {
+
+    }
+    void Play()
+    {
+        if (Input.GetKeyDown(KeyCode.F1)) Debug_Resistance();
+        if (Input.GetKeyDown(KeyCode.F2)) Debug_LevelUp();
+        if (Input.GetKeyDown(KeyCode.F3)) Debug_LevelDown();
+        if (Input.GetKeyDown(KeyCode.F4)) Debug_Heal();
+        if (Input.GetKeyDown(KeyCode.F5)) Debug_SpawnWeapon();
+        if (Input.GetKeyDown(KeyCode.F6)) Debug_SpawnActiveItem();
+        if (Input.GetKeyDown(KeyCode.F7)) Debug_TimeMove();
+
+        if (Input.GetKeyDown(KeyCode.P)) Debug_StopToggle();
+
+        stage.Read(
+            ref enemyIndex,
+            ref eventIndex,
+            time
+        );
+        time += deltaTime;
+        timeText.text = time.ToString("F1");
+
+#if UNITY_EDITOR
+        StageEditor.instance?.Repaint();
+#endif
+    }
+
+    #region Debug
+
     void Debug_Resistance()
     {
         if (ResistanceEffect.gameObject.activeInHierarchy)
@@ -111,21 +157,21 @@ public class GameManager : MonoBehaviour
     void Debug_SpawnWeapon()
     {
         if (weaponItemData.Length == 0) return;
-        
-        int random = Random.Range(0, weaponItemData.Length);
+
+        int random = UnityEngine.Random.Range(0, weaponItemData.Length);
         weaponItemData[random].Drop(
             new Vector2(0, 2.5f),
-            Random.insideUnitCircle.normalized
+            UnityEngine.Random.insideUnitCircle.normalized
         );
     }
     void Debug_SpawnActiveItem()
     {
         if (activeItem.Length == 0) return;
 
-        int random = Random.Range(0, activeItem.Length);
+        int random = UnityEngine.Random.Range(0, activeItem.Length);
         activeItem[random].Drop(
             new Vector2(0, 2.5f),
-            Random.insideUnitCircle.normalized
+            UnityEngine.Random.insideUnitCircle.normalized
         );
     }
     void Debug_TimeMove()
@@ -147,54 +193,8 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public void StartButtonDown()
-    {
-        state = GameState.Play;
-        mainPanel.SetActive(false);
-        time = 0;
-        stage.lastIndex = -1;
-#if UNITY_EDITOR
-        StageEditor.instance?.Repaint();
-#endif
-    }
-    void Ready()
-    {
+    #endregion
 
-    }
-    void Play()
-    {
-        stage.Read(
-            stage.lastIndex + 1,
-            ref eventIndex,
-            time
-        );
-
-        if (time >= stage.timeLength)
-        {
-            stage.lastIndex = -1;
-            time = 0;
-#if UNITY_EDITOR
-            StageEditor.instance?.Repaint();
-#endif
-            return;
-        }
-        
-        time += deltaTime;
-        timeText.text = time.ToString("F1");
-#if UNITY_EDITOR
-        StageEditor.instance?.Repaint();
-#endif
-
-        if (Input.GetKeyDown(KeyCode.F1)) Debug_Resistance();
-        if (Input.GetKeyDown(KeyCode.F2)) Debug_LevelUp();
-        if (Input.GetKeyDown(KeyCode.F3)) Debug_LevelDown();
-        if (Input.GetKeyDown(KeyCode.F4)) Debug_Heal();
-        if (Input.GetKeyDown(KeyCode.F5)) Debug_SpawnWeapon();
-        if (Input.GetKeyDown(KeyCode.F6)) Debug_SpawnActiveItem();
-        if (Input.GetKeyDown(KeyCode.F7)) Debug_TimeMove();
-
-        if (Input.GetKeyDown(KeyCode.P)) Debug_StopToggle();
-    }
     void Pause()
     {
 
@@ -202,7 +202,20 @@ public class GameManager : MonoBehaviour
 
     public static void StartBoss()
     {
-        Instantiate(instance.bossPrefab);
+        Stage1Boss boss = Instantiate(instance.bossPrefab).GetComponent<Stage1Boss>();
+        boss.transform.position = new Vector2(0, 3);
+        instance.bossBar.target = boss;
+    }
+
+    public void GameFail()
+    {
+        state = GameState.Pause;
+        gameOverWindow.Show("FAIL");
+    }
+    public void GameWin() 
+    { 
+        state = GameState.Pause;
+        gameOverWindow.Show("CLEAR");
     }
     void OnValidate()
     {

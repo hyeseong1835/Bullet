@@ -7,8 +7,6 @@ public class AutoInstantEnemy : Enemy
         get => data; 
         set { data = (AutoInstantEnemyData)value; } 
     }
-
-    public override Type EnemySpawnDataType => typeof(AutoInstantEnemySpawnData);
     public override EnemySpawnData EnemySpawnData { 
         get => spawnData; 
         set { spawnData = (AutoInstantEnemySpawnData)value; } 

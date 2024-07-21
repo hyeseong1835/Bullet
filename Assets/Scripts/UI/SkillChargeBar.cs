@@ -16,6 +16,6 @@ public class SkillChargeBar : MonoBehaviour
     }
     void Refresh()
     {
-        slider.value = Player.instance.skillCharge / Player.instance.skillChargeMax;
+        slider.value = Player.instance.skillCharge / Player.instance.SkillChargeMax;
     }
 }

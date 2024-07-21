@@ -1,21 +1,22 @@
 using System;
 using UnityEngine;
 
-public class InstantEnemy : Enemy
+public class WeaponEnemy : Enemy
 {
-    public InstantEnemyData data;
     public override EnemyData EnemyData {
         get => data; 
-        set { data = (InstantEnemyData)value; } 
+        set { data = (WeaponEnemyData)value; } 
     }
 
-    InstantEnemySpawnData spawnData;
     public override EnemySpawnData EnemySpawnData { 
         get => spawnData; 
-        set { spawnData = (InstantEnemySpawnData) value; } 
+        set { spawnData = (WeaponEnemySpawnData)value; } 
     }
+    protected override Vector2 GetDropDir() => dir;
 
-    Vector3 dir;
+    public WeaponEnemyData data;
+    WeaponEnemySpawnData spawnData;
+    Vector2 dir;
 
     void OnEnable()
     {
@@ -23,7 +24,12 @@ public class InstantEnemy : Enemy
 
         hp = data.maxHp;
         transform.position = spawnData.startPos;
-        dir = (spawnData.endPos - spawnData.startPos).normalized;
+        dir = ((Vector2)Player.instance.transform.position - spawnData.startPos).normalized;
+        transform.rotation = Quaternion.Euler(
+            0, 
+            0, 
+            -90 + Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg
+        );
     }
     void Start()
     {
@@ -31,18 +37,18 @@ public class InstantEnemy : Enemy
     }
     void Update()
     {
-        transform.position += dir * data.speed * GameManager.deltaTime;
-
+        transform.position += (Vector3)dir * data.speed * GameManager.deltaTime;
+        
         if (dir.x > 0)
         {
-            if (transform.position.x > spawnData.endPos.x)
+            if(transform.position.x > Window.instance.gameRight + 1)
             {
                 DeUse();
             }
         }
         else if (dir.x < 0)
         {
-            if (transform.position.x < spawnData.endPos.x)
+            if (transform.position.x < Window.instance.gameLeft - 1)
             {
                 DeUse();
             }
@@ -50,14 +56,14 @@ public class InstantEnemy : Enemy
 
         if (dir.x > 0)
         {
-            if (transform.position.y > spawnData.endPos.y)
+            if (transform.position.y > Window.instance.gameTop + 1)
             {
                 DeUse();
             }
         }
         else if (dir.x < 0)
         {
-            if (transform.position.y < spawnData.endPos.y)
+            if (transform.position.y < Window.instance.gameLeft - 1)
             {
                 DeUse();
             }
@@ -67,7 +73,6 @@ public class InstantEnemy : Enemy
     {
         GameManager.instance.stage.enemyPool[spawnData.prefabTypeIndex][spawnData.prefabIndex].DeUse(gameObject);
     }
-    protected override Vector2 GetDropDir() => dir;
     void OnTriggerEnter2D(Collider2D other)
     {
         if (other.gameObject.layer == 10)

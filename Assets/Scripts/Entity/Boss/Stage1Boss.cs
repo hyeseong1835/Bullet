@@ -7,9 +7,8 @@ public class Stage1Boss : Entity
     public DefaultEntity rightShooter;
     public DefaultEntity leftShooter;
 
-    public float bodyHp;
     public float bodyMaxHp;
-    public override float GetMaxHP() => rightShooter.maxHp + leftShooter.maxHp + bodyMaxHp;
+    public override float GetMaxHP() => bodyMaxHp;
     void OnEnable()
     {
         rightShooter.onDamaged += OnRightShooterDamaged;
@@ -33,13 +32,9 @@ public class Stage1Boss : Entity
     }
     void OnRightShooterDamaged(float damage)
     {
-        Debug.Log($"RightShooter Damaged: {rightShooter.hp} (-{damage})");
-        hp = bodyHp + leftShooter.hp + rightShooter.hp;
     }
     void OnLeftShooterDamaged(float damage)
     {
-        Debug.Log($"LeftShooter Damaged: {leftShooter.hp} (-{damage})");
-        hp = bodyHp + leftShooter.hp + rightShooter.hp;
     }
 
     void OnRightShooterDead()
@@ -54,19 +49,19 @@ public class Stage1Boss : Entity
     {
         float trueDamage = damage * resistance;
 
-        bodyHp -= trueDamage;
-        if (bodyHp < 0) bodyHp = 0;
+        hp -= trueDamage;
+        if (hp < 0) hp = 0;
 
         onDamaged?.Invoke(trueDamage);
 
-        if (bodyHp == 0)
+        if (hp == 0)
         {
             OnDead();
         }
-        hp = bodyHp + rightShooter.hp + leftShooter.hp;
     }
     protected override void OnDead()
     {
+        GameManager.instance.GameWin();
         Destroy(gameObject);
     }
 }

@@ -31,7 +31,7 @@ public class StageEditor : EditorWindow
 
     Vector2 offset;
     float prevScreenWidth;
-
+    float timeLength;
     public PreviewRenderUtility previewRender = null;
 
     Rect enemySpawnDataReNameFloatingAreaHeader = default;
@@ -348,9 +348,9 @@ public class StageEditor : EditorWindow
                                 data.selectedEnemyData.SpawnData.spawnTime += setting.timeMoveSnap;
                                 data.selectedEnemyData.SpawnData.spawnTime = Mathf.Floor(data.selectedEnemyData.SpawnData.spawnTime / setting.timeMoveSnap) * setting.timeMoveSnap;
 
-                                if (data.selectedEnemyData.SpawnData.spawnTime > data.selectedStage.timeLength)
+                                if (data.selectedEnemyData.SpawnData.spawnTime > timeLength)
                                 {
-                                    data.selectedStage.timeLength = data.selectedEnemyData.SpawnData.spawnTime;
+                                    timeLength = data.selectedEnemyData.SpawnData.spawnTime;
                                 }
 
                                 data.SortSelectedEnemyData();
@@ -1284,10 +1284,10 @@ public class StageEditor : EditorWindow
                 timeLengthFieldRect.position = new Vector2(timeLineEnd, timeLineY - (setting.timeLengthFieldSize.y + setting.timeLengthFieldOffsetY));
                 timeLengthFieldRect.size = setting.timeLengthFieldSize;
 
-                data.selectedStage.timeLength = EditorGUI.DelayedFloatField(timeLengthFieldRect, data.selectedStage.timeLength);
+                EditorGUI.DelayedFloatField(timeLengthFieldRect, timeLength);
                 if (data.editorEnemySpawnDataList.Count >= 1)
                 {
-                    data.selectedStage.timeLength = data.editorEnemySpawnDataList[^1].SpawnData.spawnTime;
+                    timeLength = data.editorEnemySpawnDataList[^1].SpawnData.spawnTime;
                 }
             }
         }
@@ -1355,7 +1355,7 @@ public class StageEditor : EditorWindow
         if (timeLineStart > timeLineEnd) return -Vector2.one;
         
         float timeLineY = instance.position.height - setting.timeBottomSpace;
-        float timeRatio = time / data.selectedStage.timeLength;
+        float timeRatio = time / instance.timeLength;
 
         return new Vector2(Mathf.Lerp(timeLineStart, timeLineEnd, timeRatio), timeLineY);
     }

@@ -43,9 +43,9 @@ public class Laser : Weapon
         {
             Entity entity = info.collider.GetComponent<Entity>();
             entity.TakeDamage(damage * Player.instance.damage);
+            player.SkillCharge(5);
         }
-        player.skillCharge += hit.Length * chargeOnHit;
-        
+
     }
     IEnumerator Grafic()
     {

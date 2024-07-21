@@ -10,13 +10,9 @@ public class Stage : ScriptableObject
     public string[] enemyPrefabFolderNameArray;
     
     public StageEvent[] stageEvent;
-    
-    public float timeLength = 0;
-
 
     public EnemySpawnData[] enemySpawnDataArray { get; private set; }
     public Pool[][] enemyPool { get; private set; }
-    public int lastIndex { get; set; } = -1;
 
     public void Init()
     {
@@ -104,7 +100,7 @@ public class Stage : ScriptableObject
         return -1;
     }
     
-    public void Read(int startIndex, ref int eventIndex, float curTime)
+    public void Read(ref int enemyIndex, ref int eventIndex, float curTime)
     {
         for (int i = eventIndex; i < stageEvent.Length; i++)
         {
@@ -121,14 +117,14 @@ public class Stage : ScriptableObject
         StageEditor.data?.SelectStage(this);
         StageEditor.instance?.Repaint();
 #endif
-        for (int i = startIndex; i < enemySpawnDataArray.Length; i++)
+        for (int i = enemyIndex; i < enemySpawnDataArray.Length; i++)
         {
             EnemySpawnData data = enemySpawnDataArray[i];
 
             if (data.spawnTime > curTime)
             {
-                lastIndex = i - 1;
-                break;
+                enemyIndex = i;
+                return;
             }
 
 #if UNITY_EDITOR
@@ -141,6 +137,7 @@ public class Stage : ScriptableObject
             enemy.EnemySpawnData = data;
             pool.Use();
         }
+        enemyIndex = enemySpawnDataArray.Length;
     }
 }
 
