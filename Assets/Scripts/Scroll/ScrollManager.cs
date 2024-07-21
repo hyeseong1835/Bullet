@@ -11,7 +11,10 @@ public class ScrollManager : MonoBehaviour
     public ScrollLayer[] scrollLayerArray;
 
     public float speed = 1;
-
+    void Awake()
+    {
+        instance = this;
+    }
     void Update()
     {
         if (GameManager.IsEditor)

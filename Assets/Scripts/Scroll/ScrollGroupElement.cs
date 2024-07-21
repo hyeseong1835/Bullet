@@ -10,7 +10,7 @@ public class ScrollGroupElement : MonoBehaviour
     {
         Gizmos.color = Color.white;
         Gizmos.DrawWireCube(
-            transform.position + Vector3.up * 0.5f * height, new Vector3(2, height, 0)
+            transform.position + Vector3.up * 0.5f * height, new Vector3(Window.instance.gameWidth, height, 0)
         );
     }
 }

@@ -101,7 +101,7 @@ public class ScrollGroup : MonoBehaviour, IScroll
         {
             Gizmos.DrawWireCube(
                 bottomElement.transform.position + Vector3.up * 0.5f * bottomElement.height, 
-                new Vector3(2, bottomElement.height, 0)
+                new Vector3(Window.instance.gameWidth, bottomElement.height, 0)
             );
         }
     }

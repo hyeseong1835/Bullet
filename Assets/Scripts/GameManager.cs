@@ -205,6 +205,7 @@ public class GameManager : MonoBehaviour
         Stage1Boss boss = Instantiate(instance.bossPrefab).GetComponent<Stage1Boss>();
         boss.transform.position = new Vector2(0, 3);
         instance.bossBar.target = boss;
+        ScrollManager.instance.speed = 0.1f;
     }
 
     public void GameFail()

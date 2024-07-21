@@ -11363,10 +11363,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: Shooter
       objectReference: {fileID: 0}
-    - target: {fileID: 8453316845299625461, guid: 1ebba1f360ac6534393bdb7f6e0230c1, type: 3}
-      propertyPath: chargeOnHit
-      value: 10
-      objectReference: {fileID: 0}
     - target: {fileID: 8532601136008918798, guid: 1ebba1f360ac6534393bdb7f6e0230c1, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0

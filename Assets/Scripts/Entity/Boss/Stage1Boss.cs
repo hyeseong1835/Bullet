@@ -36,20 +36,6 @@ public class Stage1Boss : Entity
     {
         leftShooter.gameObject.SetActive(false);
     }
-    public override void TakeDamage(float damage)
-    {
-        float trueDamage = damage * resistance;
-
-        hp -= trueDamage;
-        if (hp < 0) hp = 0;
-
-        onDamaged?.Invoke(trueDamage);
-
-        if (hp == 0)
-        {
-            OnDead();
-        }
-    }
     protected override void OnDead()
     {
         GameManager.instance.GameWin();

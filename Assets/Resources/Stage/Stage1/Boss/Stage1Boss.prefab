@@ -132,11 +132,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fd2da1e153b7e8b49b99f3e60310d784, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hp: 200
+  hp: 100
   resistance: 1
   rightShooter: {fileID: 6770787913736799806}
   leftShooter: {fileID: 5702828665703870745}
-  bodyHp: 100
   bodyMaxHp: 100
 --- !u!61 &7505898657761858864
 BoxCollider2D:
