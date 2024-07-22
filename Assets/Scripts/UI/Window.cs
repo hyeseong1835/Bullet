@@ -37,15 +37,17 @@ public class Window : MonoBehaviour
 
     [Header("Game")]
     public int gameHeight = 5;
-    public int gameWidth = 2;
+    public int gameWidth = 4;
     public float gameRatio { get; private set; }
     public float gameTop { get; private set; }
     public float gameBottom { get; private set; }
     public float gameRight { get; private set; }
     public float gameLeft { get; private set; }
 
-    [HideInInspector] public Action onScreenResized;
-    [HideInInspector] public Action onWindowValidate;
+    [NonSerialized] public Action onScreenResized;
+#if UNITY_EDITOR
+    [NonSerialized] public Action onWindowValidate;
+#endif
 
     float prevWindowHeight;
     float prevWindowWidth;

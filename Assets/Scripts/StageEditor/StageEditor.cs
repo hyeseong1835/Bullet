@@ -150,7 +150,7 @@ public class StageEditor : EditorWindow
         camera.transform.rotation = gameCam.transform.rotation;
 
         camera.clearFlags = gameCam.clearFlags;
-        camera.backgroundColor = StageEditor.setting.previewBackGroundColor;
+        camera.backgroundColor = setting.previewBackGroundColor;
         camera.cullingMask = gameCam.cullingMask;
 
         camera.fieldOfView = gameCam.fieldOfView;

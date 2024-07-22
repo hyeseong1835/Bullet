@@ -1,6 +1,5 @@
 #if UNITY_EDITOR
 using System;
-using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
@@ -17,8 +16,6 @@ public abstract class EnemyEditorData
     {
         EditorUtility.SetDirty(SpawnData);
     }
-
-    #region Prefab
 
     public GameObject SelectPrefab(int index)
     {
@@ -51,8 +48,6 @@ public abstract class EnemyEditorData
         SpawnData.prefabIndex = index;
         return prefab = prefabArray[index];
     }
-
-    #endregion
 
     public virtual void Refresh()
     {
@@ -95,3 +90,5 @@ public abstract class EnemyEditorData
     public virtual void Render() { }
 }
 #endif
+
+

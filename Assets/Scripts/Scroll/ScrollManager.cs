@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public interface IScroll
@@ -8,12 +10,16 @@ public class ScrollManager : MonoBehaviour
 {
     public static ScrollManager instance;
 
-    public ScrollLayer[] scrollLayerArray;
+    public List<ScrollLayer> scrollLayerList;
 
     public float speed = 1;
     void Awake()
     {
         instance = this;
+    }
+    void Start()
+    {
+        SetScrollLayerArray();
     }
     void Update()
     {
@@ -29,17 +35,21 @@ public class ScrollManager : MonoBehaviour
     }
     public void Scroll(float scroll)
     {
-        foreach (ScrollLayer scrollLayer in scrollLayerArray) 
+        foreach (ScrollLayer scrollLayer in scrollLayerList) 
         {
             scrollLayer.Scroll(scroll);
         }
     }
-    void OnTransformChildrenChanged()
+    void SetScrollLayerArray()
+    {
+        scrollLayerList = GetComponentsInChildren<ScrollLayer>().ToList();
+    }
+    private void OnTransformChildrenChanged()
     {
         SetScrollLayerArray();
     }
-    void SetScrollLayerArray()
+    void OnValidate()
     {
-        scrollLayerArray = GetComponentsInChildren<ScrollLayer>();
+        SetScrollLayerArray();
     }
 }

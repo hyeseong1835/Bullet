@@ -18,44 +18,6 @@ public class InstantEnemyEditorData : EnemyEditorData
         this.spawnData = spawnData;
         prefab = SelectPrefab(spawnData.prefabIndex);
     }
-    public override void Event()
-    {
-        switch (e.type)
-        {
-            case EventType.MouseDown:
-                switch (e.button)
-                {
-                    case 0: Mouse0Down(); break;
-                }
-                break;
-
-            case EventType.MouseDrag:
-                switch (e.button)
-                {
-                    case 0: Mouse0Drag(); break;
-                }
-                break;
-
-            case EventType.MouseUp:
-                switch (e.button)
-                {
-                    case 0: Mouse0Up(); break;
-                }
-                break;
-        }
-        void Mouse0Down()
-        {
-
-        }
-        void Mouse0Drag()
-        {
-
-        }
-        void Mouse0Up()
-        {
-
-        }
-    }
     public override void DrawInspectorGUI()
     {
         spawnData.startPos = EditorGUILayout.Vector2Field("World Pos", spawnData.startPos);
@@ -88,3 +50,5 @@ public class InstantEnemyEditorData : EnemyEditorData
     }
 }
 #endif
+
+

@@ -339,7 +339,7 @@ public class StageEditorData : ScriptableObject
         
         if (selectedStage == null)
         {
-            Debug.LogWarning("Fail RefreshEnemySpawnDataList (selectedStage is null)");
+            //Debug.LogWarning("Fail RefreshEnemySpawnDataList (selectedStage is null)");
             return;
         }
         if (enemyTypeNameArray == null)
@@ -349,7 +349,7 @@ public class StageEditorData : ScriptableObject
         }
         if (enemyTypeNameArray.Length == 0)
         {
-            Debug.LogWarning("Fail RefreshEnemySpawnDataList (enemyTypeNameArray is Empty)");
+            //Debug.LogWarning("Fail RefreshEnemySpawnDataList (enemyTypeNameArray is Empty)");
             return;
         }
 
