@@ -162,12 +162,8 @@ public class StageEditor : EditorWindow
 
     void OnGUI()
     {
-        #region Init
-
         Handles.color = Color.white;
         if(floatingArea.area != null) floatingArea.area.backGroundColor = setting.floatingAreaBackGroundColor;
-
-        #endregion
 
         floatingArea.EventListen(e);
 
@@ -672,7 +668,6 @@ public class StageEditor : EditorWindow
                                         false
                                     );
                                 }
-                                
                             }
                         }
                         CustomGUILayout.EndNewTab();
@@ -777,32 +772,32 @@ public class StageEditor : EditorWindow
 
                 void DrawStageSelect()     
                 {
-                        if (data.stageArray == null)
+                    if (data.stageArray == null)
+                    {
+                        CustomGUILayout.WarningLabel("StageArray is null");
+                    }
+                    else
+                    {
+                        string[] stageNameArray = new string[data.stageArray.Length + 1];
+                        stageNameArray[0] = "None";
+                        for (int i = 0; i < data.stageArray.Length; i++)
                         {
-                            CustomGUILayout.WarningLabel("StageArray is null");
+                            Stage stage = data.stageArray[i];
+                            if (stage == null) stageNameArray[i] = "NULL";
+                            else stageNameArray[i + 1] = stage.name;
                         }
-                        else
+
+                        int stageSelectInput = EditorGUILayout.Popup(
+                            data.selectedStageIndex + 1,
+                            stageNameArray,
+                            GUILayout.Height(setting.buttonHeight)
+                        ) - 1;
+
+                        if (stageSelectInput != data.selectedStageIndex)
                         {
-                            string[] stageNameArray = new string[data.stageArray.Length + 1];
-                            stageNameArray[0] = "None";
-                            for (int i = 0; i < data.stageArray.Length; i++)
-                            {
-                                Stage stage = data.stageArray[i];
-                                if (stage == null) stageNameArray[i] = "NULL";
-                                else stageNameArray[i + 1] = stage.name;
-                            }
-
-                            int stageSelectInput = EditorGUILayout.Popup(
-                                data.selectedStageIndex + 1,
-                                stageNameArray,
-                                GUILayout.Height(setting.buttonHeight)
-                            ) - 1;
-
-                            if (stageSelectInput != data.selectedStageIndex)
-                            {
-                                data.SelectStage(stageSelectInput);
-                            }
+                            data.SelectStage(stageSelectInput);
                         }
+                    }
                 }
 
                 void RefreshEnemySpawnDataShow(int startIndex)

@@ -16,6 +16,6 @@ MonoBehaviour:
   - AutoInstantEnemy
   - InstantEnemy
   stageEvent:
-  - time: 10
+  - time: 30
     typeName: GameManager
     methodName: StartBoss

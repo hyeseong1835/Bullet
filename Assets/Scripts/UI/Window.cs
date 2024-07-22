@@ -114,6 +114,7 @@ public class Window : MonoBehaviour
 
         pixelPerUnit = isDriveHeight ? (WindowHeight / screenHeight) : (WindowWidth / screenWidth);
     }
+#if UNITY_EDITOR
     void OnValidate()
     {
         Set();
@@ -121,4 +122,5 @@ public class Window : MonoBehaviour
 
         onWindowValidate?.Invoke();
     }
+#endif
 }

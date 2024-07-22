@@ -1,8 +1,8 @@
-#if UNITY_EDITOR
 using System;
-using TMPro;
+#if UNITY_EDITOR
 using UnityEditor;
 #endif
+using TMPro;
 using UnityEngine;
 
 public enum GameState
